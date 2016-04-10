@@ -19,7 +19,7 @@ Features
 
 Overview:
 
-![sample](architecture.png?raw=true)
+![sample](doc/architecture.png?raw=true)
 
 
 Requirements:

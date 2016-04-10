@@ -219,7 +219,7 @@ module.exports = (grunt) ->
       # http://support.saucelabs.com/entries/25614798
       grunt.registerTask "travis", ["test"]
   else
-      grunt.registerTask "travis", ["test", "sauce"]
+      grunt.registerTask "travis", ["test"]  # , "sauce"]
 
   grunt.registerTask "default", ["test"]
 
