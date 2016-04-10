@@ -155,19 +155,16 @@ module.exports = (grunt) ->
                 testname: "persisto qunit tests"
 
     uglify:
-        options:  # see https://github.com/gruntjs/grunt-contrib-uglify/issues/366
-          preserveComments: /(?:^!|@(?:license|preserve|cc_on))/
+        # options:  # see https://github.com/gruntjs/grunt-contrib-uglify/issues/366
+        #   preserveComments: /(?:^!|@(?:license|preserve|cc_on))/
 
         build:
             options:
                 report: "min"
-                # preserveComments: "some"
-            files: [
-              {
-                  src: ["src/persisto.js"]
-                  dest: "build/persisto.min.js"
-              }
-              ]
+                banner: "/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - " + "<%= grunt.template.today('yyyy-mm-dd') %> | " + "<%= pkg.homepage ? ' ' + pkg.homepage + ' | ' : '' %>" + " Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>;" + " Licensed <%= _.pluck(pkg.licenses, 'type').join(', ') %> */\n"
+                sourceMap: true
+            src: "src/persisto.js"
+            dest: "build/persisto.min.js"
 
     watch:
         jshint:
@@ -225,6 +222,8 @@ module.exports = (grunt) ->
       grunt.registerTask "travis", ["test", "sauce"]
 
   grunt.registerTask "default", ["test"]
+
+  grunt.registerTask "ci", ["test"]  # Called by 'npm test'
 
   grunt.registerTask "build", [
       "test"

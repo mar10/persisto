@@ -2,6 +2,8 @@
   "name": "persisto",
   "title": "Persistent, editable objects for Javascript.",
   "description": "Persist Javascript objects to localStorage and remote servers.",
+  "filename": "dist/persisto.min.js",
+  "main": "dist/persisto.js",
   "version": "0.0.3-0",
   "homepage": "https://github.com/mar10/persisto",
   "author": {
@@ -49,5 +51,16 @@
   },
   "scripts": {
     "test": "grunt ci --verbose"
-  }
+  },
+  "npmName": "persisto",
+  "npmFileMap": [
+    {
+      "basePath": "dist",
+      "files": [
+        "persisto.js",
+        "persisto.min.js",
+        "persisto.min.js.map"
+      ]
+    }
+  ]
 }

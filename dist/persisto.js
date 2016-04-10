@@ -6,8 +6,8 @@
  * Copyright (c) 2016, Martin Wendt (http://wwWendt.de)
  * Released under the MIT license
  *
- * @version 0.0.2
- * @date 2016-04-10T14:29
+ * @version 0.0.3-0
+ * @date 2016-04-10T16:46
  */
 
 ;(function($, window, document, undefined) {
