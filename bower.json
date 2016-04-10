@@ -1,0 +1,45 @@
+{
+  "name": "persisto",
+  "description": "Persist Javascript objects and arrays to localStorage and remote servers.",
+  "version": "0.0.1",
+  "main": [
+    "dist/persisto.min.js"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "/archive",
+    "/bin",
+    "/build",
+    "/demo",
+    "/doc",
+    "/lib",
+    "/src",
+    "/test",
+    "bower.json",
+    "CONTRIBUTING.md",
+    "Gruntfile.coffee"
+  ],
+  "keywords": [
+    "ajax",
+    "cache",
+    "localStorage",
+    "sessionStorage",
+    "ecosystem:jquery",
+    "persistence"
+  ],
+  "authors": [
+    {
+      "name": "Martin Wendt",
+      "homepage": "http://careers.stackoverflow.com/martin-wendt"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mar10/persisto.git"
+  },
+  "dependencies": {
+    "jquery": ">=1.7"
+  },
+  "devDependencies": {}
+}
