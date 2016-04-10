@@ -1,7 +1,6 @@
-# persisto
+# persisto [![GitHub version](https://badge.fury.io/gh/mar10%2Fpersisto.svg)](https://github.com/mar10/persisto/releases/latest) [![Build Status](https://travis-ci.org/mar10/persisto.svg?branch=master)](https://travis-ci.org/mar10/persisto)
 
 > Persistent, editable objects for Javascript.
-
 
 Features
 
