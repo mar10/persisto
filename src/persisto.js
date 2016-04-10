@@ -1,7 +1,7 @@
 /*!
  * persisto.js
  *
- * Persistent objects for Javascript.
+ * Persistent, editable objects for Javascript.
  *
  * Copyright (c) 2016, Martin Wendt (http://wwWendt.de)
  * Released under the MIT license

@@ -1,6 +1,6 @@
 # persisto
 
-> Persistent objects for Javascript.
+> Persistent, editable objects for Javascript.
 
 
 Features

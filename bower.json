@@ -1,6 +1,6 @@
 {
   "name": "persisto",
-  "description": "Persist Javascript objects and arrays to localStorage and remote servers.",
+  "description": "Persist Javascript objects to localStorage and remote servers.",
   "version": "0.0.1",
   "main": [
     "dist/persisto.min.js"
