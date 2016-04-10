@@ -17,6 +17,8 @@ Features
   - Optionally synchronize the data with a remote endpoint
 
 
+Overview:
+
 ![sample](architecture.png?raw=true)
 
 
@@ -170,11 +172,11 @@ $.when(
   store.ready
   
 ).done(function(){
-  // Load html partials (tab_main was loaded)
+  // Page was loaded and and store has pulled the data from the remote endpoint...
   initPage();
 
 }).fail(function(){
-  console.error("Error loading persistent objects or handlebar templates", arguments);
+  console.error("Error loading persistent objects", arguments);
 });
 ```
 
@@ -196,7 +198,7 @@ The following options are available:
 <dd>
     Type: <code>int</code>, 
     default: <code>2</code><br>
-    0:quiet, 1:normal, 2:verbose.
+    Verbosity level: 0:quiet, 1:normal, 2:verbose.
 </dd>
 <dt>init</dt>
 <dd>
@@ -232,7 +234,7 @@ The following options are available:
 <dd>
     Type: <code>object</code>, 
     default: <code>window.localStorage</code><br>
-    Instance of [Web Storage]((https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)).<br>
+    Instance of [Web Storage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API).<br>
     Possible values are `window.localStorage`, `window.sessionStorage`.<br>
     Pass `null` to disable persistence.
 </dd>
@@ -290,7 +292,8 @@ Following a list of available methods:
 </dd>
 <dt>set(key, value)</dt>
 <dd>
-    Modify object property and set the `dirty` flag (`key` supports dot notation).
+    Modify object property and set the `dirty` flag (`key` supports dot notation).<br>
+    *value* must be [convertible to JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify).
 </dd>
 <dt>setDirty()</dt>
 <dd>
