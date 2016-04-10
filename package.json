@@ -2,7 +2,7 @@
   "name": "persisto",
   "title": "Persistent, editable objects for Javascript.",
   "description": "Persist Javascript objects to localStorage and remote servers.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/mar10/persisto",
   "author": {
     "name": "Martin Wendt",
