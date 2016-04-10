@@ -3,16 +3,17 @@
 > Persistent objects for Javascript.
 
 
-*persisto* features
+Features
 
-  - Persist Javascript objects (`{...}`) or arrays (`[...]`) to 
+  - Persist Javascript objects (`{...}`) to 
     [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API).<br>
     Use the `get()`/`set()` API for direct (even nested) access, hiding the need
     to convert from/to JSON.
   - Cache access to
     [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
-    (deferred writing appears to be 10-15 times faster)
-  - Convert HTML form input elements into a Javascript object and vice versa
+    (deferred writing appears to be 10-15 times faster) and remote backends.
+  - Make Javascript objects editable in HTML forms.<br>
+    Common use case: maintain persistent client settings and let users edit them.
   - Optionally synchronize the data with a remote endpoint
 
 
@@ -22,45 +23,36 @@
 Requirements:
 
   - jQuery
-  - Tested with Safari 9
+  - IE 8+ or any recent major browser
 
 
 ## Usage
 
 ```js
-var store = PersistentObject("mySettings");
+var store = PersistentObject("mySettings", {
+              init: {
+                theme: "default"
+                }
+            });
 ```
 
 `store` now contains the data that was stored in `localStorage.mySettings` if 
-present. Otherwise, `store` is initialized to `{}`.
+present. Otherwise, `store` is initialized to the default values that we
+passed with the `.init` option.
 
 We can access data using `set`, `get`, `remove`, `reset`:
 
 ```js
+store.get("theme");  // -> 'default'
 store.set("owner", {name: "joe", age: 42});
 store.set("owner.role", "manager");
 store.get("owner.age");  // -> 42
 store.remove("owner.age");
-// -> store now holds {owner: {name: "joe", role: "manager"}}
+// -> store now holds {theme: "default", owner: {name: "joe", role: "manager"}}
 ```
 
 Every *modifying* operation triggers a deferred commit, so that shortly afterwards
 the data is serialized to JSON and written to `localStorage.mySettings`.
-
-Optionally, we may specify an endpoint URL that is used to synchronize the data
-with a web server using HTTP REST requests (GET and PUT):
-
-```js
-var store = PersistentObject("mySettings", {
-				remote: "persist/settings"
-			});
-```
-
-The data flows like so
-
-| Script         |           | localStorage       |         |  Web Server  |
-| -------------- |:---------:| ------------------ |:-------:| ------------ |
-| { foo: "bar" } | commit -><br><- update | `'{"foo": "bar"}'` | push -><br><-pull |  PUT<br>GET         |
 
 
 ## Synchronize Data with HTML Forms
@@ -70,7 +62,7 @@ API calls.
 Example:
 
 ```js
-// Define a 
+// Maintain client's preferences and define some defaults:
 var settingsStore = PersistentObject("mySettings", {
         init: {
           nickname: "anonymous",
@@ -81,7 +73,7 @@ var settingsStore = PersistentObject("mySettings", {
 // Initialize form elements with current data
 settingsStore.writeToForm("#settingsForm");
 
-// Allow to edit settings
+// Allow users to edit and save settings:
 $("#settingsForm").submit(function(e){
   // ... maybe some validations here ...
   settingsStore.readFromForm(this);
@@ -89,11 +81,9 @@ $("#settingsForm").submit(function(e){
 });
 ```
 
-Supported elements are `&lt;input>` (type text, checkbox, or radio), `&lt;textarea>`,
-and `&lt;select>` (single and multivalue).
+Supported elements are `<input>` (type text, checkbox, or radio), `<textarea>`,
+and `<select>` (single and multivalue).
 By convention, the html form **must use element names that match the data properties**.<br>
-Note also that only fields are synchronized, that already existed in the storage
-data.
 
 ```html
 <form id="settingsForm" action="">
@@ -109,6 +99,16 @@ data.
 </form>
 ```
 
+Note also that only fields are synchronized, that already existed in the storage
+data. Use the `addNew` option if *all* form fields should be evaluated and create 
+new properties in the store object:
+
+```js
+settingsStore.readFromForm(this, {
+  addNew: true
+});
+```
+
 
 ## Pros and Cons
 
@@ -119,12 +119,13 @@ data.
   But if your data model is more like a table with hundredth's of rows, a 
   responsive database backend may be a better choice.
 
-- Asynchounus operations and potential conflicts
+- Asynchronous operations bear the risk of potential conflicts.
+  There is currently no builtin support for resolving those.
 
 
 # HOWTOs
 
-### Arrays
+### Storing Arrays
 
 Arrays are only a special form of plain Javascript objects, so we can store and
 access them like this:
@@ -137,9 +138,9 @@ store.set("[1]", "b2");
 ```
 
 
-### Performance and direct access 
+### Performance and Direct Access 
 
-In general, performance penalty of `set()` and `get()` calls should be 
+In general, performance costs of `set()` and `get()` calls should be 
 neglectable, compared to the resulting synchronization times, but in some cases 
 direct access of the internal data object may be preferred.<br>
 In this case modifications must be signalled by a call to `setDirty()`.
@@ -152,30 +153,178 @@ store.setDirty();  // trigger commit
 ```
 
 
+### Asynchronous Operation
+
+Optionally, we may specify an endpoint URL that is used to synchronize the data
+with a web server using HTTP REST requests (GET and PUT):
+
+```js
+var store = PersistentObject("mySettings", {
+        remote: "persist/settings"
+      });
+
+$.when(
+  // Page must be loaded
+  $.ready,
+  // PersistentObjects must be pulled
+  store.ready
+  
+).done(function(){
+  // Load html partials (tab_main was loaded)
+  initPage();
+
+}).fail(function(){
+  console.error("Error loading persistent objects or handlebar templates", arguments);
+});
+```
+
+
 # API Reference
 
 ### Options
 
-**(TODO)**
+The following options are available:
 
-```js
-{
-    remote: null,          // URL for GET/PUT, ajax options, or callback
-    init: {},              // default value if no data is found in localStorage
-    commitDelay: 500,      // commit changes after 0.5 seconds of inactivity
-    maxCommitDelay: 3000,  // commit changes max. 3 seconds after first change
-    pushDelay: 5000,       // push commits after 5 seconds of inactivity
-    maxPushDelay: 30000,   // push commits max. 30 seconds after first change
-    debug: 2,              // 0:quiet, 1:normal, 2:verbose
-    storage: window.localStorage,
-}
-```
+<dl>
+<dt>commitDelay</dt>
+<dd>
+    Type: <code>int</code>, 
+    default: <code>500</code><br>
+    Commit changes after 0.5 seconds of inactivity.
+</dd>
+<dt>debug</dt>
+<dd>
+    Type: <code>int</code>, 
+    default: <code>2</code><br>
+    0:quiet, 1:normal, 2:verbose.
+</dd>
+<dt>init</dt>
+<dd>
+    Type: <code>object</code>, 
+    default: <code>{}</code><br>
+    Default value if no data is found in localStorage.
+</dd>
+<dt>maxCommitDelay</dt>
+<dd>
+    Type: <code>int</code>, 
+    default: <code>3000</code><br>
+    Commit changes max. 3 seconds after first change.
+</dd>
+<dt>maxPushDelay</dt>
+<dd>
+    Type: <code>int</code>, 
+    default: <code>30000</code><br>
+    Push commits to remote max. 30 seconds after first change.
+</dd>
+<dt>pushDelay</dt>
+<dd>
+    Type: <code>int</code>, 
+    default: <code>5000</code><br>
+    Push commits to remote after 5 seconds of inactivity.
+</dd>
+<dt>remote</dt>
+<dd>
+    Type: <code>string</code>, 
+    default: <code>null</code><br>
+    URL for GET/PUT request. Pass `null` to disable remote synchronization.
+</dd>
+<dt>storage</dt>
+<dd>
+    Type: <code>object</code>, 
+    default: <code>window.localStorage</code><br>
+    Instance of [Web Storage]((https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)).<br>
+    Possible values are `window.localStorage`, `window.sessionStorage`.<br>
+    Pass `null` to disable persistence.
+</dd>
+</dl>
+
+
+### Methods
+
+Following a list of available methods:
+
+<dl>
+<dt>commit()</dt>
+<dd>
+    Write modified data to localStorage.<br>
+    (Normally there is no need to call this method, since it is triggered internally.)
+</dd>
+<dt>get(key)</dt>
+<dd>
+    Return a data property value (`key` supports dot notation).
+</dd>
+<dt>isDirty()</dt>
+<dd>
+    Return *true* if there are uncommited or unpushed modifications.
+</dd>
+<dt>isReady()</dt>
+<dd>
+    Return true if initial pull has completed.<br>
+    See also the `store.ready` promise, that is resolved accordingly.
+</dd>
+<dt>pull()</dt>
+<dd>
+    Download  data from the cloud, then call `.update()`.
+</dd>
+<dt>push()</dt>
+<dd>
+    Commit, then upload data into the cloud.<br>
+    (Normally there is no need to call this method, since it is triggered internally.)
+</dd>
+<dt>readFromForm(form, [options])</dt>
+<dd>
+    Read data properties from form input elements with the same name.<br>
+    Supports elements of input (type: text, radio, checkbox), textarea,
+    and select.<br>
+    *form* may be a form selector or jQuery object. Example: `"#myForm"`.<br>
+    *options* is optional and defaults to <code>{addNew: false, coerce: true, trim: true}</code>.
+</dd>
+<dt>remove(key)</dt>
+<dd>
+    Delete object property and set the `dirty` flag (`key` supports dot notation).
+</dd>
+<dt>reset(newData)</dt>
+<dd>
+    Replace data object with a new instance and set the `dirty` flag.
+    *newData* is optional and defaults to <code>{}</code>.
+</dd>
+<dt>set(key, value)</dt>
+<dd>
+    Modify object property and set the `dirty` flag (`key` supports dot notation).
+</dd>
+<dt>setDirty()</dt>
+<dd>
+    Flag object as *modified*, so that commit / push will be scheduled.
+</dd>
+<dt>update()</dt>
+<dd>
+    Load data from localStorage.
+</dd>
+<dt>writeToForm(form)</dt>
+<dd>
+    Write data to form elements with the same name.<br>
+    *form* may be a form selector or jQuery object. Example: `"#myForm"`.
+</dd>
+</dl>
 
 
 ### Events
 
-**(TODO)**
+Events may be handled by passing a handler callback option:
 
+```js
+store = PersistentObject("mySettings", {
+          [...]
+          change: function(hint){
+            alert("Store " + this + " was changed. Reason: " + hint);
+          }
+        });
+```
+
+**Note:**
+Events are not yet finally implemented and subject to change!
+
+This is what we have so far:
 ```js
 {
     change: $.noop,
@@ -184,11 +333,23 @@ store.setDirty();  // trigger commit
     error: $.noop,
     pull: $.noop,
     push: $.noop,
+    ready: PROMISE
     update: $.noop
 }
 ```
 
 
-### Methods
+<!--
+Following a list of available events:
 
-**(TODO)**
+<dl>
+<dt>change(hint)</dt>
+<dd>
+    Triggered just before the popup menu is opened.<br>
+    Return <code>false</code> to prevent opening.<br>
+    This is also a good place to modify the menu (i.e. hiding, disabling, or
+    renaming entries, or replace the menu altogether).
+</dd>
+</dd>
+</dl>
+-->
