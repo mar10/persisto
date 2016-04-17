@@ -5,9 +5,11 @@
   "main": [
     "dist/persisto.js"
   ],
+  "moduleType": "globals",
   "license": "MIT",
   "ignore": [
     "**/.*",
+    "**/*.png",
     "/archive",
     "/bin",
     "/build",

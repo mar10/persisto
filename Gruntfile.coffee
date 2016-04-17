@@ -30,14 +30,6 @@ module.exports = (grunt) ->
         dist:
             src: [ "dist" ]
 
-    # compress:
-    #     dist:
-    #         options:
-    #             archive: "archive/<%= pkg.name %>-<%= pkg.version %>.zip"
-    #         files: [
-    #             {expand: true, cwd: "dist/", src: ["**/*"], dest: ""}
-    #             ]
-
     connect:
         forever:
             options:
@@ -116,8 +108,11 @@ module.exports = (grunt) ->
                 from : /buildType:\s*\"[a-zA-Z]+\"/g
                 to : "buildType: \"production\""
             },{
-                from : /debugLevel\s*[:=]\s*[0-9]/g
+                from : /debugLevel\s*:\s*[0-9]/g
                 to : "debugLevel: 1"
+            },{
+                from : /debugLevel\s*=\s*[0-9]/g
+                to : "debugLevel = 1"
             } ]
         release:
             src: ["dist/**/*.js"]
