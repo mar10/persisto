@@ -1,7 +1,7 @@
 {
   "name": "persisto",
   "description": "Persist Javascript objects to localStorage and remote servers.",
-  "version": "0.0.4",
+  "version": "0.0.5-0",
   "main": [
     "dist/persisto.js"
   ],
