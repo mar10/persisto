@@ -116,7 +116,7 @@ module.exports = (grunt) ->
                 from : /buildType:\s*\"[a-zA-Z]+\"/g
                 to : "buildType: \"production\""
             },{
-                from : /debugLevel:\s*[0-9]/g
+                from : /debugLevel\s*[:=]\s*[0-9]/g
                 to : "debugLevel: 1"
             } ]
         release:

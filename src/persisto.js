@@ -59,6 +59,7 @@ window.PersistentObject = function(namespace, opts) {
 		update: $.noop
 	}, opts);
 
+	this.debugLevel = 2;  // Set to 1 by 'grunt build'
 	this._checkTimer = null;
 	this.namespace = namespace;
 	this.storage = this.opts.storage;
@@ -111,6 +112,9 @@ window.PersistentObject = function(namespace, opts) {
 };
 
 window.PersistentObject.prototype = {
+	/** @type {string} */
+	version: "@VERSION",      // Set to semver by 'grunt release'
+
 	/* Trigger commit/push according to current settings. */
 	_invalidate: function(hint, deferredCall) {
 		var self = this,

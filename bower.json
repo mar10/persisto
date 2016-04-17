@@ -3,7 +3,7 @@
   "description": "Persist Javascript objects to localStorage and remote servers.",
   "version": "0.0.3-0",
   "main": [
-    "dist/persisto.min.js"
+    "dist/persisto.js"
   ],
   "license": "MIT",
   "ignore": [
