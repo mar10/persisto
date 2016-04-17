@@ -6,8 +6,8 @@
  * Copyright (c) 2016, Martin Wendt (http://wwWendt.de)
  * Released under the MIT license
  *
- * @version 0.0.3
- * @date 2016-04-17T17:26
+ * @version 0.0.4
+ * @date 2016-04-17T19:13
  */
 
 ;(function($, window, document, undefined) {
@@ -59,7 +59,7 @@ window.PersistentObject = function(namespace, opts) {
 		update: $.noop
 	}, opts);
 
-	this.debugLevel: 1;  // Set to 1 by 'grunt build'
+	this.debugLevel = 1;  // Set to 1 by 'grunt build'
 	this._checkTimer = null;
 	this.namespace = namespace;
 	this.storage = this.opts.storage;
@@ -113,7 +113,7 @@ window.PersistentObject = function(namespace, opts) {
 
 window.PersistentObject.prototype = {
 	/** @type {string} */
-	version: "0.0.3",      // Set to semver by 'grunt release'
+	version: "0.0.4",      // Set to semver by 'grunt release'
 
 	/* Trigger commit/push according to current settings. */
 	_invalidate: function(hint, deferredCall) {
