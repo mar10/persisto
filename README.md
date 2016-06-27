@@ -150,11 +150,32 @@ In this case modifications must be signalled by a call to `setDirty()`.
 store._data.owner = {name: "joe", age: 42});
 store._data.owner.role = "manager";
 delete store._data.owner.age;
-store.setDirty();  // trigger commit
+store.setDirty();  // schedule a commit
 ```
 
 
 ### Asynchronous Operation
+
+By default, changed values will be commited to webStorage after a small delay
+(see `.commitDelay` option). This allows to collate sequences of mutliple changes
+into one single write command.
+
+However there are situations, where this is not desirable:
+
+```js
+store.set("foo", "bar");
+
+// Page reload would prevent the delayed commit from happen, so we force 
+// synchronization:
+commit();
+
+location.reload();
+```
+
+An alternative would be to disable delay completely by setting `commitDelay: 0`.
+
+
+### Synchronize with Remote Endpoints
 
 Optionally, we may specify an endpoint URL that is used to synchronize the data
 with a web server using HTTP REST requests (GET and PUT):
@@ -191,7 +212,8 @@ The following options are available:
 <dd>
     Type: <code>int</code>, 
     default: <code>500</code><br>
-    Commit changes after 0.5 seconds of inactivity.
+    Commit changes after 0.5 seconds of inactivity. Set to `0` to force
+    synchronous mode.
 </dd>
 <dt>debug</dt>
 <dd>

@@ -219,7 +219,7 @@ window.PersistentObject.prototype = {
 	get: function(key) {
 		var i,
 			cur = this._data,
-			parts = ("" + key)                   // convert to string
+			parts = ("" + key)                 // convert to string
 				.replace(/\[(\w+)\]/g, ".$1")  // convert indexes to properties
 				.replace(/^\./, "")            // strip a leading dot
 				.split(".");
@@ -238,7 +238,7 @@ window.PersistentObject.prototype = {
 	set: function(key, value) {
 		var i,
 			cur = this._data,
-			parts = ("" + key)                   // convert to string
+			parts = ("" + key)                 // convert to string
 				.replace(/\[(\w+)\]/g, ".$1")  // convert indexes to properties
 				.replace(/^\./, "")            // strip a leading dot
 				.split("."),
