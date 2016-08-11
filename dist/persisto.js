@@ -6,8 +6,8 @@
  * Copyright (c) 2016, Martin Wendt (http://wwWendt.de)
  * Released under the MIT license
  *
- * @version 0.0.4
- * @date 2016-04-17T19:13
+ * @version 1.0.0
+ * @date 2016-08-11T21:56
  */
 
 ;(function($, window, document, undefined) {
@@ -47,6 +47,7 @@ window.PersistentObject = function(namespace, opts) {
 		pushDelay: 5000,       // push commits after 5 seconds of inactivity
 		maxPushDelay: 30000,   // push commits max. 30 seconds after first change
 		debug: 2,              // 0:quiet, 1:normal, 2:verbose
+		createParents: true,   // set() creates intermediate parent objects for children
 		storage: window.localStorage,
 		// form: {},
 		// Events
@@ -113,7 +114,7 @@ window.PersistentObject = function(namespace, opts) {
 
 window.PersistentObject.prototype = {
 	/** @type {string} */
-	version: "0.0.4",      // Set to semver by 'grunt release'
+	version: "1.0.0",      // Set to semver by 'grunt release'
 
 	/* Trigger commit/push according to current settings. */
 	_invalidate: function(hint, deferredCall) {
@@ -219,7 +220,7 @@ window.PersistentObject.prototype = {
 	get: function(key) {
 		var i,
 			cur = this._data,
-			parts = ("" + key)                   // convert to string
+			parts = ("" + key)                 // convert to string
 				.replace(/\[(\w+)\]/g, ".$1")  // convert indexes to properties
 				.replace(/^\./, "")            // strip a leading dot
 				.split(".");
@@ -231,32 +232,58 @@ window.PersistentObject.prototype = {
 
 		for (i = 0; i < parts.length; i++) {
 			cur = cur[parts[i]];
+			if ( cur === undefined && i < (parts.length - 1) ) {
+				$.error("The property '" + key +
+					"' could not be accessed because parent '" +
+					parts.slice(0, i + 1).join(".") +
+					"' does not exist");
+			}
 		}
 		return cur;
 	},
-	/** Modify object property and set the `dirty` flag (`key` supports dot notation). */
-	set: function(key, value) {
-		var i,
+	/* Modify object property and set the `dirty` flag (`key` supports dot notation). */
+	_setOrRemove: function(key, value, remove) {
+		var i, parent,
 			cur = this._data,
-			parts = ("" + key)                   // convert to string
+			parts = ("" + key)                 // convert to string
 				.replace(/\[(\w+)\]/g, ".$1")  // convert indexes to properties
 				.replace(/^\./, "")            // strip a leading dot
 				.split("."),
 			lastPart = parts.pop();
 
 		for (i = 0; i < parts.length; i++) {
-			cur = cur[parts[i]];
+			parent = cur;
+			cur = parent[parts[i]];
+			// Create intermediate parent objects properties if required
+			if ( cur === undefined ) {
+				if ( this.opts.createParents ) {
+					cur = parent[parts[i]] = {};
+					this.debug("Creating intermediate property '" + parts[i] + "'");
+				} else {
+					$.error("The property '" + key +
+						"' could not be set because parent '" +
+						parts.slice(0, i + 1).join(".") +
+						"' does not exist");
+				}
+			}
 		}
 		if ( cur[lastPart] !== value ) {
-			cur[lastPart] = value;
-			this._invalidate("set");
+			if ( remove === true ) {
+				delete cur[lastPart];
+				this._invalidate("remove");
+			} else {
+				cur[lastPart] = value;
+				this._invalidate("set");
+			}
 		}
+	},
+	/** Modify object property and set the `dirty` flag (`key` supports dot notation). */
+	set: function(key, value) {
+		return this._setOrRemove(key, value, false);
 	},
 	/** Delete object property and set the `dirty` flag (`key` supports dot notation). */
 	remove: function(key) {
-		// TODO: support '.' notation
-		delete this._data[key];
-		this._invalidate("remove");
+		return this._setOrRemove(key, undefined, true);
 	},
 	/** Replace data object with a new instance. */
 	reset: function(obj) {
