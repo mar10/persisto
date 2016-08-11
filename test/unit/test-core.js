@@ -24,8 +24,8 @@
 		assert.equal( window.localStorage.length, 0, "localStorage is clean" );
 
 		var store = new PersistentObject("foo", {
-						storage: null,  // don't commit/update  local storage
-						remote: null  // don't pull/push remote endpoint
+						storage: null,  // don't commit/update local storage
+						remote: null  // don't pull/push to remote endpoint
 					});
 
 		assert.equal( window.localStorage.length, 0, "localStorage is still clean" );
@@ -96,7 +96,7 @@
     QUnit.module( "Form access" );
 
     QUnit.test( "writeToForm", function( assert ) {
-		assert.expect(10);
+		assert.expect(11);
 
 		var res,
 			$form = $("#form1"),
@@ -109,7 +109,8 @@
 							status: "waiting",
 							attributes: ["opt2", "opt3"],
 							color: "blue",
-							tags: ["hot", "lame"]							
+							tags: ["hot", "lame"],
+							user: {name: "Jack"}						
 						}
 					});
 		
@@ -134,11 +135,14 @@
 
 		assert.equal( _fieldVal("color"), "blue", "select ok" );
 		assert.deepEqual( _fieldVal("tags"), ["hot", "lame"], "select-multiple ok" );
+
+		res = $form.find("[name='user.name']").val();
+		assert.equal( res, "Joe", "write nested fields" );
     });
 
 
     QUnit.test( "readFromForm", function( assert ) {
-		assert.expect(13);
+		assert.expect(16);
 
 		var $form = $("#form1"),
 			store = new PersistentObject("foo", {
@@ -168,12 +172,15 @@
 		assert.equal( store._data.color, "green", "select ok" );
 		assert.deepEqual( store._data.tags, ["cool", "hot"], "select-multiple ok" );
 		assert.strictEqual( store._data.title2, undefined, "no new field added" );
+		assert.strictEqual( store._data.user, undefined, "no intermediate object created" );
 
 		assert.equal( store.isDirty(), true, "store.isDirty()" );
 
 		store.readFromForm("#form1", {addNew: true});
 
 		assert.strictEqual( store._data.title2, "new", "addNew added new field" );
+		assert.ok( typeof store._data.user === "object", "create intermediate objects" );
+		assert.strictEqual( store._data.user.name, "Joe", "addNew new nested field" );
 
 		store.readFromForm("#form1", {trim: false});
 

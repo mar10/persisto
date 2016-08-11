@@ -236,7 +236,7 @@ window.PersistentObject.prototype = {
 	},
 	/** Modify object property and set the `dirty` flag (`key` supports dot notation). */
 	set: function(key, value) {
-		var i,
+		var i, parent,
 			cur = this._data,
 			parts = ("" + key)                 // convert to string
 				.replace(/\[(\w+)\]/g, ".$1")  // convert indexes to properties
@@ -245,7 +245,14 @@ window.PersistentObject.prototype = {
 			lastPart = parts.pop();
 
 		for (i = 0; i < parts.length; i++) {
-			cur = cur[parts[i]];
+			parent = cur;
+			cur = parent[parts[i]];
+			if ( cur === undefined ) {
+				cur = parent[parts[i]] = {};
+				this.debug("Creating intermediate property '" + parts[i] + "'");
+				// $.error("The property '" + parts[i] +
+				// 	"' could not be accessed because parent object does not exist");
+			}
 		}
 		if ( cur[lastPart] !== value ) {
 			cur[lastPart] = value;

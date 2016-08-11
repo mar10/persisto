@@ -211,9 +211,12 @@ The following options are available:
 <dt>commitDelay</dt>
 <dd>
     Type: <code>int</code>, 
-    default: <code>500</code><br>
-    Commit changes after 0.5 seconds of inactivity. Set to `0` to force
-    synchronous mode.
+    default: <code>500</code> milliseconds<br>
+    Commit changes after 0.5 seconds of inactivity.<br>
+    This means, after each change, we wait 0.5 more seconds for additional changes
+    to come in, before the actual commit is executed.<br>
+    The total delay (first change until actual commit) is limited `maxCommitDelay`.<br>
+    Set to <code>0</code> to force synchronous mode.
 </dd>
 <dt>debug</dt>
 <dd>
@@ -230,20 +233,21 @@ The following options are available:
 <dt>maxCommitDelay</dt>
 <dd>
     Type: <code>int</code>, 
-    default: <code>3000</code><br>
+    default: <code>3000</code> milliseconds<br>
     Commit changes max. 3 seconds after first change.
 </dd>
 <dt>maxPushDelay</dt>
 <dd>
     Type: <code>int</code>, 
-    default: <code>30000</code><br>
+    default: <code>30000</code> milliseconds<br>
     Push commits to remote max. 30 seconds after first change.
 </dd>
 <dt>pushDelay</dt>
 <dd>
     Type: <code>int</code>, 
-    default: <code>5000</code><br>
-    Push commits to remote after 5 seconds of inactivity.
+    default: <code>5000</code> milliseconds<br>
+    Push commits to remote after 5 seconds of inactivity. 
+    Set to <code>0</code> to force synchronous mode.
 </dd>
 <dt>remote</dt>
 <dd>
@@ -270,7 +274,8 @@ Following a list of available methods:
 <dt>commit()</dt>
 <dd>
     Write modified data to localStorage.<br>
-    (Normally there is no need to call this method, since it is triggered internally.)
+    (Normally there is no need to call this method, since it is triggered internally
+    after a short collation interval.)
 </dd>
 <dt>get(key)</dt>
 <dd>
