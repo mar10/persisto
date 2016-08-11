@@ -19,7 +19,7 @@
 	QUnit.module( "Functional tests" );
 
     QUnit.test( "Access core data (storage = null)", function( assert ) {
-		assert.expect(12);
+		assert.expect(19);
 
 		assert.equal( window.localStorage.length, 0, "localStorage is clean" );
 
@@ -51,6 +51,35 @@
 		assert.deepEqual( store.get("bar"), {baz: 42, boo: "booval", qux: "quxval"}, "get('bar')" );
 		assert.equal( store.get("bar.qux"), "quxval", "get('bar.qux')" );
 		assert.equal( store.get("arr[0]"), "a", "get('arr[0]')" );
+
+		assert.throws(function(){
+			store.get("bar.qux.undefined.boo");
+		}, 
+		/The property 'bar.qux.undefined.boo' could not be accessed because parent 'bar.qux.undefined' does not exist/,
+		"get() raises error if parent does not exist");
+
+		store.remove("bar.qux");
+		assert.strictEqual( store.get("bar.qux"), undefined, "reset('bar.qux')" );
+		store.remove("bar");
+		assert.strictEqual( store.get("bar"), undefined, "reset('bar')" );
+
+		store.set("bar.undefined1.test", "testval");
+		assert.ok( typeof store._data.bar.undefined1 === "object",
+			"set() creates intermediate parents" );
+		assert.equal( store._data.bar.undefined1.test, "testval",
+			"set() allows missing parents" );
+
+		store.opts.createParents = false;
+
+		assert.throws(function(){
+			store.set("bar.undefined2.test", "testval");
+		}, 
+		/The property 'bar.undefined2.test' could not be set because parent 'bar.undefined2' does not exist/,
+		"set() raises error if createParents is false");
+
+		store.reset({new: "testvalue"});
+		assert.deepEqual( store._data, { new: "testvalue" },
+			"reset()");
     });
 
 
@@ -174,13 +203,13 @@
 		assert.strictEqual( store._data.title2, undefined, "no new field added" );
 		assert.strictEqual( store._data.user, undefined, "no intermediate object created" );
 
-		assert.equal( store.isDirty(), true, "store.isDirty()" );
+		assert.strictEqual( store.isDirty(), true, "store.isDirty()" );
 
 		store.readFromForm("#form1", {addNew: true});
 
-		assert.strictEqual( store._data.title2, "new", "addNew added new field" );
+		assert.equal( store._data.title2, "new", "addNew added new field" );
 		assert.ok( typeof store._data.user === "object", "create intermediate objects" );
-		assert.strictEqual( store._data.user.name, "Joe", "addNew new nested field" );
+		assert.equal( store._data.user.name, "Joe", "addNew new nested field" );
 
 		store.readFromForm("#form1", {trim: false});
 

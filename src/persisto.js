@@ -47,6 +47,7 @@ window.PersistentObject = function(namespace, opts) {
 		pushDelay: 5000,       // push commits after 5 seconds of inactivity
 		maxPushDelay: 30000,   // push commits max. 30 seconds after first change
 		debug: 2,              // 0:quiet, 1:normal, 2:verbose
+		createParents: true,   // set() creates intermediate parent objects for children
 		storage: window.localStorage,
 		// form: {},
 		// Events
@@ -231,6 +232,12 @@ window.PersistentObject.prototype = {
 
 		for (i = 0; i < parts.length; i++) {
 			cur = cur[parts[i]];
+			if ( cur === undefined && i < (parts.length - 1) ) {
+				$.error("The property '" + key +
+					"' could not be accessed because parent '" +
+					parts.slice(0, i + 1).join(".") +
+					"' does not exist");
+			}
 		}
 		return cur;
 	},
@@ -247,11 +254,17 @@ window.PersistentObject.prototype = {
 		for (i = 0; i < parts.length; i++) {
 			parent = cur;
 			cur = parent[parts[i]];
+			// Create intermediate parent objects properties if required
 			if ( cur === undefined ) {
-				cur = parent[parts[i]] = {};
-				this.debug("Creating intermediate property '" + parts[i] + "'");
-				// $.error("The property '" + parts[i] +
-				// 	"' could not be accessed because parent object does not exist");
+				if ( this.opts.createParents ) {
+					cur = parent[parts[i]] = {};
+					this.debug("Creating intermediate property '" + parts[i] + "'");
+				} else {
+					$.error("The property '" + key +
+						"' could not be set because parent '" +
+						parts.slice(0, i + 1).join(".") +
+						"' does not exist");
+				}
 			}
 		}
 		if ( cur[lastPart] !== value ) {
