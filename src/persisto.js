@@ -241,8 +241,8 @@ window.PersistentObject.prototype = {
 		}
 		return cur;
 	},
-	/** Modify object property and set the `dirty` flag (`key` supports dot notation). */
-	set: function(key, value) {
+	/* Modify object property and set the `dirty` flag (`key` supports dot notation). */
+	_setOrRemove: function(key, value, remove) {
 		var i, parent,
 			cur = this._data,
 			parts = ("" + key)                 // convert to string
@@ -268,15 +268,22 @@ window.PersistentObject.prototype = {
 			}
 		}
 		if ( cur[lastPart] !== value ) {
-			cur[lastPart] = value;
-			this._invalidate("set");
+			if ( remove === true ) {
+				delete cur[lastPart];
+				this._invalidate("remove");
+			} else {
+				cur[lastPart] = value;
+				this._invalidate("set");
+			}
 		}
+	},
+	/** Modify object property and set the `dirty` flag (`key` supports dot notation). */
+	set: function(key, value) {
+		return this._setOrRemove(key, value, false);
 	},
 	/** Delete object property and set the `dirty` flag (`key` supports dot notation). */
 	remove: function(key) {
-		// TODO: support '.' notation
-		delete this._data[key];
-		this._invalidate("remove");
+		return this._setOrRemove(key, undefined, true);
 	},
 	/** Replace data object with a new instance. */
 	reset: function(obj) {
