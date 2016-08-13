@@ -1,6 +1,6 @@
 # persisto [![GitHub version](https://badge.fury.io/gh/mar10%2Fpersisto.svg)](https://github.com/mar10/persisto/releases/latest) [![Build Status](https://travis-ci.org/mar10/persisto.svg?branch=master)](https://travis-ci.org/mar10/persisto)
 
-> Persistent, editable objects for Javascript.
+> Persistent Javascript objects and web forms using Web Storage.
 
 Features
 
@@ -129,13 +129,29 @@ settingsStore.readFromForm(this, {
 ### Storing Arrays
 
 Arrays are only a special form of plain Javascript objects, so we can store and
-access them like this:
+access them as top level type like this:
 
 ```js
 var store = PersistentObject("mySettings", {
 				init: ["a", "b", "c"]
 			});
+store.get("[0]");  // 'a'
 store.set("[1]", "b2");
+```
+
+However if we use child properties, it is even easier:
+
+```js
+var store = PersistentObject("mySettings", {
+        init: {
+          values: ["a", "b", "c"]
+        }
+      });
+store.get("values")[0];  // 'a'
+store.get("values[0]");  // 'a'
+S.each(store.get("values"), function(idx, obj) { ... });
+
+store.set("values[1]", "b2");
 ```
 
 
@@ -147,7 +163,7 @@ direct access of the internal data object may be preferred.<br>
 In this case modifications must be signalled by a call to `setDirty()`.
 
 ```js
-store._data.owner = {name: "joe", age: 42});
+store._data.owner = { name: "joe", age: 42 };
 store._data.owner.role = "manager";
 delete store._data.owner.age;
 store.setDirty();  // schedule a commit
@@ -157,7 +173,7 @@ store.setDirty();  // schedule a commit
 ### Asynchronous Operation
 
 By default, changed values will be commited to webStorage after a small delay
-(see `.commitDelay` option). This allows to collate sequences of mutliple changes
+(see `.commitDelay` option). This allows to collate sequences of multiple changes
 into one single write command.
 
 However there are situations, where this is not desirable:

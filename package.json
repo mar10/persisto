@@ -1,6 +1,6 @@
 {
   "name": "persisto",
-  "title": "Persistent, editable objects for Javascript.",
+  "title": "Persistent Javascript objects and web forms using Web Storage.",
   "description": "Persist Javascript objects to localStorage and remote servers.",
   "filename": "dist/persisto.min.js",
   "main": "dist/persisto.js",
