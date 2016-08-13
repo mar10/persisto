@@ -29,6 +29,15 @@ Requirements:
 
 ## Usage
 
+[Download the latest persisto.js](https://github.com/mar10/persisto/releases) 
+or include directly [from CDN](https://www.jsdelivr.com/projects/persisto):
+
+```html
+  <script src="//cdn.jsdelivr.net/persisto/1/persisto.min.js"></script>
+```
+
+then instantiate a `PersistentObject`:
+
 ```js
 var store = PersistentObject("mySettings", {
               defaults: {
@@ -209,7 +218,7 @@ var store = PersistentObject("mySettings", {
 $.when(
   // Page must be loaded
   $.ready,
-  // PersistentObjects must be pulled
+  // PersistentObject must be pulled
   store.ready
   
 ).done(function(){
