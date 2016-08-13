@@ -55,6 +55,8 @@ store.remove("owner.age");
 Every *modifying* operation triggers a deferred commit, so that shortly afterwards
 the data is serialized to JSON and written to `localStorage.mySettings`.
 
+Try the [online example](http://plnkr.co/edit/Dv5ld0Nkt0nVJmn9h3q0?p=preview).
+
 
 ## Synchronize Data with HTML Forms
 
