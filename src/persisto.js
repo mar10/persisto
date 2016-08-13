@@ -37,7 +37,7 @@ window.PersistentObject = function(namespace, opts) {
 		dfd = $.Deferred(),
 		stamp = _getNow();
 
-    /* jshint ignore:start */
+    /* jshint ignore:start */  // disable warning 'PersistentObject is not defined'
 	if ( !(this instanceof PersistentObject) ) { $.error("Must use 'new' keyword"); }
     /* jshint ignore:end */
 
@@ -45,7 +45,7 @@ window.PersistentObject = function(namespace, opts) {
 
 	this.opts = $.extend({
 		remote: null,          // URL for GET/PUT, ajax options, or callback
-		init: {},              // default value if no data is found in localStorage
+		defaults: {},          // default value if no data is found in localStorage
 		commitDelay: 500,      // commit changes after 0.5 seconds of inactivity
 		maxCommitDelay: 3000,  // commit changes max. 3 seconds after first change
 		pushDelay: 5000,       // push commits after 5 seconds of inactivity
@@ -68,7 +68,7 @@ window.PersistentObject = function(namespace, opts) {
 	this._checkTimer = null;
 	this.namespace = namespace;
 	this.storage = this.opts.storage;
-	this._data = this.opts.init;
+	this._data = this.opts.defaults;
 
 	this.offline = undefined;
 	this.phase = null;
@@ -96,7 +96,7 @@ window.PersistentObject = function(namespace, opts) {
 			if ( prevValue != null ) {
 				console.warn(self + ": could not init from remote; falling back to storage.");
 				// self._data = JSON.parse(prevValue);
-				self._data = $.extend({}, self.opts.init, JSON.parse(prevValue));
+				self._data = $.extend({}, self.opts.defaults, JSON.parse(prevValue));
 			} else {
 				console.warn(self + ": could not init from remote; falling back default.");
 			}
@@ -104,8 +104,8 @@ window.PersistentObject = function(namespace, opts) {
 		});
 	} else if ( prevValue != null ) {
 		this.update();
-		// We still extend from opts.init, in case some fields where missing
-		this._data = $.extend({}, this.opts.init, this._data);
+		// We still extend from opts.defaults, in case some fields where missing
+		this._data = $.extend({}, this.opts.defaults, this._data);
 		// this.debug("init from storage", this._data);
 		dfd.resolve();
 		// this.lastUpdate = stamp;

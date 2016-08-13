@@ -13,8 +13,8 @@ Please fill in the info, then remove all unneeded lines from this issue report.
   1. ...
   2. ...
 
-Could you set up a jsFiddle (http://jsfiddle.net/mar10/KcxRd/) or
-Plunker (http://plnkr.co/edit/Dv5ld0Nkt0nVJmn9h3q0?p=preview) ?
+Could you set up a jsFiddle or
+Plunker (http://plnkr.co/edit/qcDmvN?p=preview) ?
 
 
 ### Environment

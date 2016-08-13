@@ -141,7 +141,7 @@
 			$form = $("#form1"),
 			store = new PersistentObject("foo", {
 						remote: null,  // don't pull/push remote endpoint
-						init: {
+						defaults: {
 							title: "foo",
 							details: "bar\nbaz",
 							isFavorite: true,
@@ -185,7 +185,7 @@
 
 		var $form = $("#form1"),
 			store = new PersistentObject("foo", {
-							init: {
+							defaults: {
 								title: "qux",
 								details: "qux",
 								isFavorite: undefined,

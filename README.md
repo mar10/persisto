@@ -31,7 +31,7 @@ Requirements:
 
 ```js
 var store = PersistentObject("mySettings", {
-              init: {
+              defaults: {
                 theme: "default"
                 }
             });
@@ -39,7 +39,7 @@ var store = PersistentObject("mySettings", {
 
 `store` now contains the data that was stored in `localStorage.mySettings` if 
 present. Otherwise, `store` is initialized to the default values that we
-passed with the `.init` option.
+passed with the `.defaults` option.
 
 We can access data using `set`, `get`, `remove`, `reset`:
 
@@ -55,7 +55,7 @@ store.remove("owner.age");
 Every *modifying* operation triggers a deferred commit, so that shortly afterwards
 the data is serialized to JSON and written to `localStorage.mySettings`.
 
-Try the [online example](http://plnkr.co/edit/Dv5ld0Nkt0nVJmn9h3q0?p=preview).
+Try the [online example](http://plnkr.co/edit/qcDmvN?p=preview).
 
 
 ## Synchronize Data with HTML Forms
@@ -67,7 +67,7 @@ Example:
 ```js
 // Maintain client's preferences and define some defaults:
 var settingsStore = PersistentObject("mySettings", {
-        init: {
+        defaults: {
           nickname: "anonymous",
           theme: "default"
           }
@@ -77,10 +77,10 @@ var settingsStore = PersistentObject("mySettings", {
 settingsStore.writeToForm("#settingsForm");
 
 // Allow users to edit and save settings:
-$("#settingsForm").submit(function(e){
+$("#settingsForm").submit(function(event){
   // ... maybe some validations here ...
   settingsStore.readFromForm(this);
-  e.preventDefault();
+  event.preventDefault();
 });
 ```
 
@@ -135,7 +135,7 @@ access them as top level type like this:
 
 ```js
 var store = PersistentObject("mySettings", {
-				init: ["a", "b", "c"]
+				defaults: ["a", "b", "c"]
 			});
 store.get("[0]");  // 'a'
 store.set("[1]", "b2");
@@ -145,7 +145,7 @@ However if we use child properties, it is even easier:
 
 ```js
 var store = PersistentObject("mySettings", {
-        init: {
+        defaults: {
           values: ["a", "b", "c"]
         }
       });
@@ -242,7 +242,7 @@ The following options are available:
     default: <code>2</code><br>
     Verbosity level: 0:quiet, 1:normal, 2:verbose.
 </dd>
-<dt>init</dt>
+<dt>defaults</dt>
 <dd>
     Type: <code>object</code>, 
     default: <code>{}</code><br>
