@@ -19,9 +19,19 @@
 	QUnit.module( "Functional tests" );
 
     QUnit.test( "Access core data (storage = null)", function( assert ) {
-		assert.expect(19);
+		assert.expect(21);
 
 		assert.equal( window.localStorage.length, 0, "localStorage is clean" );
+
+		assert.throws(function(){
+				var _dummy = PersistentObject();
+			}, /Must use 'new' keyword/,
+			"Fail if 'new' keyword is missing");
+
+		assert.throws(function(){
+				var _dummy = new PersistentObject();
+			}, /Missing required argument: namespace/,
+			"Fail if 'namespace' argument is missing");
 
 		var store = new PersistentObject("foo", {
 						storage: null,  // don't commit/update local storage

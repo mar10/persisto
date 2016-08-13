@@ -37,6 +37,10 @@ window.PersistentObject = function(namespace, opts) {
 		dfd = $.Deferred(),
 		stamp = _getNow();
 
+    /* jshint ignore:start */
+	if ( !(this instanceof PersistentObject) ) { $.error("Must use 'new' keyword"); }
+    /* jshint ignore:end */
+
 	if ( typeof namespace !== "string" ) { $.error("Missing required argument: namespace"); }
 
 	this.opts = $.extend({
