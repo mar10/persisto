@@ -1,5 +1,5 @@
 # 1.1.0-0 / Unreleased
-  * [CHANGE] rename `.init` options to `.defaults`
+  * [CHANGE] rename `.init` option to `.defaults`
 
 # 1.0.0 / 2016-08-11
   * [ADD] .set() creates intermediate objects if missing

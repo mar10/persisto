@@ -55,7 +55,10 @@ store.remove("owner.age");
 Every *modifying* operation triggers a deferred commit, so that shortly afterwards
 the data is serialized to JSON and written to `localStorage.mySettings`.
 
-Try the [online example](http://plnkr.co/edit/qcDmvN?p=preview).
+**More:**
+
+  * Try the [online example](http://plnkr.co/edit/qcDmvN?p=preview).
+  * Run the [unit tests](http://rawgit.com/mar10/persisto/master/test/unit/test-core.html).
 
 
 ## Synchronize Data with HTML Forms
