@@ -12,15 +12,16 @@
 
 ;(function($, window, document, undefined) {
 
-/*globals console */
-
 "use strict";
 
 /*******************************************************************************
  * Private functions and variables
  */
 
-var MAX_INT = 9007199254740991;
+var MAX_INT = 9007199254740991,
+	// Allow mangling of some global names:
+	console = window.console,
+	error = $.error;
 
 /* Return current time stamp. */
 function _getNow() {
@@ -38,11 +39,11 @@ window.PersistentObject = function(namespace, opts) {
 		stamp = _getNow();
 
     /* jshint ignore:start */  // disable warning 'PersistentObject is not defined'
-	if ( !(this instanceof PersistentObject) ) { $.error("Must use 'new' keyword"); }
+	if ( !(this instanceof PersistentObject) ) { error("Must use 'new' keyword"); }
     /* jshint ignore:end */
 
 	if ( typeof namespace !== "string" ) {
-		$.error(this + ": Missing required argument: namespace");
+		error(this + ": Missing required argument: namespace");
 	}
 
 	this.opts = $.extend({
@@ -207,14 +208,14 @@ window.PersistentObject.prototype = {
 	debug: function() {
 		if ( this.opts.debugLevel >= 2 ) {
 			Array.prototype.unshift.call(arguments, this.toString());
-			console.log.apply(window.console, arguments);
+			console.log.apply(console, arguments);
 		}
 	},
 	/* Log to console if opts.debugLevel >= 1 */
 	log: function() {
 		if ( this.opts.debugLevel >= 1 ) {
 			Array.prototype.unshift.call(arguments, this.toString());
-			console.log.apply(window.console, arguments);
+			console.log.apply(console, arguments);
 		}
 	},
 	/** Return true if there are uncommited or unpushed modifications. */
@@ -244,7 +245,7 @@ window.PersistentObject.prototype = {
 		for (i = 0; i < parts.length; i++) {
 			cur = cur[parts[i]];
 			if ( cur === undefined && i < (parts.length - 1) ) {
-				$.error(this + ": Property '" + key + "' could not be accessed because parent '" +
+				error(this + ": Property '" + key + "' could not be accessed because parent '" +
 					parts.slice(0, i + 1).join(".") + "' does not exist");
 			}
 		}
@@ -269,7 +270,7 @@ window.PersistentObject.prototype = {
 					this.debug("Creating intermediate parent '" + parts[i] + "'");
 					cur = parent[parts[i]] = {};
 				} else {
-					$.error(this + ": Property '" + key + "' could not be set because parent '" +
+					error(this + ": Property '" + key + "' could not be set because parent '" +
 						parts.slice(0, i + 1).join(".") + "' does not exist");
 				}
 			}
@@ -307,7 +308,7 @@ window.PersistentObject.prototype = {
 	/** Load data from localStorage. */
 	update: function() {
 		if ( this.phase ) {
-			$.error(this + ": Trying to update while '" + this.phase + "' is pending.");
+			error(this + ": Trying to update while '" + this.phase + "' is pending.");
 		}
 		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(this + ".update"); }
 		var data = this.storage.getItem(this.namespace);
@@ -319,7 +320,7 @@ window.PersistentObject.prototype = {
 	commit: function() {
 		var data;
 		if ( this.phase ) {
-			$.error(this + ": Trying to commit while '" + this.phase + "' is pending.");
+			error(this + ": Trying to commit while '" + this.phase + "' is pending.");
 		}
 		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(this + ".commit"); }
 		// try { data = JSON.stringify(this._data); } catch(e) { }
@@ -337,7 +338,7 @@ window.PersistentObject.prototype = {
 		var self = this;
 
 		if ( this.phase ) {
-			$.error(this + ": Trying to pull while '" + this.phase + "' is pending.");
+			error(this + ": Trying to pull while '" + this.phase + "' is pending.");
 		}
 		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(this + ".pull"); }
 		this.phase = "pull";
@@ -368,11 +369,11 @@ window.PersistentObject.prototype = {
 			data = this.commit();
 
 		if ( this.phase ) {
-			$.error(this + ": Trying to push while '" + this.phase + "' is pending.");
+			error(this + ": Trying to push while '" + this.phase + "' is pending.");
 		}
 		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(self + ".push"); }
 		this.phase = "push";
-		if ( !this.opts.remote ) { $.error(this + ": Missing remote option"); }
+		if ( !this.opts.remote ) { error(this + ": Missing remote option"); }
 		return $.ajax({
 			type: "PUT",
 			url: this.opts.remote,

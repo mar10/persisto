@@ -245,7 +245,7 @@ The following options are available:
     Commit changes after 0.5 seconds of inactivity.<br>
     This means, after each change, we wait 0.5 more seconds for additional changes
     to come in, before the actual commit is executed.<br>
-    The total delay (first change until actual commit) is limited `maxCommitDelay`.<br>
+    The total delay (first change until actual commit) is limited by `maxCommitDelay`.<br>
     Set to <code>0</code> to force synchronous mode.
 </dd>
 <dt>debugLevel</dt>

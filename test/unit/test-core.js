@@ -69,9 +69,9 @@
 		"get() raises error if parent does not exist");
 
 		store.remove("bar.qux");
-		assert.strictEqual( store.get("bar.qux"), undefined, "reset('bar.qux')" );
+		assert.strictEqual( store.get("bar.qux"), undefined, "remove('bar.qux')" );
 		store.remove("bar");
-		assert.strictEqual( store.get("bar"), undefined, "reset('bar')" );
+		assert.strictEqual( store.get("bar"), undefined, "remove('bar')" );
 
 		store.set("bar.undefined1.test", "testval");
 		assert.ok( typeof store._data.bar.undefined1 === "object",
