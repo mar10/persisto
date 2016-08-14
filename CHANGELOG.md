@@ -1,4 +1,7 @@
-# 1.1.0-0 / Unreleased
+# 1.1.1-0 / Unreleased
+  *
+
+# 1.1.0 / 2016-08-14
   * [CHANGE] rename `.init` option to `.defaults`
 
 # 1.0.0 / 2016-08-11
