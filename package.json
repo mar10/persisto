@@ -4,7 +4,7 @@
   "description": "Persist Javascript objects to localStorage and remote servers.",
   "filename": "dist/persisto.min.js",
   "main": "dist/persisto.js",
-  "version": "1.0.1-0",
+  "version": "1.1.0",
   "homepage": "https://github.com/mar10/persisto",
   "author": {
     "name": "Martin Wendt",
