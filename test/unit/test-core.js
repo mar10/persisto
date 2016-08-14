@@ -65,7 +65,7 @@
 		assert.throws(function(){
 			store.get("bar.qux.undefined.boo");
 		}, 
-		/The property 'bar.qux.undefined.boo' could not be accessed because parent 'bar.qux.undefined' does not exist/,
+		/PersistentObject\('foo'\): Property 'bar.qux.undefined.boo' could not be accessed because parent 'bar.qux.undefined' does not exist/,
 		"get() raises error if parent does not exist");
 
 		store.remove("bar.qux");
@@ -84,7 +84,7 @@
 		assert.throws(function(){
 			store.set("bar.undefined2.test", "testval");
 		}, 
-		/The property 'bar.undefined2.test' could not be set because parent 'bar.undefined2' does not exist/,
+		/PersistentObject\('foo'\): Property 'bar.undefined2.test' could not be set because parent 'bar.undefined2' does not exist/,
 		"set() raises error if createParents is false");
 
 		store.reset({new: "testvalue"});
@@ -232,7 +232,7 @@
 
     QUnit.test( "store.get() / set() - without webStorage", function( assert ) {
 		var i, v,
-		    store = new PersistentObject("foo", {storage: null, debug: 0}),
+		    store = new PersistentObject("foo", {storage: null, debugLevel: 0}),
 		    count = 100000;
 
 		   // return;
@@ -291,7 +291,7 @@
 
     QUnit.test( "store.get() / set() - with webStorage and deferred commit", function( assert ) {
 		var i, v,
-		    store = new PersistentObject("foo", {storage: window.sessionStorage, debug: 0}),
+		    store = new PersistentObject("foo", {storage: window.sessionStorage, debugLevel: 0}),
 		    count = 10000;
 
 		   // return;
@@ -350,7 +350,7 @@
 
     QUnit.test( "store.get() / set() - with webStorage and immediate commit", function( assert ) {
 		var i, v,
-		    store = new PersistentObject("foo", {storage: window.sessionStorage, commitDelay: 0, debug: 0}),
+		    store = new PersistentObject("foo", {storage: window.sessionStorage, commitDelay: 0, debugLevel: 0}),
 		    count = 1000;
 
 		   // return;

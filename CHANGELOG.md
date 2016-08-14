@@ -3,6 +3,7 @@
 
 # 1.1.0 / 2016-08-14
   * [CHANGE] rename `.init` option to `.defaults`
+  * [CHANGE] rename `.debug` option to `.debugLevel`
 
 # 1.0.0 / 2016-08-11
   * [ADD] .set() creates intermediate objects if missing

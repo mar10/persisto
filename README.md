@@ -248,10 +248,10 @@ The following options are available:
     The total delay (first change until actual commit) is limited `maxCommitDelay`.<br>
     Set to <code>0</code> to force synchronous mode.
 </dd>
-<dt>debug</dt>
+<dt>debugLevel</dt>
 <dd>
     Type: <code>int</code>, 
-    default: <code>2</code><br>
+    default: <code>1</code><br>
     Verbosity level: 0:quiet, 1:normal, 2:verbose.
 </dd>
 <dt>defaults</dt>

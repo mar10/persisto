@@ -41,19 +41,21 @@ window.PersistentObject = function(namespace, opts) {
 	if ( !(this instanceof PersistentObject) ) { $.error("Must use 'new' keyword"); }
     /* jshint ignore:end */
 
-	if ( typeof namespace !== "string" ) { $.error("Missing required argument: namespace"); }
+	if ( typeof namespace !== "string" ) {
+		$.error(this + ": Missing required argument: namespace");
+	}
 
 	this.opts = $.extend({
 		remote: null,          // URL for GET/PUT, ajax options, or callback
 		defaults: {},          // default value if no data is found in localStorage
 		commitDelay: 500,      // commit changes after 0.5 seconds of inactivity
+		createParents: true,   // set() creates missing intermediate parent objects for children
 		maxCommitDelay: 3000,  // commit changes max. 3 seconds after first change
 		pushDelay: 5000,       // push commits after 5 seconds of inactivity
 		maxPushDelay: 30000,   // push commits max. 30 seconds after first change
-		debug: 2,              // 0:quiet, 1:normal, 2:verbose
-		createParents: true,   // set() creates intermediate parent objects for children
 		storage: window.localStorage,
-		// form: {},
+		// Default debugLevel is set to 1 by `grunt build`:
+		debugLevel: 2,         // 0:quiet, 1:normal, 2:verbose
 		// Events
 		change: $.noop,
 		commit: $.noop,
@@ -63,8 +65,6 @@ window.PersistentObject = function(namespace, opts) {
 		push: $.noop,
 		update: $.noop
 	}, opts);
-
-	this.debugLevel = 2;  // Set to 1 by 'grunt build'
 	this._checkTimer = null;
 	this.namespace = namespace;
 	this.storage = this.opts.storage;
@@ -141,7 +141,7 @@ window.PersistentObject.prototype = {
 			if ( !this.unpushedSince ) { this.unpushedSince = now; }
 			this.opts.change(hint);
 		} else {
-			this.debug("_invalidate recursive()");
+			this.debug("_invalidate() recursive");
 		}
 
 		if ( this.storage ) {
@@ -150,7 +150,7 @@ window.PersistentObject.prototype = {
 			if ( ((now - prevChange) >= this.opts.commitDelay) ||
 				((now - this.uncommittedSince) >= this.opts.maxCommitDelay) ) {
 
-				this.debug("_invalidate: force commit",
+				this.debug("_invalidate(): force commit",
 					((now - prevChange) >= this.opts.commitDelay),
 					((now - this.uncommittedSince) >= this.opts.maxCommitDelay));
 				this.commit();
@@ -166,7 +166,7 @@ window.PersistentObject.prototype = {
 			if ( ((now - prevChange) >= this.opts.pushDelay) ||
 				((now - this.unpushedSince) >= this.opts.maxPushDelay) ) {
 
-				this.debug("_invalidate: force push", ((now - prevChange) >= this.opts.pushDelay),
+				this.debug("_invalidate(): force push", ((now - prevChange) >= this.opts.pushDelay),
 					((now - this.unpushedSince) >= this.opts.maxPushDelay));
 				this.push();
 			} else {
@@ -180,7 +180,7 @@ window.PersistentObject.prototype = {
 				nextCommit || MAX_INT,
 				nextPush || MAX_INT);
 			// this.debug("Defer update:", nextCheck - now)
-			this.debug("_invalidate defer (" + hint + ") by " + (nextCheck - now) + "ms" );
+			this.debug("_invalidate(" + hint + ") defer by " + (nextCheck - now) + "ms" );
 			this._checkTimer = setTimeout(function() {
 				self._checkTimer = null; // no need to call clearTimeout in the handler...
 				self._invalidate.call(self, null, true);
@@ -199,13 +199,20 @@ window.PersistentObject.prototype = {
 		// this.dirty = false;
 		this.lastUpdate = _getNow();
 	},
-	/* */
+	/* Return readable string representation for this instance. */
 	toString: function() {
 		return "PersistentObject('" + this.namespace + "')";
 	},
-	/* */
+	/* Log to console if opts.debugLevel >= 2 */
 	debug: function() {
-		if ( this.opts.debug >= 1 ) {
+		if ( this.opts.debugLevel >= 2 ) {
+			Array.prototype.unshift.call(arguments, this.toString());
+			console.log.apply(window.console, arguments);
+		}
+	},
+	/* Log to console if opts.debugLevel >= 1 */
+	log: function() {
+		if ( this.opts.debugLevel >= 1 ) {
 			Array.prototype.unshift.call(arguments, this.toString());
 			console.log.apply(window.console, arguments);
 		}
@@ -237,10 +244,8 @@ window.PersistentObject.prototype = {
 		for (i = 0; i < parts.length; i++) {
 			cur = cur[parts[i]];
 			if ( cur === undefined && i < (parts.length - 1) ) {
-				$.error("The property '" + key +
-					"' could not be accessed because parent '" +
-					parts.slice(0, i + 1).join(".") +
-					"' does not exist");
+				$.error(this + ": Property '" + key + "' could not be accessed because parent '" +
+					parts.slice(0, i + 1).join(".") + "' does not exist");
 			}
 		}
 		return cur;
@@ -261,13 +266,11 @@ window.PersistentObject.prototype = {
 			// Create intermediate parent objects properties if required
 			if ( cur === undefined ) {
 				if ( this.opts.createParents ) {
+					this.debug("Creating intermediate parent '" + parts[i] + "'");
 					cur = parent[parts[i]] = {};
-					this.debug("Creating intermediate property '" + parts[i] + "'");
 				} else {
-					$.error("The property '" + key +
-						"' could not be set because parent '" +
-						parts.slice(0, i + 1).join(".") +
-						"' does not exist");
+					$.error(this + ": Property '" + key + "' could not be set because parent '" +
+						parts.slice(0, i + 1).join(".") + "' does not exist");
 				}
 			}
 		}
@@ -306,11 +309,11 @@ window.PersistentObject.prototype = {
 		if ( this.phase ) {
 			$.error(this + ": Trying to update while '" + this.phase + "' is pending.");
 		}
-		if ( this.opts.debug >= 2 && console.time ) { console.time(this + ".update"); }
+		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(this + ".update"); }
 		var data = this.storage.getItem(this.namespace);
 		data = JSON.parse(data);
 		this._update(data);
-		if ( this.opts.debug >= 2 && console.time ) { console.timeEnd(this + ".update"); }
+		if ( this.opts.debugLevel >= 2 && console.time ) { console.timeEnd(this + ".update"); }
 	},
 	/** Write data to localStorage. */
 	commit: function() {
@@ -318,7 +321,7 @@ window.PersistentObject.prototype = {
 		if ( this.phase ) {
 			$.error(this + ": Trying to commit while '" + this.phase + "' is pending.");
 		}
-		if ( this.opts.debug >= 2 && console.time ) { console.time(this + ".commit"); }
+		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(this + ".commit"); }
 		// try { data = JSON.stringify(this._data); } catch(e) { }
 		data = JSON.stringify(this._data);
 		this.storage.setItem(this.namespace, data);
@@ -326,7 +329,7 @@ window.PersistentObject.prototype = {
 		this.uncommittedSince = null;
 		this.commitCount += 1;
 		// this.lastCommit = _getNow();
-		if ( this.opts.debug >= 2 && console.time ) { console.timeEnd(this + ".commit"); }
+		if ( this.opts.debugLevel >= 2 && console.time ) { console.timeEnd(this + ".commit"); }
 		return data;
 	},
 	/** Download, then update data from the cloud. */
@@ -336,7 +339,7 @@ window.PersistentObject.prototype = {
 		if ( this.phase ) {
 			$.error(this + ": Trying to pull while '" + this.phase + "' is pending.");
 		}
-		if ( this.opts.debug >= 2 && console.time ) { console.time(this + ".pull"); }
+		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(this + ".pull"); }
 		this.phase = "pull";
 		// return $.get(this.opts.remote, function(objData) {
 		return $.ajax({
@@ -356,7 +359,7 @@ window.PersistentObject.prototype = {
 			self.opts.error(arguments);
 		}).always(function() {
 			self.phase = null;
-			if ( self.opts.debug >= 2 && console.time ) { console.timeEnd(self + ".pull"); }
+			if ( self.opts.debugLevel >= 2 && console.time ) { console.timeEnd(self + ".pull"); }
 		});
 	},
 	/** Commit, then upload data to the cloud. */
@@ -367,9 +370,9 @@ window.PersistentObject.prototype = {
 		if ( this.phase ) {
 			$.error(this + ": Trying to push while '" + this.phase + "' is pending.");
 		}
-		if ( this.opts.debug >= 2 && console.time ) { console.time(self + ".push"); }
+		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(self + ".push"); }
 		this.phase = "push";
-		if ( !this.opts.remote ) { $.error(this + ": missing remote option"); }
+		if ( !this.opts.remote ) { $.error(this + ": Missing remote option"); }
 		return $.ajax({
 			type: "PUT",
 			url: this.opts.remote,
@@ -383,7 +386,7 @@ window.PersistentObject.prototype = {
 			self.opts.error(arguments);
 		}).always(function() {
 			self.phase = null;
-			if ( self.opts.debug >= 2 && console.time ) { console.timeEnd(self + ".push"); }
+			if ( self.opts.debugLevel >= 2 && console.time ) { console.timeEnd(self + ".push"); }
 		});
 	},
 	/** Read data properties from form input elements with the same name.
@@ -403,8 +406,8 @@ window.PersistentObject.prototype = {
 			$form.find("[name]").each(function() {
 				var name = $(this).attr("name");
 				if ( self._data[name] === undefined ) {
-					self._data[name] = null;
 					self.debug("readFromForm: add field '" + name + "'");
+					self._data[name] = null;
 				}
 			});
 		}
