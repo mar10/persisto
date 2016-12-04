@@ -30,7 +30,8 @@ Requirements:
 ## Usage
 
 [Download the latest persisto.js](https://github.com/mar10/persisto/releases) 
-or include directly [from CDN](https://www.jsdelivr.com/projects/persisto):
+or include directly [from CDN](https://www.jsdelivr.com/projects/persisto) or
+[UNPKG](https://unpkg.com/persisto@latest/dist/persisto.min.js):
 
 ```html
   <script src="//cdn.jsdelivr.net/persisto/1/persisto.min.js"></script>
