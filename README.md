@@ -4,7 +4,7 @@
 
 Features
 
-  - Persist Javascript objects (`{...}`) to 
+  - Persist Javascript objects (`{...}`) to
     [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API).<br>
     Use the `get()`/`set()` API for direct (even nested) access, hiding the need
     to convert from/to JSON.
@@ -29,12 +29,12 @@ Requirements:
 
 ## Usage
 
-[Download the latest persisto.js](https://github.com/mar10/persisto/releases) 
-or include directly [from CDN](https://www.jsdelivr.com/projects/persisto) or
+[Download the latest persisto.js](https://github.com/mar10/persisto/releases)
+or include directly [from CDN](http://cdn.jsdelivr.net/gh/mar10/persisto@v1.1.0/dist/) or
 [UNPKG](https://unpkg.com/persisto@latest/dist/persisto.min.js):
 
 ```html
-  <script src="//cdn.jsdelivr.net/persisto/1/persisto.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/mar10/persisto@v1/dist/"></script>
 ```
 
 then instantiate a `PersistentObject`:
@@ -47,7 +47,7 @@ var store = PersistentObject("mySettings", {
             });
 ```
 
-`store` now contains the data that was stored in `localStorage.mySettings` if 
+`store` now contains the data that was stored in `localStorage.mySettings` if
 present. Otherwise, `store` is initialized to the default values that we
 passed with the `.defaults` option.
 
@@ -104,7 +104,7 @@ By convention, the html form **must use element names that match the data proper
 ```html
 <form id="settingsForm" action="">
   <label>Nickname:<input name="nickname" type="text" value="" /></label><br>
-  <label>Theme: 
+  <label>Theme:
     <fieldset>
       <label> <input name="theme" type="radio" value="default" /> Standard </label><br>
       <label> <input name="theme" type="radio" value="light" /> Light </label><br>
@@ -116,7 +116,7 @@ By convention, the html form **must use element names that match the data proper
 ```
 
 Note also that only fields are synchronized, that already existed in the storage
-data. Use the `addNew` option if *all* form fields should be evaluated and create 
+data. Use the `addNew` option if *all* form fields should be evaluated and create
 new properties in the store object:
 
 ```js
@@ -129,10 +129,10 @@ settingsStore.readFromForm(this, {
 ## Pros and Cons
 
 - Any `PersistentObject` instance is stored as one monolythic JSON string.<br>
-  *Persisto* deferres and collates these updates, but modifying a single 
+  *Persisto* deferres and collates these updates, but modifying a single
   property of a large data object still comes with some overhead.<br>
   Splitting data into several `PersistentObject`s may remedy the problem.<br>
-  But if your data model is more like a table with hundredth's of rows, a 
+  But if your data model is more like a table with hundredth's of rows, a
   responsive database backend may be a better choice.
 
 - Asynchronous operations bear the risk of potential conflicts.
@@ -170,10 +170,10 @@ store.set("values[1]", "b2");
 ```
 
 
-### Performance and Direct Access 
+### Performance and Direct Access
 
-In general, performance costs of `set()` and `get()` calls should be 
-neglectable, compared to the resulting synchronization times, but in some cases 
+In general, performance costs of `set()` and `get()` calls should be
+neglectable, compared to the resulting synchronization times, but in some cases
 direct access of the internal data object may be preferred.<br>
 In this case modifications must be signalled by a call to `setDirty()`.
 
@@ -196,7 +196,7 @@ However there are situations, where this is not desirable:
 ```js
 store.set("foo", "bar");
 
-// Page reload would prevent the delayed commit from happen, so we force 
+// Page reload would prevent the delayed commit from happen, so we force
 // synchronization:
 commit();
 
@@ -221,7 +221,7 @@ $.when(
   $.ready,
   // PersistentObject must be pulled
   store.ready
-  
+
 ).done(function(){
   // Page was loaded and and store has pulled the data from the remote endpoint...
   initPage();
@@ -241,7 +241,7 @@ The following options are available:
 <dl>
 <dt>commitDelay</dt>
 <dd>
-    Type: <code>int</code>, 
+    Type: <code>int</code>,
     default: <code>500</code> milliseconds<br>
     Commit changes after 0.5 seconds of inactivity.<br>
     This means, after each change, we wait 0.5 more seconds for additional changes
@@ -251,44 +251,44 @@ The following options are available:
 </dd>
 <dt>debugLevel</dt>
 <dd>
-    Type: <code>int</code>, 
+    Type: <code>int</code>,
     default: <code>1</code><br>
     Verbosity level: 0:quiet, 1:normal, 2:verbose.
 </dd>
 <dt>defaults</dt>
 <dd>
-    Type: <code>object</code>, 
+    Type: <code>object</code>,
     default: <code>{}</code><br>
     Default value if no data is found in localStorage.
 </dd>
 <dt>maxCommitDelay</dt>
 <dd>
-    Type: <code>int</code>, 
+    Type: <code>int</code>,
     default: <code>3000</code> milliseconds<br>
     Commit changes max. 3 seconds after first change.
 </dd>
 <dt>maxPushDelay</dt>
 <dd>
-    Type: <code>int</code>, 
+    Type: <code>int</code>,
     default: <code>30000</code> milliseconds<br>
     Push commits to remote max. 30 seconds after first change.
 </dd>
 <dt>pushDelay</dt>
 <dd>
-    Type: <code>int</code>, 
+    Type: <code>int</code>,
     default: <code>5000</code> milliseconds<br>
-    Push commits to remote after 5 seconds of inactivity. 
+    Push commits to remote after 5 seconds of inactivity.
     Set to <code>0</code> to force synchronous mode.
 </dd>
 <dt>remote</dt>
 <dd>
-    Type: <code>string</code>, 
+    Type: <code>string</code>,
     default: <code>null</code><br>
     URL for GET/PUT request. Pass `null` to disable remote synchronization.
 </dd>
 <dt>storage</dt>
 <dd>
-    Type: <code>object</code>, 
+    Type: <code>object</code>,
     default: <code>window.localStorage</code><br>
     Instance of [Web Storage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API).<br>
     Possible values are `window.localStorage`, `window.sessionStorage`.<br>
