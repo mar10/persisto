@@ -198,7 +198,7 @@ store.set("foo", "bar");
 
 // Page reload would prevent the delayed commit from happen, so we force
 // synchronization:
-commit();
+store.commit();
 
 location.reload();
 ```
@@ -243,10 +243,11 @@ The following options are available:
 <dd>
     Type: <code>int</code>,
     default: <code>500</code> milliseconds<br>
-    Commit changes after 0.5 seconds of inactivity.<br>
-    This means, after each change, we wait 0.5 more seconds for additional changes
-    to come in, before the actual commit is executed.<br>
-    The total delay (first change until actual commit) is limited by `maxCommitDelay`.<br>
+    Commit cached changes to localStorage after 0.5 seconds of inactivity.<br>
+    After each change, we wait 0.5 more seconds for additional changes to come
+    in, before the actual commit is executed.<br>
+    The maximum delay (first change until actual commit) is limited by
+    `maxCommitDelay`.<br>
     Set to <code>0</code> to force synchronous mode.
 </dd>
 <dt>debugLevel</dt>
@@ -265,19 +266,22 @@ The following options are available:
 <dd>
     Type: <code>int</code>,
     default: <code>3000</code> milliseconds<br>
-    Commit changes max. 3 seconds after first change.
+    Commit every change max. 3 seconds after it occurred.
 </dd>
 <dt>maxPushDelay</dt>
 <dd>
     Type: <code>int</code>,
     default: <code>30000</code> milliseconds<br>
-    Push commits to remote max. 30 seconds after first change.
+    Push every commit to remote max. 30 seconds after it occurred.
 </dd>
 <dt>pushDelay</dt>
 <dd>
     Type: <code>int</code>,
     default: <code>5000</code> milliseconds<br>
-    Push commits to remote after 5 seconds of inactivity.
+    Push commits to remote after 5 seconds of inactivity.<br>
+    After each change, we wait 5 more seconds for additional changes to come
+    in, before the actual push is executed.<br>
+    The maximum delay (first change until actual push) is limited by `maxPushDelay`.<br>
     Set to <code>0</code> to force synchronous mode.
 </dd>
 <dt>remote</dt>
