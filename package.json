@@ -47,7 +47,7 @@
     "grunt-jscs": "^2.7.0",
     "grunt-saucelabs": "^8.1.1",
     "grunt-text-replace": "^0.4.0",
-    "grunt-yabs": "^1.0.0"
+    "grunt-yabs": "^1.1.0"
   },
   "scripts": {
     "test": "grunt ci --verbose"

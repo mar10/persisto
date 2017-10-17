@@ -34,7 +34,7 @@ or include directly from CDN: [![](https://data.jsdelivr.com/v1/package/npm/pers
 [UNPKG](https://unpkg.com/persisto@latest/dist/persisto.min.js):
 
 ```html
-  <script src="//cdn.jsdelivr.net/gh/mar10/persisto@v1.1.0/dist/persisto.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/persisto@1/dist/persisto.min.js"></script>
 ```
 
 then instantiate a `PersistentObject`:
