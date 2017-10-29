@@ -12,7 +12,7 @@ module.exports = (grunt) ->
 
   grunt.initConfig
 
-    pkg: 
+    pkg:
         grunt.file.readJSON("package.json")
 
     # Project metadata, used by the <banner> directive.
@@ -90,10 +90,10 @@ module.exports = (grunt) ->
         # options:
         #   timeout: 20000
         #   '--cookies-file': 'misc/cookies.txt'
-        build: [ 
-            "test/unit/test-core-build.html" 
+        build: [
+            "test/unit/test-core-build.html"
         ]
-        develop: [ 
+        develop: [
           "test/unit/test-core.html"
         ]
 
@@ -103,7 +103,8 @@ module.exports = (grunt) ->
             overwrite : true
             replacements: [ {
                 from : /@DATE/g
-                to : "<%= grunt.template.today('yyyy-mm-dd\"T\"HH:MM') %>"
+                # https://github.com/felixge/node-dateformat
+                to : "<%= grunt.template.today('isoUtcDateTime') %>"
             },{
                 from : /buildType:\s*\"[a-zA-Z]+\"/g
                 to : "buildType: \"production\""
@@ -176,7 +177,7 @@ module.exports = (grunt) ->
             run_test: { tasks: ['test'] }
             check: { branch: ['master'], canPush: true, clean: true, cmpVersion: 'gte' }
             bump: {} # 'bump' also uses the increment mode `yabs:release:MODE`
-            run_build: { tasks: ['make_release'] }
+            run_build: { tasks: ['make_dist'] }
             commit: { add: '.' }
             tag: {}
             push: { tags: true, useFollowTags: true },
@@ -231,8 +232,8 @@ module.exports = (grunt) ->
       # "uglify:build"
       # "qunit:build"
       ]
-  
-  grunt.registerTask "make_release", [
+
+  grunt.registerTask "make_dist", [
       "build"
       "clean:dist"
       "copy:dist"

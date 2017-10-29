@@ -1,18 +1,28 @@
 /*!
  * persisto.js
  *
- * Persistent Javascript objects and web forms using Web Storage.
+ * Persistent JavaScript objects and web forms using Web Storage.
  *
- * Copyright (c) 2016, Martin Wendt (http://wwWendt.de)
+ * Copyright (c) 2016-2017, Martin Wendt (http://wwWendt.de)
  * Released under the MIT license
  *
- * @version 1.1.0
- * @date 2016-08-14T10:00
+ * @version 1.1.1-0
+ * @date 2017-10-29T20:57:41Z
  */
 
-;(function($, window, document, undefined) {
+( function( factory ) {
+	if ( typeof define === "function" && define.amd ) {
+		// AMD. Register as an anonymous module.
+		define( [ "jquery" ], factory );
+	} else if ( typeof module === "object" && module.exports ) {
+		// Node/CommonJS
+		module.exports = factory( require( "jquery" ) );
+	} else {
+		// Browser globals
+		factory( jQuery );
+	}
 
-/*globals console */
+}( function( $ ) {
 
 "use strict";
 
@@ -20,12 +30,10 @@
  * Private functions and variables
  */
 
-var MAX_INT = 9007199254740991;
-
-/* Return current time stamp. */
-function _getNow() {
-	return new Date().getTime();
-}
+var MAX_INT = 9007199254740991,
+	// Allow mangling of some global names:
+	console = window.console,
+	error = $.error;
 
 /**
  * A persistent plain object or array.
@@ -35,14 +43,14 @@ window.PersistentObject = function(namespace, opts) {
 	var prevValue,
 		self = this,
 		dfd = $.Deferred(),
-		stamp = _getNow();
+		stamp = Date.now();
 
     /* jshint ignore:start */  // disable warning 'PersistentObject is not defined'
-	if ( !(this instanceof PersistentObject) ) { $.error("Must use 'new' keyword"); }
+	if ( !(this instanceof PersistentObject) ) { error("Must use 'new' keyword"); }
     /* jshint ignore:end */
 
 	if ( typeof namespace !== "string" ) {
-		$.error(this + ": Missing required argument: namespace");
+		error(this + ": Missing required argument: namespace");
 	}
 
 	this.opts = $.extend({
@@ -118,13 +126,13 @@ window.PersistentObject = function(namespace, opts) {
 
 window.PersistentObject.prototype = {
 	/** @type {string} */
-	version: "1.1.0",      // Set to semver by 'grunt release'
+	version: "1.1.1-0",      // Set to semver by 'grunt release'
 
 	/* Trigger commit/push according to current settings. */
 	_invalidate: function(hint, deferredCall) {
 		var self = this,
 			prevChange = this.lastModified,
-			now = _getNow(),
+			now = Date.now(),
 			nextCommit = 0,
 			nextPush = 0,
 			nextCheck = 0;
@@ -197,7 +205,7 @@ window.PersistentObject.prototype = {
 		}
 		this._data = objData;
 		// this.dirty = false;
-		this.lastUpdate = _getNow();
+		this.lastUpdate = Date.now();
 	},
 	/* Return readable string representation for this instance. */
 	toString: function() {
@@ -207,14 +215,14 @@ window.PersistentObject.prototype = {
 	debug: function() {
 		if ( this.opts.debugLevel >= 2 ) {
 			Array.prototype.unshift.call(arguments, this.toString());
-			console.log.apply(window.console, arguments);
+			console.log.apply(console, arguments);
 		}
 	},
 	/* Log to console if opts.debugLevel >= 1 */
 	log: function() {
 		if ( this.opts.debugLevel >= 1 ) {
 			Array.prototype.unshift.call(arguments, this.toString());
-			console.log.apply(window.console, arguments);
+			console.log.apply(console, arguments);
 		}
 	},
 	/** Return true if there are uncommited or unpushed modifications. */
@@ -244,7 +252,7 @@ window.PersistentObject.prototype = {
 		for (i = 0; i < parts.length; i++) {
 			cur = cur[parts[i]];
 			if ( cur === undefined && i < (parts.length - 1) ) {
-				$.error(this + ": Property '" + key + "' could not be accessed because parent '" +
+				error(this + ": Property '" + key + "' could not be accessed because parent '" +
 					parts.slice(0, i + 1).join(".") + "' does not exist");
 			}
 		}
@@ -269,7 +277,7 @@ window.PersistentObject.prototype = {
 					this.debug("Creating intermediate parent '" + parts[i] + "'");
 					cur = parent[parts[i]] = {};
 				} else {
-					$.error(this + ": Property '" + key + "' could not be set because parent '" +
+					error(this + ": Property '" + key + "' could not be set because parent '" +
 						parts.slice(0, i + 1).join(".") + "' does not exist");
 				}
 			}
@@ -307,7 +315,7 @@ window.PersistentObject.prototype = {
 	/** Load data from localStorage. */
 	update: function() {
 		if ( this.phase ) {
-			$.error(this + ": Trying to update while '" + this.phase + "' is pending.");
+			error(this + ": Trying to update while '" + this.phase + "' is pending.");
 		}
 		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(this + ".update"); }
 		var data = this.storage.getItem(this.namespace);
@@ -319,7 +327,7 @@ window.PersistentObject.prototype = {
 	commit: function() {
 		var data;
 		if ( this.phase ) {
-			$.error(this + ": Trying to commit while '" + this.phase + "' is pending.");
+			error(this + ": Trying to commit while '" + this.phase + "' is pending.");
 		}
 		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(this + ".commit"); }
 		// try { data = JSON.stringify(this._data); } catch(e) { }
@@ -328,7 +336,7 @@ window.PersistentObject.prototype = {
 		// this.dirty = false;
 		this.uncommittedSince = null;
 		this.commitCount += 1;
-		// this.lastCommit = _getNow();
+		// this.lastCommit = Date.now();
 		if ( this.opts.debugLevel >= 2 && console.time ) { console.timeEnd(this + ".commit"); }
 		return data;
 	},
@@ -337,7 +345,7 @@ window.PersistentObject.prototype = {
 		var self = this;
 
 		if ( this.phase ) {
-			$.error(this + ": Trying to pull while '" + this.phase + "' is pending.");
+			error(this + ": Trying to pull while '" + this.phase + "' is pending.");
 		}
 		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(this + ".pull"); }
 		this.phase = "pull";
@@ -354,7 +362,7 @@ window.PersistentObject.prototype = {
 			}
 			self.storage.setItem(self.namespace, strData);
 			self._update(objData);
-			self.lastPull = _getNow();
+			self.lastPull = Date.now();
 		}).fail(function() {
 			self.opts.error(arguments);
 		}).always(function() {
@@ -368,18 +376,18 @@ window.PersistentObject.prototype = {
 			data = this.commit();
 
 		if ( this.phase ) {
-			$.error(this + ": Trying to push while '" + this.phase + "' is pending.");
+			error(this + ": Trying to push while '" + this.phase + "' is pending.");
 		}
 		if ( this.opts.debugLevel >= 2 && console.time ) { console.time(self + ".push"); }
 		this.phase = "push";
-		if ( !this.opts.remote ) { $.error(this + ": Missing remote option"); }
+		if ( !this.opts.remote ) { error(this + ": Missing remote option"); }
 		return $.ajax({
 			type: "PUT",
 			url: this.opts.remote,
 			data: data
 		}).done(function() {
 			// console.log("PUT", arguments);
-			// self.lastPush = _getNow();
+			// self.lastPush = Date.now();
 			self.unpushedSince = null;
 			self.pushCount += 1;
 		}).fail(function() {
@@ -475,5 +483,6 @@ window.PersistentObject.prototype = {
 	}
 };
 // -----------------------------------------------------------------------------
-
-}(jQuery, window, document));
+// Value returned by `require('persisto')`
+return window.PersistentObject;
+}) );  // End of closure
