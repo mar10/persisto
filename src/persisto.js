@@ -1,16 +1,28 @@
 /*!
  * persisto.js
  *
- * Persistent Javascript objects and web forms using Web Storage.
+ * Persistent JavaScript objects and web forms using Web Storage.
  *
- * Copyright (c) 2016, Martin Wendt (http://wwWendt.de)
+ * Copyright (c) 2016-2017, Martin Wendt (http://wwWendt.de)
  * Released under the MIT license
  *
  * @version @VERSION
  * @date @DATE
  */
 
-;(function($, window, document, undefined) {
+( function( factory ) {
+	if ( typeof define === "function" && define.amd ) {
+		// AMD. Register as an anonymous module.
+		define( [ "jquery" ], factory );
+	} else if ( typeof module === "object" && module.exports ) {
+		// Node/CommonJS
+		module.exports = factory( require( "jquery" ) );
+	} else {
+		// Browser globals
+		factory( jQuery );
+	}
+
+}( function( $ ) {
 
 "use strict";
 
@@ -23,11 +35,6 @@ var MAX_INT = 9007199254740991,
 	console = window.console,
 	error = $.error;
 
-/* Return current time stamp. */
-function _getNow() {
-	return new Date().getTime();
-}
-
 /**
  * A persistent plain object or array.
  */
@@ -36,7 +43,7 @@ window.PersistentObject = function(namespace, opts) {
 	var prevValue,
 		self = this,
 		dfd = $.Deferred(),
-		stamp = _getNow();
+		stamp = Date.now();
 
     /* jshint ignore:start */  // disable warning 'PersistentObject is not defined'
 	if ( !(this instanceof PersistentObject) ) { error("Must use 'new' keyword"); }
@@ -125,7 +132,7 @@ window.PersistentObject.prototype = {
 	_invalidate: function(hint, deferredCall) {
 		var self = this,
 			prevChange = this.lastModified,
-			now = _getNow(),
+			now = Date.now(),
 			nextCommit = 0,
 			nextPush = 0,
 			nextCheck = 0;
@@ -198,7 +205,7 @@ window.PersistentObject.prototype = {
 		}
 		this._data = objData;
 		// this.dirty = false;
-		this.lastUpdate = _getNow();
+		this.lastUpdate = Date.now();
 	},
 	/* Return readable string representation for this instance. */
 	toString: function() {
@@ -329,7 +336,7 @@ window.PersistentObject.prototype = {
 		// this.dirty = false;
 		this.uncommittedSince = null;
 		this.commitCount += 1;
-		// this.lastCommit = _getNow();
+		// this.lastCommit = Date.now();
 		if ( this.opts.debugLevel >= 2 && console.time ) { console.timeEnd(this + ".commit"); }
 		return data;
 	},
@@ -355,7 +362,7 @@ window.PersistentObject.prototype = {
 			}
 			self.storage.setItem(self.namespace, strData);
 			self._update(objData);
-			self.lastPull = _getNow();
+			self.lastPull = Date.now();
 		}).fail(function() {
 			self.opts.error(arguments);
 		}).always(function() {
@@ -380,7 +387,7 @@ window.PersistentObject.prototype = {
 			data: data
 		}).done(function() {
 			// console.log("PUT", arguments);
-			// self.lastPush = _getNow();
+			// self.lastPush = Date.now();
 			self.unpushedSince = null;
 			self.pushCount += 1;
 		}).fail(function() {
@@ -476,5 +483,6 @@ window.PersistentObject.prototype = {
 	}
 };
 // -----------------------------------------------------------------------------
-
-}(jQuery, window, document));
+// Value returned by `require('persisto')`
+return window.PersistentObject;
+}) );  // End of closure

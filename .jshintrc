@@ -23,7 +23,9 @@
 
 	"browser": true,
 	"globals": {
-		"define": true,
-		"jQuery": true
+		"define": false,
+		"jQuery": false,
+		"module": false,
+		"require": false
 	}
 }

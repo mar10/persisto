@@ -1,17 +1,21 @@
-# persisto [![GitHub version](https://badge.fury.io/gh/mar10%2Fpersisto.svg)](https://github.com/mar10/persisto/releases/latest) [![Build Status](https://travis-ci.org/mar10/persisto.svg?branch=master)](https://travis-ci.org/mar10/persisto)
+# persisto
+[![GitHub version](https://img.shields.io/github/release/mar10/persisto.svg)](https://github.com/mar10/persisto/releases/latest) 
+[![Build Status](https://travis-ci.org/mar10/persisto.svg?branch=master)](https://travis-ci.org/mar10/persisto)
+[![npm](https://img.shields.io/npm/dm/jquery.persisto.svg)](https://www.npmjs.com/package/jquery.persisto)
+[![](https://data.jsdelivr.com/v1/package/npm/persisto/badge)](https://www.jsdelivr.com/package/npm/persisto)
 
-> Persistent Javascript objects and web forms using Web Storage.
+> Persistent JavaScript objects and web forms using Web Storage.
 
 Features
 
-  - Persist Javascript objects (`{...}`) to
+  - Persist JavaScript objects (`{...}`) to
     [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API).<br>
     Use the `get()`/`set()` API for direct (even nested) access, hiding the need
     to convert from/to JSON.
   - Cache access to
     [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
     (deferred writing appears to be 10-15 times faster) and remote backends.
-  - Make Javascript objects editable in HTML forms.<br>
+  - Make JavaScript objects editable in HTML forms.<br>
     Common use case: maintain persistent client settings and let users edit them.
   - Optionally synchronize the data with a remote endpoint
 
@@ -34,7 +38,7 @@ or include directly from CDN: [![](https://data.jsdelivr.com/v1/package/npm/pers
 [UNPKG](https://unpkg.com/persisto@latest/dist/persisto.min.js):
 
 ```html
-  <script src="//cdn.jsdelivr.net/npm/persisto@1/dist/persisto.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/persisto@1/dist/persisto.min.js"></script>
 ```
 
 then instantiate a `PersistentObject`:
@@ -143,7 +147,7 @@ settingsStore.readFromForm(this, {
 
 ### Storing Arrays
 
-Arrays are only a special form of plain Javascript objects, so we can store and
+Arrays are only a special form of plain JavaScript objects, so we can store and
 access them as top level type like this:
 
 ```js

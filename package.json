@@ -1,7 +1,7 @@
 {
   "name": "persisto",
-  "title": "Persistent Javascript objects and web forms using Web Storage.",
-  "description": "Persist Javascript objects to localStorage and remote servers.",
+  "title": "Persistent JavaScript objects and web forms using Web Storage.",
+  "description": "Persist JavaScript objects to localStorage and remote servers.",
   "filename": "dist/persisto.min.js",
   "main": "dist/persisto.js",
   "version": "1.1.1-0",
