@@ -66,25 +66,49 @@ module.exports = (grunt) ->
         dist: # copy build folder to dist
             files: [{expand: true, cwd: "build/", src: ["**"], dest: "dist/"}]
 
-    jscs:
-      src: ["src/*.js", "test/*.js"]
-      options:
-        config: ".jscsrc"
-        force: true
+    eslint:
+        # options:
+        #   # See https://github.com/sindresorhus/grunt-eslint/issues/119
+        #   quiet: true
+        # We have to explicitly declare "src" property otherwise "newer"
+        # task wouldn't work properly :/
+        dist:
+            src: "dist/persisto.js"
+        dev:
+            options:
+                fix: false
+                maxWarnings: 100
+            src: [
+              "src/*.js"
+              "test/test-*.js"
+              ]
+        fix:
+            options:
+                fix: true
+            src: [
+              "src/*.js"
+              "test/test-*.js"
+              ]
 
-    jshint:
-        options:
-            # Linting according to http://contribute.jquery.org/style-guide/js/
-            jshintrc: ".jshintrc"
-        beforeConcat: [
-            # "Gruntfile.js"
-            "src/*.js"
-            "test/*.js"
-            ]
-        afterConcat: [
-            "<%= concat.core.dest %>"
-            "<%= concat.all.dest %>"
-            ]
+    # jscs:
+    #   src: ["src/*.js", "test/*.js"]
+    #   options:
+    #     config: ".jscsrc"
+    #     force: true
+
+    # jshint:
+    #     options:
+    #         # Linting according to http://contribute.jquery.org/style-guide/js/
+    #         jshintrc: ".jshintrc"
+    #     beforeConcat: [
+    #         # "Gruntfile.js"
+    #         "src/*.js"
+    #         "test/*.js"
+    #         ]
+    #     afterConcat: [
+    #         "<%= concat.core.dest %>"
+    #         "<%= concat.all.dest %>"
+    #         ]
 
     qunit:
         # options:
@@ -163,11 +187,12 @@ module.exports = (grunt) ->
             dest: "build/persisto.min.js"
 
     watch:
-        jshint:
+        eslint:
             options:
                 atBegin: true
             files: ["src/*.js", "test/unit/*.js", "demo/**/*.js"]
-            tasks: ["jshint:beforeConcat", "jscs"]
+            tasks: ["eslint:dev"]
+            # tasks: ["jshint:beforeConcat", "jscs"]
 
     yabs:
         release:
@@ -203,9 +228,10 @@ module.exports = (grunt) ->
   grunt.registerTask "dev", ["connect:dev", "watch"]
   # grunt.registerTask "tabfix", ["exec:tabfix"]
   grunt.registerTask "test", [
-      "jshint:beforeConcat"
+    #   "jshint:beforeConcat"
       # "csslint"
-      "jscs"
+      "eslint:dev"
+    #   "jscs"
       "qunit:develop"
   ]
 
@@ -222,6 +248,7 @@ module.exports = (grunt) ->
   grunt.registerTask "ci", ["test"]  # Called by 'npm test'
 
   grunt.registerTask "build", [
+      "eslint:fix"
       "test"
       "clean:build"
       "copy:build"
