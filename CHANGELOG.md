@@ -1,5 +1,6 @@
 # 1.2.0-0 / Unreleased
   * [ADD] AMD wrapper and module support (`persisto = require('persisto')`).
+  * [CHANGE] Apply and enforce 'prettier' codestyle
 
 # 1.1.0 / 2016-08-14
   * [CHANGE] Rename `.init` option to `.defaults`.
