@@ -1,4 +1,5 @@
-# 1.2.0-0 / Unreleased
+# 1.2.1-0 / Unreleased
+# 1.2.0 / 2019-09-07
   * [ADD] AMD wrapper and module support (`persisto = require('persisto')`).
   * [CHANGE] Apply and enforce 'prettier' codestyle
 
