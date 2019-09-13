@@ -1,4 +1,7 @@
 # 1.2.1-0 / Unreleased
+  * [Changed] jQuery is now a peerDependency (>=1.12), so users can install or re-use their own version.
+
+
 # 1.2.0 / 2019-09-07
   * [ADD] AMD wrapper and module support (`persisto = require('persisto')`).
   * [CHANGE] Apply and enforce 'prettier' codestyle

@@ -53,6 +53,9 @@
     "grunt-yabs": "^1.1.4",
     "prettier": "^1.15.3"
   },
+  "peerDependencies": {
+    "jquery": ">=1.12"
+  },
   "scripts": {
     "test": "grunt ci --verbose"
   },
