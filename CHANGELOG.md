@@ -1,6 +1,8 @@
 # 1.2.1-0 / Unreleased
-  * [Changed] jQuery is now a peerDependency (>=1.12), so users can install or re-use their own version.
-
+  * [Changed] jQuery is now a peerDependency (>=1.12), so users can install or
+    re-use their own version.
+  * [FIX] #3: `writeToForm()` skips input elements of type 'file', because setting
+    these values would raise an exception.
 
 # 1.2.0 / 2019-09-07
   * [ADD] AMD wrapper and module support (`persisto = require('persisto')`).

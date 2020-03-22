@@ -551,6 +551,8 @@
                 $.isArray(v) ? $.inArray(this.value, v) >= 0 : this.value === v
               );
             });
+          } else if (type === "file") {
+            // #3 skip type=file
           } else {
             $input.val(v);
           }
