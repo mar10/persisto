@@ -1,4 +1,6 @@
-# 1.2.1-0 / Unreleased
+# 1.3.1-0 / Unreleased
+
+# 1.3.0 / 2020-09-11
   * [Changed] jQuery is now a peerDependency (>=1.12), so users can install or
     re-use their own version.
   * [FIX] #3: `writeToForm()` skips input elements of type 'file', because setting
