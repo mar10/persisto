@@ -42,10 +42,10 @@
       dfd = $.Deferred(),
       stamp = Date.now(); // disable warning 'PersistentObject is not defined'
 
-    /* jshint ignore:start */ if (!(this instanceof PersistentObject)) {
+    // eslint-disable-next-line no-undef
+    if (!(this instanceof PersistentObject)) {
       error("Must use 'new' keyword");
     }
-    /* jshint ignore:end */
 
     if (typeof namespace !== "string") {
       error(this + ": Missing required argument: namespace");
@@ -104,7 +104,11 @@
         })
         .fail(function() {
           self.offline = true;
-          if (prevValue != null) {
+          if (prevValue == null) {
+            console.warn(
+              self + ": could not init from remote; falling back default."
+            );
+          } else {
             console.warn(
               self + ": could not init from remote; falling back to storage."
             );
@@ -114,13 +118,10 @@
               self.opts.defaults,
               JSON.parse(prevValue)
             );
-          } else {
-            console.warn(
-              self + ": could not init from remote; falling back default."
-            );
           }
           dfd.resolve();
         });
+      // eslint-disable-next-line no-negated-condition
     } else if (prevValue != null) {
       this.update();
       // We still extend from opts.defaults, in case some fields where missing
@@ -153,7 +154,9 @@
         this._checkTimer = null;
       }
 
-      if (!deferredCall) {
+      if (deferredCall) {
+        this.debug("_invalidate() recursive");
+      } else {
         // this.debug("_invalidate(" + hint + ")");
         this.lastModified = now;
         if (!this.uncommittedSince) {
@@ -163,8 +166,6 @@
           this.unpushedSince = now;
         }
         this.opts.change(hint);
-      } else {
-        this.debug("_invalidate() recursive");
       }
 
       if (this.storage) {
@@ -345,8 +346,7 @@
     },
     /** Flag object as modified, so that commit / push will be scheduled. */
     setDirty: function(flag) {
-      if (flag === false) {
-      } else {
+      if (flag !== false) {
         this._invalidate("explicit");
       }
     },
