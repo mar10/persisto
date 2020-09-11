@@ -2,10 +2,6 @@
 Build scripts for persisto
 ###
 
-# jshint directives for the generated JS:
-
-###jshint node: true, unused: false ###
-
 "use strict"
 
 module.exports = (grunt) ->
@@ -90,26 +86,6 @@ module.exports = (grunt) ->
               "test/test-*.js"
               ]
 
-    # jscs:
-    #   src: ["src/*.js", "test/*.js"]
-    #   options:
-    #     config: ".jscsrc"
-    #     force: true
-
-    # jshint:
-    #     options:
-    #         # Linting according to http://contribute.jquery.org/style-guide/js/
-    #         jshintrc: ".jshintrc"
-    #     beforeConcat: [
-    #         # "Gruntfile.js"
-    #         "src/*.js"
-    #         "test/*.js"
-    #         ]
-    #     afterConcat: [
-    #         "<%= concat.core.dest %>"
-    #         "<%= concat.all.dest %>"
-    #         ]
-
     qunit:
         # options:
         #   timeout: 20000
@@ -192,7 +168,6 @@ module.exports = (grunt) ->
                 atBegin: true
             files: ["src/*.js", "test/unit/*.js", "demo/**/*.js"]
             tasks: ["eslint:dev"]
-            # tasks: ["jshint:beforeConcat", "jscs"]
 
     yabs:
         release:
@@ -228,10 +203,7 @@ module.exports = (grunt) ->
   grunt.registerTask "dev", ["connect:dev", "watch"]
   # grunt.registerTask "tabfix", ["exec:tabfix"]
   grunt.registerTask "test", [
-    #   "jshint:beforeConcat"
-      # "csslint"
       "eslint:dev"
-    #   "jscs"
       "qunit:develop"
   ]
 
@@ -255,7 +227,6 @@ module.exports = (grunt) ->
       "uglify:build"
       # "clean:extMin"
       "replace:production"
-      # "jshint:afterConcat"
       # "uglify:build"
       # "qunit:build"
       ]
