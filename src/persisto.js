@@ -520,12 +520,12 @@
     /** Write data to form elements with the same name.
      */
     writeToForm: function(form, options) {
-      var $form = $(form);
-      self = this;
+      var $form = $(form),
+        self = this;
 
       $.each(this._data, function(k) {
-        var v = self.get(k);
-        var $input = $form.find("[name='" + k + "']"),
+        var v = self.get(k),
+          $input = $form.find("[name='" + k + "']"),
           type = $input.attr("type");
 
         if ($input.length) {
