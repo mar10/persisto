@@ -3,6 +3,7 @@
     re-use their own version.
   * [FIX] #3: `writeToForm()` skips input elements of type 'file', because setting
     these values would raise an exception.
+  * [FIX] #6: `writeToForm()` handles complex input names.
   * Update to jQuery 3.5.1 and Qunit 2.11
 
 # 1.2.0 / 2019-09-07
