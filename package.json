@@ -30,7 +30,6 @@
     "cache",
     "localStorage",
     "sessionStorage",
-    "ecosystem:jquery",
     "persistence"
   ],
   "devDependencies": {

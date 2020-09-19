@@ -3,7 +3,7 @@
  *
  * Persistent JavaScript objects and web forms using Web Storage.
  *
- * Copyright (c) 2016-2017, Martin Wendt (http://wwWendt.de)
+ * Copyright (c) 2016-2020, Martin Wendt (https://wwWendt.de)
  * Released under the MIT license
  *
  * @version @VERSION
@@ -14,7 +14,6 @@
   TODO:
   - remove  eslint relaxes;
   - change eslint to non-jquery
-  - fetch is not supported by IE
   - use :scope for querySelectorAll
 */
 (function(factory) {

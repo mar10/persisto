@@ -1,5 +1,6 @@
 # 2.0.0-0 / Unreleased
-  * Drop jQuery
+  * Drop dependency on jQuery
+  * Drop support for IE
 
 # 1.3.1-0 / Unreleased
 

@@ -78,7 +78,7 @@ the data is serialized to JSON and written to `localStorage.mySettings`.
 **More:**
 
   * Try the [online example](http://plnkr.co/edit/qcDmvN?p=preview).
-  * Run the [unit tests](http://rawgit.com/mar10/persisto/master/test/unit/test-core.html).
+  * Run the [unit tests](https://rawgit.com/mar10/persisto/master/test/unit/test-core.html).
 
 
 ## Synchronize Data with HTML Forms
@@ -349,7 +349,7 @@ Following a list of available methods:
     Read data properties from form input elements with the same name.<br>
     Supports elements of input (type: text, radio, checkbox), textarea,
     and select.<br>
-    *form* may be a form selector or jQuery object. Example: `"#myForm"`.<br>
+    *form* may be a form element or selector string. Example: `"#myForm"`.<br>
     *options* is optional and defaults to <code>{addNew: false, coerce: true, trim: true}</code>.
 </dd>
 <dt>remove(key)</dt>

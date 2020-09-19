@@ -27,21 +27,18 @@
     "cache",
     "localStorage",
     "sessionStorage",
-    "ecosystem:jquery",
     "persistence"
   ],
   "authors": [
     {
       "name": "Martin Wendt",
-      "homepage": "http://careers.stackoverflow.com/martin-wendt"
+      "homepage": "https://careers.stackoverflow.com/martin-wendt"
     }
   ],
   "repository": {
     "type": "git",
     "url": "git://github.com/mar10/persisto.git"
   },
-  "dependencies": {
-    "jquery": ">=1.7"
-  },
+  "dependencies": {},
   "devDependencies": {}
 }
