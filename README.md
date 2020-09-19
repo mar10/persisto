@@ -28,6 +28,11 @@ Overview:
 
 Requirements:
 
+  - <strike>jQuery</strike> not required since v2.0
+  - Recent major browser (Internet Explorer is **not** supported!)
+
+Requirements for version 1.x:
+
   - jQuery
   - IE 8+ or any recent major browser
 

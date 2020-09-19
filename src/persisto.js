@@ -577,10 +577,10 @@
           self._update(objData);
           self.lastPull = Date.now();
         })
-        .fail(function() {
+        .catch(function() {
           self.opts.error(arguments);
         })
-        .always(function() {
+        .finally(function() {
           self.phase = null;
           if (self.opts.debugLevel >= 2 && console.time) {
             console.timeEnd(self + ".pull");
@@ -606,16 +606,16 @@
         method: "PUT",
         data: data,
       })
-        .done(function() {
+        .then(function() {
           // console.log("PUT", arguments);
           // self.lastPush = Date.now();
           self.unpushedSince = null;
           self.pushCount += 1;
         })
-        .fail(function() {
+        .catch(function() {
           self.opts.error(arguments);
         })
-        .always(function() {
+        .finally(function() {
           self.phase = null;
           if (self.opts.debugLevel >= 2 && console.time) {
             console.timeEnd(self + ".push");
@@ -728,9 +728,10 @@
           });
         } else if (type === "checkbox") {
           if (inputItems.length === 1) {
+            // single checkbox treated as bool
             item.checked = !!v;
           } else {
-            // multi-value checkbox
+            // multi-checkbox group is treated as array of values
             for (i = 0; i < inputItems.length; i++) {
               elem = inputItems[i];
               match = vIsArray ? v.indexOf(elem.value) >= 0 : elem.value === v;
