@@ -10,28 +10,191 @@
  * @date @DATE
  */
 
+/*
+  TODO:
+  - remove  eslint relaxes;
+  - change eslint to non-jquery
+  - fetch is not supported by IE
+  - use :scope for querySelectorAll
+*/
 (function(factory) {
   if (typeof define === "function" && define.amd) {
     // AMD. Register as an anonymous module.
-    define(["jquery"], factory);
+    define([], factory);
   } else if (typeof module === "object" && module.exports) {
     // Node/CommonJS
-    module.exports = factory(require("jquery"));
+    module.exports = factory();
   } else {
     // Browser globals
-    factory(jQuery);
+    factory();
   }
-})(function($) {
+})(function() {
   "use strict";
+
+  /**
+   * Deferred is a ES6 Promise, that exposes the resolve() method
+   */
+  var Deferred = function() {
+    var self = this;
+    // eslint-disable-next-line no-undef
+    if (!(this instanceof Deferred)) {
+      throw new Error("Must use 'new' keyword");
+    }
+    this.resolve = null;
+    this.reject = null;
+    this._promise = new Promise(function(resolve, reject) {
+      self.resolve = resolve;
+      self.reject = reject;
+    });
+  };
+  Deferred.prototype = {
+    /** Return `Promise` instance. */
+    promise: function() {
+      return this._promise;
+    },
+  };
+
+  /**
+   * jQuery Shims
+   * http://youmightnotneedjquery.com
+   */
+
+  // eslint-disable-next-line one-var
+  var shim = {
+    each: function(obj, callback) {
+      if (obj == null) {
+        // accept `null` or `undefined`
+        return obj;
+      }
+      var length = obj.length,
+        i = 0;
+
+      if (typeof length === "number") {
+        for (; i < length; i++) {
+          if (callback.call(obj[i], i, obj[i]) === false) {
+            break;
+          }
+        }
+      } else {
+        for (i in obj) {
+          if (callback.call(obj[i], i, obj[i]) === false) {
+            break;
+          }
+        }
+      }
+      return obj;
+    },
+    error: function(msg) {
+      throw new Error(msg);
+    },
+    extend: function() {
+      for (var i = 1; i < arguments.length; i++) {
+        var arg = arguments[i];
+        for (var key in arg) {
+          if (Object.prototype.hasOwnProperty.call(arg, key)) {
+            arguments[0][key] = arg[key];
+          }
+        }
+      }
+      return arguments[0];
+    },
+    // grep: function(elems, callback, invert) {
+    //   var callbackInverse,
+    //     matches = [],
+    //     i = 0,
+    //     length = elems.length,
+    //     callbackExpect = !invert;
+
+    //   // Go through the array, only saving the items
+    //   // that pass the validator function
+    //   for (; i < length; i++) {
+    //     callbackInverse = !callback(elems[i], i);
+    //     if (callbackInverse !== callbackExpect) {
+    //       matches.push(elems[i]);
+    //     }
+    //   }
+    //   return matches;
+    // },
+    // isArray: Array.isArray,
+    // inArray: function(item, arr) {
+    //   return arr.indexOf(item);
+    // },
+    isEmptyObject: function(obj) {
+      // var name;
+      // // eslint-disable-next-line guard-for-in
+      // for (name in obj) {
+      //   return false;
+      // }
+      // return true;
+      // because Object.keys(new Date()).length === 0
+      // we have to do some additional check
+      return Object.keys(obj).length === 0 && obj.constructor === Object;
+    },
+    isPlainObject: function(obj) {
+      return Object.prototype.toString.call(obj) === "[object Object]";
+    },
+    // map: function(arr, callback) {
+    //   return Array.prototype.map.call(arr, function(currentValue, index, array) {
+    //     return callback.call(this, currentValue, index, array);
+    //   });
+    // },
+    noop: function() {},
+    ready: function(fn) {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", fn);
+      } else {
+        fn();
+      }
+    },
+    type: function(obj) {
+      return Object.prototype.toString
+        .call(obj)
+        .replace(/^\[object (.+)\]$/, "$1")
+        .toLowerCase();
+    },
+    /*
+     * Helpers (not jQuery syntax)
+     */
+    // getVal: function(elem) {
+    //   var type = elem.getAttribute("type");
+    //   if (type === "radio") {
+    //     // TODO: querySelector() may return null:
+    //     val = elem.querySelector(">option:checked").value;
+    //   } else if (type === "checkbox" && inputItems.length === 1) {
+    //     val = !!inputItems[0].checked;
+    //   } else if (type === "checkbox" && inputItems.length > 1) {
+    //     val = [];
+    //     inputItems.forEach(function(elem) {
+    //       if (elem.checked) {
+    //         val.push(elem.value);
+    //       }
+    //     });
+    //   } else if (inputItems[0].matches("select")) {
+    //     val = [];
+    //     inputItems[0].querySelectorAll("option").forEach(function(elem) {
+    //       if (elem.selected) {
+    //         val.push(elem.value);
+    //       }
+    //     });
+    //   } else {
+    //     val = inputItems[0].value;
+    //     if (opts.trim && typeof val === "string") {
+    //       val = val.trim();
+    //     }
+    //   }
+    // },
+  };
 
   /*******************************************************************************
    * Private functions and variables
    */
 
+  // eslint-disable-next-line one-var
   var MAX_INT = 9007199254740991,
     // Allow mangling of some global names:
     console = window.console,
-    error = $.error;
+    noop = shim.noop,
+    error = shim.error;
 
   /**
    * A persistent plain object or array.
@@ -39,7 +202,7 @@
   window.PersistentObject = function(namespace, opts) {
     var prevValue,
       self = this,
-      dfd = $.Deferred(),
+      dfd = new Deferred(),
       stamp = Date.now(); // disable warning 'PersistentObject is not defined'
 
     // eslint-disable-next-line no-undef
@@ -51,7 +214,7 @@
       error(this + ": Missing required argument: namespace");
     }
 
-    this.opts = $.extend(
+    this.opts = shim.extend(
       {
         remote: null, // URL for GET/PUT, ajax options, or callback
         defaults: {}, // default value if no data is found in localStorage
@@ -64,13 +227,13 @@
         // Default debugLevel is set to 1 by `grunt build`:
         debugLevel: 2, // 0:quiet, 1:normal, 2:verbose
         // Events
-        change: $.noop,
-        commit: $.noop,
-        conflict: $.noop,
-        error: $.noop,
-        pull: $.noop,
-        push: $.noop,
-        update: $.noop,
+        change: noop,
+        commit: noop,
+        conflict: noop,
+        error: noop,
+        pull: noop,
+        push: noop,
+        update: noop,
       },
       opts
     );
@@ -89,7 +252,7 @@
     this.pushCount = 0;
     this.lastModified = stamp;
 
-    this.ready = dfd.promise;
+    this.ready = dfd.promise();
 
     // _data contains the default value. Now load from persistent storage if any
     prevValue = this.storage ? this.storage.getItem(this.namespace) : null;
@@ -113,7 +276,7 @@
               self + ": could not init from remote; falling back to storage."
             );
             // self._data = JSON.parse(prevValue);
-            self._data = $.extend(
+            self._data = shim.extend(
               {},
               self.opts.defaults,
               JSON.parse(prevValue)
@@ -125,7 +288,7 @@
     } else if (prevValue != null) {
       this.update();
       // We still extend from opts.defaults, in case some fields where missing
-      this._data = $.extend({}, this.opts.defaults, this._data);
+      this._data = shim.extend({}, this.opts.defaults, this._data);
       // this.debug("init from storage", this._data);
       dfd.resolve();
       // this.lastUpdate = stamp;
@@ -401,14 +564,11 @@
         console.time(this + ".pull");
       }
       this.phase = "pull";
-      // return $.get(this.opts.remote, function(objData) {
-      return $.ajax({
-        type: "GET",
-        url: this.opts.remote,
-      })
-        .done(function(objData) {
+
+      return fetch(this.opts.remote, { method: "GET" })
+        .then(function(objData) {
           var strData = objData;
-          if ($.isArray(objData) || $.isPlainObject(objData)) {
+          if (Array.isArray(objData) || shim.isPlainObject(objData)) {
             strData = JSON.stringify(objData);
           } else {
             objData = JSON.parse(objData);
@@ -442,9 +602,8 @@
       if (!this.opts.remote) {
         error(this + ": Missing remote option");
       }
-      return $.ajax({
-        type: "PUT",
-        url: this.opts.remote,
+      return fetch(this.opts.remote, {
+        method: "PUT",
         data: data,
       })
         .done(function() {
@@ -469,8 +628,7 @@
      */
     readFromForm: function(form, options) {
       var self = this,
-        $form = $(form),
-        opts = $.extend(
+        opts = shim.extend(
           {
             addNew: false,
             coerce: true, // convert single checkboxes to bool (instead value)
@@ -479,37 +637,61 @@
           options
         );
 
+      if (typeof form === "string") {
+        form = document.querySelector(form);
+      }
       if (opts.addNew) {
-        $form.find("[name]").each(function() {
-          var name = $(this).attr("name");
+        var formItems = form.querySelectorAll("[name]");
+        for (var i = 0; i < formItems.length; i++) {
+          var name = formItems[i].getAttribute("name");
           if (self._data[name] === undefined) {
             self.debug("readFromForm: add field '" + name + "'");
             self._data[name] = null;
           }
-        });
-      }
-      $.each(this._data, function(k, v) {
-        var val,
-          $input = $form.find("[name='" + k + "']"),
-          type = $input.attr("type");
-
-        if (!$input.length) {
-          self.debug("readFromForm: field not found: '" + k + "'");
-          return;
         }
+      }
+
+      shim.each(this._data, function(k, v) {
+        var val,
+          type,
+          inputItems = form.querySelectorAll("[name='" + k + "']"),
+          item = inputItems[0];
+
+        if (!inputItems.length) {
+          self.debug("readFromForm: field not found: '" + k + "'");
+          return; // continue iteration
+        }
+        type = item.getAttribute("type");
         if (type === "radio") {
-          val = $input.filter(":checked").val();
-        } else if (type === "checkbox" && $input.length === 1) {
-          val = !!$input.filter(":checked").length;
-        } else if (type === "checkbox" && $input.length > 1) {
+          // TODO: querySelector() may return null:
+          // val = form.querySelector("[name='" + k + "']:checked").value;
+          val = form[k].value;
+        } else if (type === "checkbox" && inputItems.length === 1) {
+          // Single checkbox is handled as bool
+          val = !!item.checked;
+        } else if (type === "checkbox" && inputItems.length > 1) {
+          // Multi-checkbox group is handled as array of values
           val = [];
-          $input.filter(":checked").each(function() {
-            val.push($(this).val());
+          inputItems.forEach(function(elem) {
+            if (elem.checked) {
+              val.push(elem.value);
+            }
           });
+        } else if (item.matches("select")) {
+          if (item.multiple) {
+            // Multiselect listbox
+            val = [];
+            Array.from(item.selectedOptions).forEach(function(elem) {
+              val.push(elem.value);
+            });
+          } else {
+            // sinlge select listbox
+            val = item.options[item.selectedIndex].value;
+          }
         } else {
-          val = $input.val();
+          val = item.value;
           if (opts.trim && typeof val === "string") {
-            val = $.trim(val);
+            val = val.trim();
           }
         }
         // console.log("readFromForm: val(" + k + "): '" + val + "'");
@@ -520,44 +702,57 @@
     /** Write data to form elements with the same name.
      */
     writeToForm: function(form, options) {
-      var $form = $(form),
+      var i,
+        elem,
+        match,
         self = this;
 
-      $.each(this._data, function(k) {
-        var v = self.get(k),
-          $input = $form.find("[name='" + k + "']"),
-          type = $input.attr("type");
+      if (typeof form === "string") {
+        form = document.querySelector(form);
+      }
 
-        if ($input.length) {
-          if (type === "radio") {
-            $input.filter("[value='" + v + "']").prop("checked", true);
-          } else if (type === "checkbox") {
-            if ($input.length === 1) {
-              $input.prop("checked", !!v);
-            } else {
-              // multi-value checkbox
-              $input.each(function() {
-                $(this).prop(
-                  "checked",
-                  $.isArray(v)
-                    ? $.inArray(this.value, v) >= 0
-                    : this.value === v
-                );
-              });
-            }
-          } else if ($input.is("select")) {
-            // listbox
-            $input.find("option").each(function() {
-              $(this).prop(
-                "selected",
-                $.isArray(v) ? $.inArray(this.value, v) >= 0 : this.value === v
-              );
-            });
-          } else if (type === "file") {
-            // #3 skip type=file
+      shim.each(this._data, function(k) {
+        var v = self.get(k),
+          vIsArray = Array.isArray(v),
+          inputItems = form.querySelectorAll("[name='" + k + "']");
+
+        if (!inputItems.length) {
+          return; // continue iteration
+        }
+        var item = inputItems[0],
+          type = item.getAttribute("type");
+
+        if (type === "radio") {
+          inputItems.forEach(function(elem) {
+            elem.checked = elem.value === v;
+          });
+        } else if (type === "checkbox") {
+          if (inputItems.length === 1) {
+            item.checked = !!v;
           } else {
-            $input.val(v);
+            // multi-value checkbox
+            for (i = 0; i < inputItems.length; i++) {
+              elem = inputItems[i];
+              match = vIsArray ? v.indexOf(elem.value) >= 0 : elem.value === v;
+              elem.checked = match;
+            }
           }
+        } else if (item.matches("select")) {
+          // listbox
+          for (i = 0; i < item.options.length; i++) {
+            elem = item.options[i];
+            match = vIsArray ? v.indexOf(elem.value) >= 0 : elem.value === v;
+            elem.selected = match;
+            // if (match) {
+            //   elem.setAttribute("selected", true);
+            // } else {
+            //   elem.removeAttribute("selected");
+            // }
+          }
+        } else if (type === "file") {
+          // #3 skip type=file
+        } else {
+          item.value = v;
         }
       });
     },

@@ -1,9 +1,7 @@
-;(function($, window, document, undefined) {
-// jQUnit defines:
-// asyncTest,deepEqual,equal,expect,module,notDeepEqual,notEqual,notStrictEqual,ok,QUnit,raises,start,stop,strictEqual,test
+;(function(window, document, undefined) {
 
 /*globals QUnit */
-/*globals TEST_TOOLS, PersistentObject */
+/*globals PersistentObject */
 
 	/* Setup */
 	QUnit.testStart(function(){
@@ -40,7 +38,7 @@
 
 		assert.equal( window.localStorage.length, 0, "localStorage is still clean" );
 		assert.equal( store.namespace, "foo", "namespace is set" );
-		assert.ok( $.isEmptyObject(store._data), "initial data is {}" );
+		assert.deepEqual( store._data, {}, "initial data is {}" );
 		assert.ok( store.get("bar") === undefined, "get() returns undefined" );
 
 		store.set("bar", {baz: 42});
@@ -64,7 +62,7 @@
 
 		assert.throws(function(){
 			store.get("bar.qux.undefined.boo");
-		}, 
+		},
 		/PersistentObject\('foo'\): Property 'bar.qux.undefined.boo' could not be accessed because parent 'bar.qux.undefined' does not exist/,
 		"get() raises error if parent does not exist");
 
@@ -83,7 +81,7 @@
 
 		assert.throws(function(){
 			store.set("bar.undefined2.test", "testval");
-		}, 
+		},
 		/PersistentObject\('foo'\): Property 'bar.undefined2.test' could not be set because parent 'bar.undefined2' does not exist/,
 		"set() raises error if createParents is false");
 
@@ -107,7 +105,7 @@
 
 		assert.equal( window.localStorage.length, 0, "localStorage is still clean" );
 		assert.equal( store.namespace, "foo", "namespace is set" );
-		assert.ok( $.isEmptyObject(store._data), "initial data is {}" );
+		assert.deepEqual( store._data, {}, "initial data is {}" );
 		assert.ok( store.get("bar") === undefined, "get() returns undefined" );
 
 		store.set("bar", {baz: 42});
@@ -138,7 +136,7 @@
 		assert.expect(11);
 
 		var res,
-			$form = $("#form1"),
+			form = document.querySelector("#form1"),
 			store = new PersistentObject("foo", {
 						remote: null,  // don't pull/push remote endpoint
 						defaults: {
@@ -149,33 +147,41 @@
 							attributes: ["opt2", "opt3"],
 							color: "blue",
 							tags: ["hot", "lame"],
-							user: {name: "Jack"}						
+							user: {name: "Jack"}
 						}
 					});
-		
+
 		function _fieldVal(name, select) {
-			select = select || "";
-			return $form.find("[name='" + name + "']" + select).val();
+      var elems = form.querySelectorAll("[name='" + name + "']" + (select || ""));
+        elem = elems[0];
+
+      if(!elem) {
+        return;
+      } else if(elem.multiple){
+        // assert !select;
+        return Array.from(elem.selectedOptions).map(e => e.value);
+      }
+      return elem.value;
 		}
-		
+
 		assert.equal( _fieldVal("title"), " untrimmed ", "form is reset" );
-	
+
 		store.writeToForm("#form1");
 
 		assert.equal( _fieldVal("title"), "foo", "text ok" );
 		assert.equal( _fieldVal("details"), "bar\nbaz", "textarea ok" );
 		assert.ok( _fieldVal("isFavorite", ":checked") !== undefined, "boolean (single-checkbox) ok" );
 		assert.equal( _fieldVal("status", ":checked"), "waiting", "radio ok" );
-		
-		res = $form.find("[name='attributes']:checked");
+
+		res = form.querySelectorAll("[name='attributes']:checked");
 		assert.equal( res.length, 2, "multi-checkbox ok" );
-		assert.equal( res.eq(0).val(), "opt2", "multi-checkbox ok" );
-		assert.equal( res.eq(1).val(), "opt3", "multi-checkbox ok" );
+		assert.equal( res[0].value, "opt2", "multi-checkbox ok" );
+		assert.equal( res[1].value, "opt3", "multi-checkbox ok" );
 
 		assert.equal( _fieldVal("color"), "blue", "select ok" );
 		assert.deepEqual( _fieldVal("tags"), ["hot", "lame"], "select-multiple ok" );
 
-		res = $form.find("[name='user.name']").val();
+		res = form.querySelector("[name='user.name']").value;
 		assert.equal( res, "Joe", "write nested fields" );
     });
 
@@ -183,7 +189,7 @@
     QUnit.test( "readFromForm", function( assert ) {
 		assert.expect(16);
 
-		var $form = $("#form1"),
+		var form = document.querySelector("#form1"),
 			store = new PersistentObject("foo", {
 							defaults: {
 								title: "qux",
@@ -198,8 +204,8 @@
 
 		assert.equal( store._data.title, "qux", "store is initialized" );
 
-		$("#form1 :reset").click();
-		assert.equal($form.find("[name='title']").val(), " untrimmed ", "form was reset" );
+		form.querySelector("[type=reset]").click();
+		assert.equal(form.querySelector("[name='title']").value, " untrimmed ", "form was reset" );
 
 		store.readFromForm("#form1");
 
@@ -227,185 +233,4 @@
 
     });
 
-/*
-    QUnit.module( "Benchmarks" );
-
-    QUnit.test( "store.get() / set() - without webStorage", function( assert ) {
-		var i, v,
-		    store = new PersistentObject("foo", {storage: null, debugLevel: 0}),
-		    count = 100000;
-
-		   // return;
-		store._data.v = 0;
-		store._data.x = {y: {z: 0}};
-
-		TEST_TOOLS.makeBenchWrapper("store.get() flat", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.get("v");
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.get() deep", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.get("x.y.z");
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() flat, same value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("v", 0);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() flat, changing value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("v", i);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() deep, same value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("x.y.z", 0);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() deep, changing value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("x.y.z", i);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("_data.get() deep", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store._data.x.y.z;
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("_data.set() deep", count, function(){
-		    for(i=0; i<count; i++) {
-		        store._data.x.y.z = i;
-		    }
-		})();
-
-    });
-
-    QUnit.test( "store.get() / set() - with webStorage and deferred commit", function( assert ) {
-		var i, v,
-		    store = new PersistentObject("foo", {storage: window.sessionStorage, debugLevel: 0}),
-		    count = 10000;
-
-		   // return;
-		store._data.v = 0;
-		store._data.x = {y: {z: 0}};
-
-		TEST_TOOLS.makeBenchWrapper("store.get() flat", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.get("v");
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.get() deep", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.get("x.y.z");
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() flat, same value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("v", 0);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() flat, changing value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("v", i);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() deep, same value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("x.y.z", 0);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() deep, changing value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("x.y.z", i);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("_data.get() deep", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store._data.x.y.z;
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("_data.set() deep", count, function(){
-		    for(i=0; i<count; i++) {
-		        store._data.x.y.z = i;
-		    }
-		})();
-
-    });
-
-    QUnit.test( "store.get() / set() - with webStorage and immediate commit", function( assert ) {
-		var i, v,
-		    store = new PersistentObject("foo", {storage: window.sessionStorage, commitDelay: 0, debugLevel: 0}),
-		    count = 1000;
-
-		   // return;
-		store._data.v = 0;
-		store._data.x = {y: {z: 0}};
-
-		TEST_TOOLS.makeBenchWrapper("store.get() flat", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.get("v");
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.get() deep", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.get("x.y.z");
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() flat, same value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("v", 0);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() flat, changing value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("v", i);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() deep, same value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("x.y.z", 0);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("store.set() deep, changing value", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store.set("x.y.z", i);
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("_data.get() deep", count, function(){
-		    for(i=0; i<count; i++) {
-		        v = store._data.x.y.z;
-		    }
-		})();
-
-		TEST_TOOLS.makeBenchWrapper("_data.set() deep", count, function(){
-		    for(i=0; i<count; i++) {
-		        store._data.x.y.z = i;
-		    }
-		})();
-
-    });
-*/
-
-}(jQuery, window, document));
+}(window, document));
