@@ -31,6 +31,11 @@ Requirements:
   - jQuery
   - IE 8+ or any recent major browser
 
+**NOTE:**
+You may try the
+[experimental 2.0 pre-release](https://github.com/mar10/persisto/blob/no-jquery/src/persisto.js)
+that drops the jQuery dependency (and Internet Explorer). Please provide feedback!
+
 
 ## Usage
 
