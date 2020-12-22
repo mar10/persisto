@@ -33,25 +33,47 @@
   /**
    * Deferred is a ES6 Promise, that exposes the resolve() method
    */
-  var Deferred = function() {
-    var self = this;
-    // eslint-disable-next-line no-undef
-    if (!(this instanceof Deferred)) {
-      throw new Error("Must use 'new' keyword");
-    }
-    this.resolve = null;
-    this.reject = null;
-    this._promise = new Promise(function(resolve, reject) {
-      self.resolve = resolve;
-      self.reject = reject;
-    });
-  };
-  Deferred.prototype = {
-    /** Return `Promise` instance. */
-    promise: function() {
-      return this._promise;
-    },
-  };
+  function Deferred() {
+    let thens = [];
+    let catches = [];
+
+    let status;
+    let resolvedValue;
+    let rejectedError;
+
+    let dfd = {
+      resolve: value => {
+        status = "resolved";
+        resolvedValue = value;
+        thens.forEach(t => t(value));
+        thens = []; // Avoid memleaks.
+      },
+      reject: error => {
+        status = "rejected";
+        rejectedError = error;
+        catches.forEach(c => c(error));
+        catches = []; // Avoid memleaks.
+      },
+      then: cb => {
+        if (status === "resolved") {
+          cb(resolvedValue);
+        } else {
+          thens.unshift(cb);
+        }
+      },
+      catch: cb => {
+        if (status === "rejected") {
+          cb(rejectedError);
+        } else {
+          catches.unshift(cb);
+        }
+      },
+    };
+    dfd.promise = () => {
+      return { then: dfd.then, catch: dfd.catch };
+    };
+    return dfd;
+  }
 
   /**
    * jQuery Shims
@@ -259,20 +281,22 @@
     if (this.opts.remote) {
       // Try to pull, then resolve
       this.pull()
-        .done(function() {
-          // self.debug("init from remote", this._data);
+        .then(function() {
+          self.debug("init from remote", self._data);
           self.offline = false;
           dfd.resolve();
         })
-        .fail(function() {
+        .catch(function() {
           self.offline = true;
           if (prevValue == null) {
             console.warn(
-              self + ": could not init from remote; falling back default."
+              self + ": could not init from remote; falling back default.",
+              arguments
             );
           } else {
             console.warn(
-              self + ": could not init from remote; falling back to storage."
+              self + ": could not init from remote; falling back to storage.",
+              arguments
             );
             // self._data = JSON.parse(prevValue);
             self._data = shim.extend(
@@ -332,7 +356,7 @@
 
       if (this.storage) {
         // If we came here by a deferred timer (or delay is 0), commit
-        // immedialtely
+        // immediately
         if (
           now - prevChange >= this.opts.commitDelay ||
           now - this.uncommittedSince >= this.opts.maxCommitDelay
@@ -531,7 +555,7 @@
     },
     /** Write data to localStorage. */
     commit: function() {
-      var data;
+      var jsonData;
       if (this.phase) {
         error(
           this + ": Trying to commit while '" + this.phase + "' is pending."
@@ -541,8 +565,8 @@
         console.time(this + ".commit");
       }
       // try { data = JSON.stringify(this._data); } catch(e) { }
-      data = JSON.stringify(this._data);
-      this.storage.setItem(this.namespace, data);
+      jsonData = JSON.stringify(this._data);
+      this.storage.setItem(this.namespace, jsonData);
       // this.dirty = false;
       this.uncommittedSince = null;
       this.commitCount += 1;
@@ -550,7 +574,7 @@
       if (this.opts.debugLevel >= 2 && console.time) {
         console.timeEnd(this + ".commit");
       }
-      return data;
+      return jsonData;
     },
     /** Download, then update data from the cloud. */
     pull: function() {
@@ -565,18 +589,22 @@
       this.phase = "pull";
 
       return fetch(this.opts.remote, { method: "GET" })
-        .then(function(objData) {
-          var strData = objData;
-          if (Array.isArray(objData) || shim.isPlainObject(objData)) {
-            strData = JSON.stringify(objData);
-          } else {
-            objData = JSON.parse(objData);
+        .then(function(response) {
+          if (response.status !== 200) {
+            error(
+              "GET " + this.opts.remote + " returned " + response.status,
+              response
+            );
           }
-          self.storage.setItem(self.namespace, strData);
-          self._update(objData);
+          return response.json();
+        })
+        .then(function(data) {
+          self.storage.setItem(self.namespace, JSON.stringify(data));
+          self._update.call(self, data);
           self.lastPull = Date.now();
         })
         .catch(function() {
+          console.error(arguments);
           self.opts.error(arguments);
         })
         .finally(function() {
@@ -589,7 +617,7 @@
     /** Commit, then upload data to the cloud. */
     push: function() {
       var self = this,
-        data = this.commit();
+        jsonData = this.commit();
 
       if (this.phase) {
         error(this + ": Trying to push while '" + this.phase + "' is pending.");
@@ -603,7 +631,10 @@
       }
       return fetch(this.opts.remote, {
         method: "PUT",
-        data: data,
+        body: jsonData,
+        headers: {
+          "Content-Type": "application/json",
+        },
       })
         .then(function() {
           // console.log("PUT", arguments);
