@@ -636,9 +636,15 @@
           "Content-Type": "application/json",
         },
       })
-        .then(function() {
+        .then(function(response) {
           // console.log("PUT", arguments);
           // self.lastPush = Date.now();
+          if (response.status !== 200) {
+            error(
+              "PUT " + this.opts.remote + " returned " + response.status,
+              response
+            );
+          }
           self.unpushedSince = null;
           self.pushCount += 1;
         })
