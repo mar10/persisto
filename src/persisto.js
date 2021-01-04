@@ -590,7 +590,9 @@
 
       return fetch(this.opts.remote, { method: "GET" })
         .then(function(response) {
-          if (response.status !== 200) {
+          if (response.ok) {
+            self.opts.pull(arguments);
+          }else{
             error(
               "GET " + this.opts.remote + " returned " + response.status,
               response
@@ -639,7 +641,9 @@
         .then(function(response) {
           // console.log("PUT", arguments);
           // self.lastPush = Date.now();
-          if (response.status !== 200) {
+          if (response.ok) {
+            self.opts.push(arguments);
+          }else{
             error(
               "PUT " + this.opts.remote + " returned " + response.status,
               response
