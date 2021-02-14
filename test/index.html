@@ -7,7 +7,7 @@
   <script>
 	var store = new PersistentObject("test", {
 		// remote: "service/settings.json",
-		store: sessionStorage,	
+		store: sessionStorage,
 		defaults: {
 			title: "foo",
 			details: "bar\nbaz",
@@ -18,8 +18,8 @@
 			tags: ["lame", "hot"],
 		}
 	});
-	$(function(){
-		$("#form1").submit(function(e){
+	document.addEventListener("DOMContentLoaded", function(event) {
+		document.querySelector("#form1").submit(function(e){
 			store.readFromForm("#form1");
 			e.preventDefault();
 		});
@@ -34,28 +34,28 @@
 		<label>Favorite:
 			<input name="isFavorite" type="checkbox" />
 		</label><br>
-		<label>Status: 
+		<label>Status:
 			<fieldset>
 				<label> <input name="status" type="radio" value="active" /> active </label><br>
 				<label> <input name="status" type="radio" value="done" checked="checked" /> done </label><br>
 				<label> <input name="status" type="radio" value="waiting" /> waiting </label>
 			</fieldset>
 		</label><br>
-		<label>Attributes: 
+		<label>Attributes:
 			<fieldset>
 				<label> <input name="attributes" type="checkbox" value="opt1" checked="" /> opt1 </label><br>
 				<label> <input name="attributes" type="checkbox" value="opt2" checked="" /> opt2 </label><br>
 				<label> <input name="attributes" type="checkbox" value="opt3"> opt3 </input></label>
 			</fieldset>
 		</label><br>
-		<label>Color: 
+		<label>Color:
 			<select name="color">
 				<option value="red">Red</option>
 				<option value="green" selected>Green</option>
 				<option value="blue">Blue</option>
 			</select>
 		</label><br>
-		<label>Tags: 
+		<label>Tags:
 			<select name="tags" multiple="multiple">
 				<option value="cool">Cool</option>
 				<option value="hot" selected>Hot</option>
