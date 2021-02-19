@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <title>Persisto Demo</title>
-  <script src="../src/persisto.js"> </script>
+  <script src="../dist/persisto.umd.js"> </script>
   <script>
-	var store = new PersistentObject("test", {
+	var store = new mar10.PersistentObject("test", {
 		// remote: "service/settings.json",
 		store: sessionStorage,
 		defaults: {
@@ -19,7 +19,7 @@
 		}
 	});
 	document.addEventListener("DOMContentLoaded", function(event) {
-		document.querySelector("#form1").submit(function(e){
+		document.querySelector("#form1").addEventListener("submit", function(e){
 			store.readFromForm("#form1");
 			e.preventDefault();
 		});
