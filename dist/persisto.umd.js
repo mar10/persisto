@@ -133,6 +133,10 @@
             let dfd = new Deferred();
             // let stamp = Date.now()
             this.namespace = namespace;
+            if (!namespace) {
+                error("Missing required argument: namespace");
+            }
+            // if( !new.target ) { error("Must use `new`")}
             this.opts = extend({
                 remote: null,
                 defaults: {},
@@ -219,9 +223,10 @@
             if (this.storage) {
                 // If we came here by a deferred timer (or delay is 0), commit
                 // immediately
-                if (now - prevChange >= this.opts.commitDelay ||
-                    now - this.uncommittedSince >= this.opts.maxCommitDelay) {
-                    this.debug("_invalidate(): force commit", now - prevChange >= this.opts.commitDelay, now - this.uncommittedSince >= this.opts.maxCommitDelay);
+                if (prevChange !== 0 && // do not force commit if this is the first change
+                    (now - prevChange >= this.opts.commitDelay ||
+                        now - this.uncommittedSince >= this.opts.maxCommitDelay)) {
+                    this.debug("_invalidate(): force commit", now - prevChange >= this.opts.commitDelay, now - this.uncommittedSince >= this.opts.maxCommitDelay, prevChange);
                     this.commit();
                 }
                 else {

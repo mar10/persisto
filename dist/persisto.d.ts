@@ -47,7 +47,7 @@ declare module "persisto" {
         protected opts: any;
         protected storage: Storage;
         protected _checkTimer: any | null;
-        protected namespace: string;
+        readonly namespace: string;
         protected offline: undefined | boolean;
         protected phase: string | null;
         protected uncommittedSince: number;

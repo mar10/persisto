@@ -27,7 +27,7 @@ export class PersistentObject {
   protected opts: any;
   protected storage: Storage;
   protected _checkTimer: any | null = null;
-  protected namespace: string;
+  readonly namespace: string;
   protected offline: undefined | boolean = undefined;
   protected phase: string | null = null;
   protected uncommittedSince = 0;
@@ -44,7 +44,11 @@ export class PersistentObject {
     let dfd = new Deferred();
     // let stamp = Date.now()
     this.namespace = namespace;
+    if (!namespace) {
+      error("Missing required argument: namespace");
+    }
 
+    // if( !new.target ) { error("Must use `new`")}
     this.opts = extend(
       {
         remote: null, // URL for GET/PUT, ajax options, or callback
@@ -148,13 +152,15 @@ export class PersistentObject {
       // If we came here by a deferred timer (or delay is 0), commit
       // immediately
       if (
-        now - prevChange >= this.opts.commitDelay ||
-        now - this.uncommittedSince >= this.opts.maxCommitDelay
+        prevChange !== 0 &&  // do not force commit if this is the first change
+        (now - prevChange >= this.opts.commitDelay ||
+          now - this.uncommittedSince >= this.opts.maxCommitDelay)
       ) {
         this.debug(
           "_invalidate(): force commit",
           now - prevChange >= this.opts.commitDelay,
-          now - this.uncommittedSince >= this.opts.maxCommitDelay
+          now - this.uncommittedSince >= this.opts.maxCommitDelay,
+          prevChange
         );
         this.commit();
       } else {
@@ -461,7 +467,7 @@ export class PersistentObject {
    * Supports elements of input (type: text, radio, checkbox), textarea,
    * and select.
    */
-  readFromForm(form:any, options?:any) {
+  readFromForm(form: any, options?: any) {
     let self = this;
     let opts = extend(
       {
@@ -486,7 +492,7 @@ export class PersistentObject {
       }
     }
 
-    each(this._data, function (k:string, v:any) {
+    each(this._data, function (k: string, v: any) {
       let val,
         type,
         inputItems = form.querySelectorAll("[name='" + k + "']"),
@@ -507,7 +513,7 @@ export class PersistentObject {
       } else if (type === "checkbox" && inputItems.length > 1) {
         // Multi-checkbox group is handled as array of values
         val = [];
-        inputItems.forEach(function (elem:any) {
+        inputItems.forEach(function (elem: any) {
           if (elem.checked) {
             val.push(elem.value);
           }
@@ -516,7 +522,7 @@ export class PersistentObject {
         if (item.multiple) {
           // Multiselect listbox
           val = [];
-          Array.from(item.selectedOptions).forEach(function (elem:any) {
+          Array.from(item.selectedOptions).forEach(function (elem: any) {
             val.push(elem.value);
           });
         } else {
@@ -536,7 +542,7 @@ export class PersistentObject {
   }
   /** Write data to form elements with the same name.
    */
-  writeToForm(form:any, options?:any) {
+  writeToForm(form: any, options?: any) {
     let i,
       elem,
       match,
@@ -546,7 +552,7 @@ export class PersistentObject {
       form = document.querySelector(form);
     }
 
-    each(this._data, function (k:string) {
+    each(this._data, function (k: string) {
       let v = self.get(k),
         vIsArray = Array.isArray(v),
         inputItems = form.querySelectorAll("[name='" + k + "']");
@@ -558,7 +564,7 @@ export class PersistentObject {
         type = item.getAttribute("type");
 
       if (type === "radio") {
-        inputItems.forEach(function (elem:any) {
+        inputItems.forEach(function (elem: any) {
           elem.checked = elem.value === v;
         });
       } else if (type === "checkbox") {
