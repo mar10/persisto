@@ -5,13 +5,14 @@
  */
 
 export const MAX_INT = 9007199254740991;
+type promiseCallbackType = (val:any) => void
 
 /**
  * Deferred is a ES6 Promise, that exposes the resolve() method
  */
 export class Deferred {
-  private thens = [];
-  private catches = [];
+  private thens:promiseCallbackType[] = [];
+  private catches:promiseCallbackType[] = [];
 
   private status = "";
   private resolvedValue: any;
@@ -21,7 +22,7 @@ export class Deferred {
 
   resolve(value?: any) {
     if (this.status) {
-      throw new Error("already fulfilled");
+      throw new Error("already settled");
     }
     this.status = "resolved";
     this.resolvedValue = value;
@@ -30,7 +31,7 @@ export class Deferred {
   }
   reject(error?: any) {
     if (this.status) {
-      throw new Error("already fulfilled");
+      throw new Error("already settled");
     }
     this.status = "rejected";
     this.rejectedError = error;
