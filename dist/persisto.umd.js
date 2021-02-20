@@ -21,7 +21,7 @@
         }
         resolve(value) {
             if (this.status) {
-                throw new Error("already fulfilled");
+                throw new Error("already settled");
             }
             this.status = "resolved";
             this.resolvedValue = value;
@@ -30,7 +30,7 @@
         }
         reject(error) {
             if (this.status) {
-                throw new Error("already fulfilled");
+                throw new Error("already settled");
             }
             this.status = "rejected";
             this.rejectedError = error;
@@ -223,10 +223,11 @@
             if (this.storage) {
                 // If we came here by a deferred timer (or delay is 0), commit
                 // immediately
-                if (prevChange !== 0 && // do not force commit if this is the first change
-                    (now - prevChange >= this.opts.commitDelay ||
-                        now - this.uncommittedSince >= this.opts.maxCommitDelay)) {
-                    this.debug("_invalidate(): force commit", now - prevChange >= this.opts.commitDelay, now - this.uncommittedSince >= this.opts.maxCommitDelay, prevChange);
+                if (
+                // Do not force commit if this is the first change (i.e. prevChange is 0)
+                (prevChange && now - prevChange >= this.opts.commitDelay) ||
+                    now - this.uncommittedSince >= this.opts.maxCommitDelay) {
+                    this.debug("_invalidate(): force commit", now - prevChange >= this.opts.commitDelay, now - this.uncommittedSince >= this.opts.maxCommitDelay);
                     this.commit();
                 }
                 else {
@@ -235,7 +236,9 @@
                 }
             }
             if (this.opts.remote) {
-                if (now - prevChange >= this.opts.pushDelay ||
+                if (
+                // Do not force push if this is the first change (i.e. prevChange is 0)
+                (prevChange && now - prevChange >= this.opts.pushDelay) ||
                     now - this.unpushedSince >= this.opts.maxPushDelay) {
                     this.debug("_invalidate(): force push", now - prevChange >= this.opts.pushDelay, now - this.unpushedSince >= this.opts.maxPushDelay);
                     this.push();
@@ -322,7 +325,7 @@
             let i, parent, cur = this._data, parts = ("" + key) // convert to string
                 .replace(/\[(\w+)\]/g, ".$1") // convert indexes to properties
                 .replace(/^\./, "") // strip a leading dot
-                .split("."), lastPart = parts.pop();
+                .split("."), lastPart = parts.pop(); // '!': Cannot be empty (silence linter)
             for (i = 0; i < parts.length; i++) {
                 parent = cur;
                 cur = parent[parts[i]];
@@ -380,7 +383,7 @@
             if (this.opts.debugLevel >= 2 && console.time) {
                 console.time(this + ".update");
             }
-            let data = this.storage.getItem(this.namespace);
+            let data = this.storage.getItem(this.namespace); // '!' marks it as 'is a string'
             data = JSON.parse(data);
             this._update(data);
             if (this.opts.debugLevel >= 2 && console.time) {
@@ -520,7 +523,7 @@
                     }
                 }
             }
-            each(this._data, function (k, v) {
+            each(this._data, function (k, _v) {
                 let val, type, inputItems = form.querySelectorAll("[name='" + k + "']"), item = inputItems[0];
                 if (!inputItems.length) {
                     self.debug("readFromForm: field not found: '" + k + "'");

@@ -152,15 +152,14 @@ export class PersistentObject {
       // If we came here by a deferred timer (or delay is 0), commit
       // immediately
       if (
-        prevChange !== 0 &&  // do not force commit if this is the first change
-        (now - prevChange >= this.opts.commitDelay ||
-          now - this.uncommittedSince >= this.opts.maxCommitDelay)
+        // Do not force commit if this is the first change (i.e. prevChange is 0)
+        (prevChange && now - prevChange >= this.opts.commitDelay) ||
+        now - this.uncommittedSince >= this.opts.maxCommitDelay
       ) {
         this.debug(
           "_invalidate(): force commit",
           now - prevChange >= this.opts.commitDelay,
-          now - this.uncommittedSince >= this.opts.maxCommitDelay,
-          prevChange
+          now - this.uncommittedSince >= this.opts.maxCommitDelay
         );
         this.commit();
       } else {
@@ -174,7 +173,8 @@ export class PersistentObject {
 
     if (this.opts.remote) {
       if (
-        now - prevChange >= this.opts.pushDelay ||
+        // Do not force push if this is the first change (i.e. prevChange is 0)
+        (prevChange && now - prevChange >= this.opts.pushDelay) ||
         now - this.unpushedSince >= this.opts.maxPushDelay
       ) {
         this.debug(
@@ -263,11 +263,11 @@ export class PersistentObject {
       if (cur === undefined && i < parts.length - 1) {
         error(
           this +
-          ": Property '" +
-          key +
-          "' could not be accessed because parent '" +
-          parts.slice(0, i + 1).join(".") +
-          "' does not exist"
+            ": Property '" +
+            key +
+            "' could not be accessed because parent '" +
+            parts.slice(0, i + 1).join(".") +
+            "' does not exist"
         );
       }
     }
@@ -282,7 +282,7 @@ export class PersistentObject {
         .replace(/\[(\w+)\]/g, ".$1") // convert indexes to properties
         .replace(/^\./, "") // strip a leading dot
         .split("."),
-      lastPart = parts.pop()!;  // '!': Cannot be empty (silence linter)
+      lastPart = parts.pop()!; // '!': Cannot be empty (silence linter)
 
     for (i = 0; i < parts.length; i++) {
       parent = cur;
@@ -295,11 +295,11 @@ export class PersistentObject {
         } else {
           error(
             this +
-            ": Property '" +
-            key +
-            "' could not be set because parent '" +
-            parts.slice(0, i + 1).join(".") +
-            "' does not exist"
+              ": Property '" +
+              key +
+              "' could not be set because parent '" +
+              parts.slice(0, i + 1).join(".") +
+              "' does not exist"
           );
         }
       }
@@ -341,7 +341,7 @@ export class PersistentObject {
     if (this.opts.debugLevel >= 2 && console.time) {
       console.time(this + ".update");
     }
-    let data = this.storage.getItem(this.namespace)!;  // '!' marks it as 'is a string'
+    let data = this.storage.getItem(this.namespace)!; // '!' marks it as 'is a string'
     data = JSON.parse(data);
     this._update(data);
     if (this.opts.debugLevel >= 2 && console.time) {
@@ -388,11 +388,11 @@ export class PersistentObject {
         } else {
           error(
             "GET " +
-            self.opts.remote +
-            " returned " +
-            response.status +
-            ", " +
-            response
+              self.opts.remote +
+              " returned " +
+              response.status +
+              ", " +
+              response
           );
         }
         return response.json();
@@ -443,11 +443,11 @@ export class PersistentObject {
         } else {
           error(
             "PUT " +
-            self.opts.remote +
-            " returned " +
-            response.status +
-            ", " +
-            response
+              self.opts.remote +
+              " returned " +
+              response.status +
+              ", " +
+              response
           );
         }
         self.unpushedSince = 0;
