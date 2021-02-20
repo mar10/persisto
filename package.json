@@ -67,19 +67,19 @@
     "terser": "^5.3.8",
     "ts-jest": "^26.4.3",
     "tslib": "^2.0.3",
-    "typedoc": "^0.19.2",
-    "typescript": "^4.0.5"
+    "typedoc": "^0.20.26",
+    "typescript": "^4.1.5"
   },
   "peerDependencies": {},
   "scripts": {
     "test": "grunt ci --verbose",
-    "docs": "typedoc && touch docs/.nojekyll",
+    "docs": "typedoc --out docs/typedoc src/*.ts && touch docs/typedoc/.nojekyll",
     "build:types": "tsc -t esnext --moduleResolution node -d --emitDeclarationOnly --outFile dist/persisto.d.ts src/persisto.ts",
     "build:js": "rollup -c rollup.config.js",
     "build:minjs:umd": "terser dist/persisto.umd.js --compress --mangle > dist/persisto.umd.min.js",
     "build:minjs:esm": "terser dist/persisto.esm.js --compress --mangle > dist/persisto.esm.min.js",
     "build:minjs": "npm run build:minjs:esm -s && npm run build:minjs:umd -s",
-    "build": "npm run build:js -s && npm run build:minjs -s && npm run build:types -s"
+    "build": "npm run build:js -s && npm run build:minjs -s && npm run build:types -s && npm run docs"
   },
   "npmName": "persisto",
   "npmFileMap": [

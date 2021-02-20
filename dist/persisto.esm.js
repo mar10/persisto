@@ -619,4 +619,5 @@ class PersistentObject {
     }
 }
 
+export default PersistentObject;
 export { PersistentObject };

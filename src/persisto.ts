@@ -18,6 +18,29 @@
 */
 import { each, error, extend, noop, Deferred, MAX_INT } from "./util";
 
+// type PersistoCallbackType = (...args: any[]) => void | boolean;
+
+interface PersistoOptions {
+  remote?: any; // URL for GET/PUT, ajax options, or callback
+  defaults?: any; // default value if no data is found in localStorage
+  commitDelay?: number; // commit changes after 0.5 seconds of inactivity
+  createParents?: boolean; // set() creates missing intermediate parent objects for children
+  maxCommitDelay?: number; // commit changes max. 3 seconds after first change
+  pushDelay?: number; // push commits after 5 seconds of inactivity
+  maxPushDelay?: number; // push commits max. 30 seconds after first change
+  storage?: any;
+  // Default debugLevel is set to 1 by `grunt build`:
+  debugLevel?: number; // 0:quiet, 1:normal, 2:verbose
+  // Events
+  change?: (hint: string) => void;
+  commit?: (hint: string) => void;
+  conflict?: (hint: string) => boolean;
+  error?: (hint: string) => void;
+  pull?: (hint: string) => void;
+  push?: (hint: string) => void;
+  update?: (hint: string) => void;
+}
+
 /**
  * A persistent plain object or array.
  */
@@ -26,7 +49,7 @@ export class PersistentObject {
   protected _data: any;
   protected opts: any;
   protected storage: Storage;
-  protected _checkTimer: any | null = null;
+  protected _checkTimer: any = null;
   readonly namespace: string;
   protected offline: undefined | boolean = undefined;
   protected phase: string | null = null;
@@ -40,7 +63,7 @@ export class PersistentObject {
 
   // ready: Promise<any>;
 
-  constructor(namespace: string, options: any) {
+  constructor(namespace: string, options: PersistoOptions) {
     let dfd = new Deferred();
     // let stamp = Date.now()
     this.namespace = namespace;
@@ -599,3 +622,13 @@ export class PersistentObject {
     });
   }
 }
+
+// let p = new PersistentObject("namespace", {
+//   remote: null,
+//   change: function () {
+//     return 3;
+//   },
+//   conflict: (...args) => {return true}
+// });
+
+export default PersistentObject;

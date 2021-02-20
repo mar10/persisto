@@ -38,6 +38,24 @@ declare module "util" {
     export function type(obj: any): any;
 }
 declare module "persisto" {
+    interface PersistoOptions {
+        remote?: any;
+        defaults?: any;
+        commitDelay?: number;
+        createParents?: boolean;
+        maxCommitDelay?: number;
+        pushDelay?: number;
+        maxPushDelay?: number;
+        storage?: any;
+        debugLevel?: number;
+        change?: (hint: string) => void;
+        commit?: (hint: string) => void;
+        conflict?: (hint: string) => boolean;
+        error?: (hint: string) => void;
+        pull?: (hint: string) => void;
+        push?: (hint: string) => void;
+        update?: (hint: string) => void;
+    }
     /**
      * A persistent plain object or array.
      */
@@ -46,7 +64,7 @@ declare module "persisto" {
         protected _data: any;
         protected opts: any;
         protected storage: Storage;
-        protected _checkTimer: any | null;
+        protected _checkTimer: any;
         readonly namespace: string;
         protected offline: undefined | boolean;
         protected phase: string | null;
@@ -57,7 +75,7 @@ declare module "persisto" {
         commitCount: number;
         pushCount: number;
         protected lastModified: number;
-        constructor(namespace: string, options: any);
+        constructor(namespace: string, options: PersistoOptions);
         _invalidate(hint: string, deferredCall?: boolean): void;
         _update(objData: any): void;
         toString(): string;
@@ -95,4 +113,5 @@ declare module "persisto" {
          */
         writeToForm(form: any, options?: any): void;
     }
+    export default PersistentObject;
 }

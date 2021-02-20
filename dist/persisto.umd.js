@@ -626,6 +626,7 @@
     }
 
     exports.PersistentObject = PersistentObject;
+    exports.default = PersistentObject;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
