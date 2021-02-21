@@ -20,71 +20,71 @@ module.exports = (grunt) ->
                 "  * Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>;" +
                 " Licensed <%= _.map(pkg.licenses, 'type').join(', ') %> */\n"
 
-    clean:
-        build:
-            src: [ "build" ]
-        dist:
-            src: [ "dist" ]
+    # clean:
+    #     build:
+    #         src: [ "build" ]
+    #     dist:
+    #         src: [ "dist" ]
 
-    connect:
-        forever:
-            options:
-                port: 8080
-                base: "./"
-                keepalive: true
-        dev: # pass on, so subsequent tasks (like watch) can start
-            options:
-                port: 8080
-                base: "./"
-                keepalive: false
-        sauce:
-            options:
-                hostname: "localhost"
-                port: 9999
-                base: ""
-                keepalive: false
+    # connect:
+    #     forever:
+    #         options:
+    #             port: 8080
+    #             base: "./"
+    #             keepalive: true
+    #     dev: # pass on, so subsequent tasks (like watch) can start
+    #         options:
+    #             port: 8080
+    #             base: "./"
+    #             keepalive: false
+    #     sauce:
+    #         options:
+    #             hostname: "localhost"
+    #             port: 9999
+    #             base: ""
+    #             keepalive: false
 
-    copy:
-        build: # copy production files to build folder
-            files: [{
-                expand: true # required for cwd
-                cwd: "src/"
-                src: [
-                    "*.js"
-                    "*.txt"
-                    ]
-                dest: "build/"
-            }, {
-                # src: ["*.txt", "*.md"]
-                src: ["LICENSE.txt"]
-                dest: "build/"
-            }]
-        dist: # copy build folder to dist
-            files: [{expand: true, cwd: "build/", src: ["**"], dest: "dist/"}]
+    # copy:
+    #     build: # copy production files to build folder
+    #         files: [{
+    #             expand: true # required for cwd
+    #             cwd: "src/"
+    #             src: [
+    #                 "*.js"
+    #                 "*.txt"
+    #                 ]
+    #             dest: "build/"
+    #         }, {
+    #             # src: ["*.txt", "*.md"]
+    #             src: ["LICENSE.txt"]
+    #             dest: "build/"
+    #         }]
+    #     dist: # copy build folder to dist
+    #         files: [{expand: true, cwd: "build/", src: ["**"], dest: "dist/"}]
 
-    eslint:
-        # options:
-        #   # See https://github.com/sindresorhus/grunt-eslint/issues/119
-        #   quiet: true
-        # We have to explicitly declare "src" property otherwise "newer"
-        # task wouldn't work properly :/
-        dist:
-            src: "dist/persisto.js"
-        dev:
-            options:
-                fix: false
-                maxWarnings: 100
-            src: [
-              "src/*.js"
-              "test/test-*.js"
-              ]
-        fix:
-            options:
-                fix: true
-            src: [
-              "src/*.js"
-              "test/test-*.js"
-              ]
+    # eslint:
+    #     # options:
+    #     #   # See https://github.com/sindresorhus/grunt-eslint/issues/119
+    #     #   quiet: true
+    #     # We have to explicitly declare "src" property otherwise "newer"
+    #     # task wouldn't work properly :/
+    #     dist:
+    #         src: "dist/persisto.js"
+    #     dev:
+    #         options:
+    #             fix: false
+    #             maxWarnings: 100
+    #         src: [
+    #           "src/*.js"
+    #           "test/test-*.js"
+    #           ]
+    #     fix:
+    #         options:
+    #             fix: true
+    #         src: [
+    #           "src/*.js"
+    #           "test/test-*.js"
+    #           ]
 
     qunit:
         # options:
@@ -123,51 +123,12 @@ module.exports = (grunt) ->
                 to : "<%= pkg.version %>"
             } ]
 
-    "saucelabs-qunit":
-        all:
-            options:
-                urls: ["http://localhost:9999/test/unit/test-core.html"]
-                # tunnelTimeout: 5
-                build: process.env.TRAVIS_JOB_ID
-                # concurrency: 3
-                throttled: 5
-                browsers: [
-                  { browserName: "chrome", platform: "Windows 8.1" }
-                  # { browserName: "firefox", platform: "Windows 8.1" }
-                  # { browserName: "firefox", platform: "Windows XP" }
-                  { browserName: "firefox", platform: "Linux" }
-                  # { browserName: "internet explorer", version: "6", platform: "Windows XP" }
-                  # { browserName: "internet explorer", version: "7", platform: "Windows XP" }
-                  # { browserName: "internet explorer", version: "8", platform: "Windows 7" }
-                  # { browserName: "internet explorer", version: "9", platform: "Windows 7" }
-                  # { browserName: "internet explorer", version: "10", platform: "Windows 8" }
-                  { browserName: "internet explorer", version: "11", platform: "Windows 8.1" }
-                  { browserName: "microsoftedge", platform: "Windows 10" }
-                  # { browserName: "safari", version: "6", platform: "OS X 10.8" }
-                  # { browserName: "safari", version: "7", platform: "OS X 10.9" }
-                  # { browserName: "safari", version: "8", platform: "OS X 10.10" }
-                  { browserName: "safari", version: "9", platform: "OS X 10.11" }
-                ]
-                testname: "persisto qunit tests"
-
-    uglify:
-        # options:  # see https://github.com/gruntjs/grunt-contrib-uglify/issues/366
-        #   preserveComments: /(?:^!|@(?:license|preserve|cc_on))/
-
-        build:
-            options:
-                report: "min"
-                banner: "/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - " + "<%= grunt.template.today('yyyy-mm-dd') %> | " + "<%= pkg.homepage ? ' ' + pkg.homepage + ' | ' : '' %>" + " Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>;" + " Licensed <%= _.map(pkg.licenses, 'type').join(', ') %> */\n"
-                sourceMap: true
-            src: "src/persisto.js"
-            dest: "build/persisto.min.js"
-
-    watch:
-        eslint:
-            options:
-                atBegin: true
-            files: ["src/*.js", "test/unit/*.js", "demo/**/*.js"]
-            tasks: ["eslint:dev"]
+    # watch:
+    #     eslint:
+    #         options:
+    #             atBegin: true
+    #         files: ["src/*.js", "test/unit/*.js", "demo/**/*.js"]
+    #         tasks: ["eslint:dev"]
 
     yabs:
         release:
@@ -203,11 +164,11 @@ module.exports = (grunt) ->
   grunt.registerTask "dev", ["connect:dev", "watch"]
   # grunt.registerTask "tabfix", ["exec:tabfix"]
   grunt.registerTask "test", [
-      "eslint:dev"
+    #   "eslint:dev"
       "qunit:develop"
   ]
 
-  grunt.registerTask "sauce", ["connect:sauce", "saucelabs-qunit"]
+#   grunt.registerTask "sauce", ["connect:sauce", "saucelabs-qunit"]
   if parseInt(process.env.TRAVIS_PULL_REQUEST, 10) > 0
       # saucelab keys do not work on forks
       # http://support.saucelabs.com/entries/25614798

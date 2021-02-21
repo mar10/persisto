@@ -66,6 +66,7 @@
     "nodemon": "^2.0.7",
     "prettier": "^2.1.2",
     "pretty-quick": "^3.1.0",
+    "qunit": "^2.14.0",
     "rollup": "^2.32.1",
     "terser": "^5.3.8",
     "ts-jest": "^26.4.3",
@@ -74,9 +75,10 @@
     "typedoc": "^0.20.26",
     "typescript": "^4.1.5"
   },
-  "peerDependencies": {},
   "nodemonConfig": {
-    "watch": ["src/"],
+    "watch": [
+      "src/"
+    ],
     "ext": "ts",
     "exec": "npm run build:js -s",
     "ignore": [
@@ -92,23 +94,26 @@
     "docs": "typedoc && touch docs/.nojekyll",
     "build:types": "tsc -t esnext --moduleResolution node -d --emitDeclarationOnly --outFile dist/persisto.d.ts src/persisto.ts",
     "build:js": "rollup -c rollup.config.js",
-    "build:minjs:umd": "terser dist/persisto.umd.js --compress --mangle > dist/persisto.umd.min.js",
-    "build:minjs:esm": "terser dist/persisto.esm.js --compress --mangle > dist/persisto.esm.min.js",
+    "build:minjs:umd": "terser dist/persisto.umd.js --compress --mangle --source-map \"url='persisto.umd.min.js.map'\" --output dist/persisto.umd.min.js",
+    "build:minjs:esm": "terser dist/persisto.esm.js --compress --mangle --source-map \"url='persisto.esm.min.js.map'\" --output dist/persisto.esm.min.js",
     "build:minjs": "npm run build:minjs:esm -s && npm run build:minjs:umd -s",
     "build": "npm run build:js -s && npm run build:minjs -s && npm run build:types -s && npm run docs",
     "watch:umd": "nodemon --watch src --ext 'ts' -x \"npm run build:minjs:umd\"",
     "watch": "nodemon",
     "serve": "http-server test",
-    "dev": "concurrently 'serve ./ -p 8080 -o' 'nodemon'"
+    "dev": "concurrently 'http-server -p 8080 -o test/' 'nodemon'"
   },
   "npmName": "persisto",
   "npmFileMap": [
     {
       "basePath": "dist",
       "files": [
-        "persisto.js",
-        "persisto.min.js",
-        "persisto.min.js.map"
+        "persisto.esm.js",
+        "persisto.esm.min.js",
+        "persisto.esm.min.js.map",
+        "persisto.umd.js",
+        "persisto.umd.min.js",
+        "persisto.umd.min.js.map"
       ]
     }
   ]

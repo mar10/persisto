@@ -23,7 +23,7 @@ Features
 
 Overview:
 
-![sample](doc/architecture.png?raw=true)
+![sample](https://rawgit.com/mar10/persisto/no-jquery-ts/assets/architecture.png?raw=true)
 
 
 Requirements:

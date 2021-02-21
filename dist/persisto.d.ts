@@ -91,20 +91,47 @@ declare module "persisto" {
         /** localStorage */
         storage?: any;
         debugLevel?: number;
-        /** @event at least one  */
+        /**
+         * Called when data was changed (before comitting).
+         * @category Callback
+         */
         change?: (hint: string) => void;
-        /** Modified data was written to storage */
+        /**
+         * Called after modified data was written to storage.
+         * @category Callback
+         */
         commit?: (hint: string) => void;
+        /**
+         * Called ...
+         * @category Callback
+         */
         conflict?: (hint: string) => boolean;
+        /**
+         * Called on errors.
+         * @category Callback
+         */
         error?: (hint: string) => void;
+        /**
+         * Called after date was read from `remote` into `store`.
+         * @category Callback
+         */
         pull?: (hint: string) => void;
-        /** Modified data was sent to `remote` */
+        /**
+         * Called after modified data was POSTed to `remote`.
+         * @category Callback
+         */
         push?: (hint: string) => void;
-        /** Modified data was stored.
-         * If `remote was passed, this means `push`has finished,
+        /**
+         * Modified data was stored.
+         * If `remote` was passed, this means `push` has finished,
          * otherwise `commit` has finished.
+         * @category Callback
          */
         saved?: () => void;
+        /**
+         * Called after ...
+         * @category Callback
+         */
         update?: (hint: string) => void;
     }
     export class PersistentObject {

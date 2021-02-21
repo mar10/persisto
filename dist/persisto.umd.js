@@ -217,7 +217,6 @@
             if (this.form) {
                 this.form.classList.add("persisto");
                 onEvent(this.form, "input", "input,textarea", function (e) {
-                    console.log(e.type, e.target, e);
                     self.readFromForm(self.form);
                 });
                 onEvent(this.form, "change", "select", function (e) {
@@ -283,7 +282,7 @@
                 this.opts.change(hint);
                 if (this.form) {
                     this.form.classList.add(class_modified);
-                    self.form.classList.remove(class_error);
+                    this.form.classList.remove(class_error);
                 }
             }
             if (this.storage) {
@@ -292,7 +291,7 @@
                 if (now - prevChange >= this.opts.commitDelay ||
                     now - this.uncommittedSince >= this.opts.maxCommitDelay) {
                     this.debug("_invalidate(): force commit", now - prevChange >= this.opts.commitDelay, now - this.uncommittedSince >= this.opts.maxCommitDelay);
-                    self.commit.call(self);
+                    this.commit();
                 }
                 else {
                     // otherwise schedule next check
@@ -475,9 +474,9 @@
             if (this.opts.debugLevel >= 2 && console.time) {
                 console.timeEnd(this + ".commit");
             }
-            this.opts.commit.call(this);
+            this.opts.commit();
             if (!this.opts.remote) {
-                this.opts.save.call(this);
+                this.opts.save();
                 this.lastModified = 0; // so next change will not force-commit
             }
             return jsonData;
@@ -526,7 +525,18 @@
         }
         /** Commit, then upload data to the cloud. */
         push() {
-            let self = this, jsonData = this.commit();
+            let jsonData;
+            let self = this;
+            if (this.uncommittedSince) {
+                if (this.phase) {
+                    console.error("Resetting phase: " + this.phase);
+                    this.phase = null;
+                }
+                jsonData = this.commit();
+            }
+            else {
+                jsonData = JSON.stringify(this._data);
+            }
             if (this.phase) {
                 error(this + ": Trying to push while '" + this.phase + "' is pending.");
             }
@@ -538,7 +548,7 @@
                 error(this + ": Missing remote option");
             }
             if (this.form) {
-                this.form.classList.remove(class_modified);
+                this.form.classList.remove(class_error);
                 this.form.classList.add(class_saving);
             }
             return fetch(this.opts.remote, {
@@ -567,13 +577,10 @@
                 self.pushCount += 1;
                 self.opts.push.call(self);
                 self.opts.save.call(self);
-                if (self.form) {
-                    self.form.classList.remove(class_saving);
-                }
             })
                 .catch(function () {
                 if (self.form) {
-                    self.form.classList.remove(class_error);
+                    self.form.classList.add(class_error);
                 }
                 self.opts.error.call(self, arguments);
             })
@@ -581,6 +588,9 @@
                 self.phase = null;
                 if (self.opts.debugLevel >= 2 && console.time) {
                     console.timeEnd(self + ".push");
+                }
+                if (self.form) {
+                    self.form.classList.remove(class_saving);
                 }
             });
         }

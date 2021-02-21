@@ -1,7 +1,7 @@
 var store = new mar10.PersistentObject("test", {
-    // remote: "service/settings.json",
     store: sessionStorage,
     attachForm: "#form1",
+    remote: "https://google.com",
     defaults: {
       title: "foo",
       details: "bar\nbaz",
@@ -11,8 +11,21 @@ var store = new mar10.PersistentObject("test", {
       color: "blue",
       tags: ["lame", "hot"],
     },
+    change: function() {
+      console.log("persisto.change", arguments)
+    },
+    commit: function() {
+      console.log("persisto.commit", arguments)
+    },
+    error: function() {
+      console.log("persisto.error", arguments)
+    },
+    push: function() {
+      console.log("persisto.push", arguments)
+    },
     save: function() {
-      console.log(this.commitCount)
+      console.log("persisto.save", arguments)
+      document.querySelector("#stats").innerHTML = "" + this.commitCount + " commits"
     }
   });
 

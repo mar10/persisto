@@ -54,23 +54,50 @@ export interface PersistoOptions {
   maxPushDelay?: number;
   /** localStorage */
   storage?: any;
-  // Default debugLevel 0:quiet, 1:normal, 2:verbose, is set to 1 by `grunt build`:
+  // Default debugLevel (0:quiet, 1:normal, 2:verbose), is set to 1 by `grunt build`:
   debugLevel?: number;
   // Events
-  /** @event at least one  */
+  /**
+   * Called when data was changed (before comitting). 
+   * @category Callback
+   */
   change?: (hint: string) => void;
-  /** Modified data was written to storage */
+  /**
+   * Called after modified data was written to storage.
+   * @category Callback
+   */
   commit?: (hint: string) => void;
+  /**
+   * Called ...
+   * @category Callback
+   */
   conflict?: (hint: string) => boolean;
+  /**
+   * Called on errors.
+   * @category Callback
+   */
   error?: (hint: string) => void;
+  /**
+   * Called after date was read from `remote` into `store`.
+   * @category Callback
+   */
   pull?: (hint: string) => void;
-  /** Modified data was sent to `remote` */
+  /**
+   * Called after modified data was POSTed to `remote`.
+   * @category Callback
+   */
   push?: (hint: string) => void;
-  /** Modified data was stored.
-   * If `remote was passed, this means `push`has finished,
+  /** 
+   * Modified data was stored.
+   * If `remote` was passed, this means `push` has finished,
    * otherwise `commit` has finished.
+   * @category Callback
    */
   saved?: () => void;
+  /**
+   * Called after ...
+   * @category Callback
+   */
   update?: (hint: string) => void;
 }
 
@@ -152,7 +179,6 @@ export class PersistentObject {
     if (this.form) {
       this.form.classList.add("persisto");
       onEvent(this.form, "input", "input,textarea", function (e: Event) {
-        console.log(e.type, e.target, e);
         self.readFromForm(self.form);
       });
       onEvent(this.form, "change", "select", function (e: Event) {
@@ -227,7 +253,7 @@ export class PersistentObject {
       this.opts.change(hint);
       if (this.form) {
         this.form.classList.add(class_modified);
-        self.form.classList.remove(class_error);
+        this.form.classList.remove(class_error);
       }
     }
     if (this.storage) {
@@ -242,7 +268,7 @@ export class PersistentObject {
           now - prevChange >= this.opts.commitDelay,
           now - this.uncommittedSince >= this.opts.maxCommitDelay
         );
-        self.commit.call(self);
+        this.commit();
       } else {
         // otherwise schedule next check
         nextCommit = Math.min(
@@ -343,11 +369,11 @@ export class PersistentObject {
       if (cur === undefined && i < parts.length - 1) {
         error(
           this +
-            ": Property '" +
-            key +
-            "' could not be accessed because parent '" +
-            parts.slice(0, i + 1).join(".") +
-            "' does not exist"
+          ": Property '" +
+          key +
+          "' could not be accessed because parent '" +
+          parts.slice(0, i + 1).join(".") +
+          "' does not exist"
         );
       }
     }
@@ -375,11 +401,11 @@ export class PersistentObject {
         } else {
           error(
             this +
-              ": Property '" +
-              key +
-              "' could not be set because parent '" +
-              parts.slice(0, i + 1).join(".") +
-              "' does not exist"
+            ": Property '" +
+            key +
+            "' could not be set because parent '" +
+            parts.slice(0, i + 1).join(".") +
+            "' does not exist"
           );
         }
       }
@@ -451,9 +477,9 @@ export class PersistentObject {
     if (this.opts.debugLevel >= 2 && console.time) {
       console.timeEnd(this + ".commit");
     }
-    this.opts.commit.call(this);
+    this.opts.commit();
     if (!this.opts.remote) {
-      this.opts.save.call(this);
+      this.opts.save();
       this.lastModified = 0;  // so next change will not force-commit
     }
     return jsonData;
@@ -477,11 +503,11 @@ export class PersistentObject {
         } else {
           error(
             "GET " +
-              self.opts.remote +
-              " returned " +
-              response.status +
-              ", " +
-              response
+            self.opts.remote +
+            " returned " +
+            response.status +
+            ", " +
+            response
           );
         }
         return response.json();
@@ -505,9 +531,18 @@ export class PersistentObject {
   }
   /** Commit, then upload data to the cloud. */
   push() {
-    let self = this,
-      jsonData = this.commit();
+    let jsonData;
+    let self = this;
 
+    if (this.uncommittedSince) {
+      if (this.phase) {
+        console.error("Resetting phase: " + this.phase)
+        this.phase = null;
+      }
+      jsonData = this.commit();
+    } else {
+      jsonData = JSON.stringify(this._data);
+    }
     if (this.phase) {
       error(this + ": Trying to push while '" + this.phase + "' is pending.");
     }
@@ -519,7 +554,7 @@ export class PersistentObject {
       error(this + ": Missing remote option");
     }
     if (this.form) {
-      this.form.classList.remove(class_modified);
+      this.form.classList.remove(class_error);
       this.form.classList.add(class_saving);
     }
     return fetch(this.opts.remote, {
@@ -537,11 +572,11 @@ export class PersistentObject {
         } else {
           error(
             "PUT " +
-              self.opts.remote +
-              " returned " +
-              response.status +
-              ", " +
-              response
+            self.opts.remote +
+            " returned " +
+            response.status +
+            ", " +
+            response
           );
         }
         self.unpushedSince = 0;
@@ -549,13 +584,10 @@ export class PersistentObject {
         self.pushCount += 1;
         self.opts.push.call(self);
         self.opts.save.call(self);
-        if (self.form) {
-          self.form.classList.remove(class_saving);
-        }
       })
       .catch(function () {
         if (self.form) {
-          self.form.classList.remove(class_error);
+          self.form.classList.add(class_error);
         }
         self.opts.error.call(self, arguments);
       })
@@ -563,6 +595,9 @@ export class PersistentObject {
         self.phase = null;
         if (self.opts.debugLevel >= 2 && console.time) {
           console.timeEnd(self + ".push");
+        }
+        if (self.form) {
+          self.form.classList.remove(class_saving);
         }
       });
   }
