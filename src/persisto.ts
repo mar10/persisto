@@ -3,8 +3,8 @@
  *
  * Persistent JavaScript objects and web forms using Web Storage.
  *
- * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de)
- * Released under the MIT license
+ * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de).
+ * Released under the MIT license.
  *
  * @version @VERSION
  * @date @DATE
@@ -18,7 +18,11 @@
 */
 import { each, error, extend, noop, onEvent, Deferred, MAX_INT } from "./util";
 
-// type PersistoCallbackType = (...args: any[]) => void | boolean;
+const default_debuglevel = 2; // Replaced by rollup script
+const class_modified = "persisto-modified";
+const class_saving = "persisto-saving";
+const class_error = "persisto-error";
+
 
 /**
  * Available options for [[PersistentObject]].
@@ -58,7 +62,7 @@ export interface PersistoOptions {
   debugLevel?: number;
   // Events
   /**
-   * Called when data was changed (before comitting). 
+   * Called when data was changed (before comitting).
    * @category Callback
    */
   change?: (hint: string) => void;
@@ -87,7 +91,7 @@ export interface PersistoOptions {
    * @category Callback
    */
   push?: (hint: string) => void;
-  /** 
+  /**
    * Modified data was stored.
    * If `remote` was passed, this means `push` has finished,
    * otherwise `commit` has finished.
@@ -104,10 +108,6 @@ export interface PersistoOptions {
 /**
  * A persistent plain object or array.
  */
-const class_modified = "persisto-modified";
-const class_saving = "persisto-saving";
-const class_error = "persisto-error";
-
 export class PersistentObject {
   version: string = "@VERSION"; // Set to semver by 'grunt release'
   protected _data: any;
@@ -149,7 +149,7 @@ export class PersistentObject {
         maxPushDelay: 30000, // push commits max. 30 seconds after first change
         storage: window.localStorage,
         // Default debugLevel is set to 1 by `grunt build`:
-        debugLevel: 2, // 0:quiet, 1:normal, 2:verbose
+        debugLevel: default_debuglevel, // 0:quiet, 1:normal, 2:verbose
         // Events
         change: noop,
         commit: noop,

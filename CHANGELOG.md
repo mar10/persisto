@@ -1,7 +1,8 @@
 # 2.0.0-0 / Unreleased
   * Drop dependency on jQuery
   * Drop support for IE
-  * Switch to TypeScript
+  * Rewritten in TypeScript
+  * Use typedoc for API documetation
 
 # 1.3.1-0 / Unreleased
 

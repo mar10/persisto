@@ -6,8 +6,9 @@
 
     /*!
      * persisto.js - utils
-     * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de)
-     * Released under the MIT license
+     * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de).
+     * Released under the MIT license.
+     * v2.0.0-0, Sun, 21 Feb 2021 20:00:11 GMT
      */
     const MAX_INT = 9007199254740991;
     /**
@@ -146,22 +147,23 @@
      *
      * Persistent JavaScript objects and web forms using Web Storage.
      *
-     * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de)
-     * Released under the MIT license
+     * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de).
+     * Released under the MIT license.
      *
-     * @version @VERSION
-     * @date @DATE
+     * @version v2.0.0-0
+     * @date Sun, 21 Feb 2021 20:00:11 GMT
      */
-    /**
-     * A persistent plain object or array.
-     */
+    const default_debuglevel = 1; // Replaced by rollup script
     const class_modified = "persisto-modified";
     const class_saving = "persisto-saving";
     const class_error = "persisto-error";
+    /**
+     * A persistent plain object or array.
+     */
     class PersistentObject {
         // ready: Promise<any>;
         constructor(namespace, options) {
-            this.version = "@VERSION"; // Set to semver by 'grunt release'
+            this.version = "v2.0.0-0"; // Set to semver by 'grunt release'
             this._checkTimer = null;
             this.offline = undefined;
             this.phase = null;
@@ -190,7 +192,7 @@
                 maxPushDelay: 30000,
                 storage: window.localStorage,
                 // Default debugLevel is set to 1 by `grunt build`:
-                debugLevel: 2,
+                debugLevel: default_debuglevel,
                 // Events
                 change: noop,
                 commit: noop,

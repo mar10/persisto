@@ -1,8 +1,9 @@
 declare module "util" {
     /*!
      * persisto.js - utils
-     * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de)
-     * Released under the MIT license
+     * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de).
+     * Released under the MIT license.
+     * @VERSION, @DATE
      */
     export const MAX_INT = 9007199254740991;
     /**
@@ -134,6 +135,9 @@ declare module "persisto" {
          */
         update?: (hint: string) => void;
     }
+    /**
+     * A persistent plain object or array.
+     */
     export class PersistentObject {
         version: string;
         protected _data: any;

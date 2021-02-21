@@ -1,4 +1,8 @@
+import fs from 'fs';
 import typescript from '@rollup/plugin-typescript';
+import modify from 'rollup-plugin-modify';
+
+let package_json = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
 export default {
   input: 'src/persisto.ts',
@@ -13,5 +17,12 @@ export default {
       name: 'mar10',
     },
   ],
-  plugins: [typescript()],
+  plugins: [
+    typescript(),
+    modify({
+      '@VERSION': 'v' + package_json.version,
+      '@DATE': '' + new Date().toUTCString(),
+      'const default_debuglevel = 2;': 'const default_debuglevel = 1;',
+    }),
+  ],
 };

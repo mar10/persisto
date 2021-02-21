@@ -1,7 +1,8 @@
 /*!
  * persisto.js - utils
- * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de)
- * Released under the MIT license
+ * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de).
+ * Released under the MIT license.
+ * @VERSION, @DATE
  */
 
 export const MAX_INT = 9007199254740991;
