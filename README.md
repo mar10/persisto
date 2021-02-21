@@ -2,8 +2,10 @@
 [![GitHub version](https://img.shields.io/github/release/mar10/persisto.svg)](https://github.com/mar10/persisto/releases/latest)
 [![Build Status](https://travis-ci.org/mar10/persisto.svg?branch=master)](https://travis-ci.org/mar10/persisto)
 [![npm](https://img.shields.io/npm/dm/persisto.svg)](https://www.npmjs.com/package/persisto)
-[![](https://data.jsdelivr.com/v1/package/npm/persisto/badge)](https://www.jsdelivr.com/package/npm/persisto)
-[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![jsDelivr](https://data.jsdelivr.com/v1/package/npm/persisto/badge)](https://www.jsdelivr.com/package/npm/persisto)
+[![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
+[![Released with: grunt-yabs](https://img.shields.io/badge/released%20with-grunt--yabs-yellowgreen)](https://github.com/mar10/grunt-yabs)
+[![StackOverflow: persisto](https://img.shields.io/badge/StackOverflow-persisto-blue.svg)](https://stackoverflow.com/questions/tagged/persisto)
 
 > Persistent JavaScript objects and web forms using Web Storage.
 
@@ -20,6 +22,8 @@ Features
     Common use case: maintain persistent client settings and let users edit them.
   - Optionally synchronize the data with a remote endpoint
 
+
+[API Documentation](https://mar10.github.io/persisto/)
 
 Overview:
 
