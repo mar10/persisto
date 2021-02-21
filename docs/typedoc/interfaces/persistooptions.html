@@ -65,6 +65,23 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Available options for <a href="../classes/persistentobject.html">PersistentObject</a>.</p>
+					</div>
+					<p><strong>Note:</strong> this will be passed as plain object:</p>
+					<pre><code class="language-ts"><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #001080">mar10</span><span style="color: #000000">.</span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;test&quot;</span><span style="color: #000000">, {</span>
+<span style="color: #000000">  </span><span style="color: #001080">store:</span><span style="color: #000000"> </span><span style="color: #001080">sessionStorage</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">attachForm:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;#form1&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  </span><span style="color: #001080">defaults:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #001080">title:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;foo&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    ...</span>
+<span style="color: #000000">  }</span>
+<span style="color: #000000">});</span>
+</code></pre>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -110,7 +127,7 @@
 					<div class="tsd-signature tsd-kind-icon">attach<wbr>Form<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L27">persisto.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L44">persisto.ts:44</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -125,7 +142,7 @@
 					<div class="tsd-signature tsd-kind-icon">change<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>hint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L37">persisto.ts:37</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L60">persisto.ts:60</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -135,7 +152,7 @@
 					<div class="tsd-signature tsd-kind-icon">commit<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>hint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L38">persisto.ts:38</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L61">persisto.ts:61</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -145,9 +162,14 @@
 					<div class="tsd-signature tsd-kind-icon">commit<wbr>Delay<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L28">persisto.ts:28</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L46">persisto.ts:46</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>commit changes after 0.5 seconds of inactivity</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="conflict" class="tsd-anchor"></a>
@@ -155,7 +177,7 @@
 					<div class="tsd-signature tsd-kind-icon">conflict<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>hint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L39">persisto.ts:39</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L62">persisto.ts:62</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -165,9 +187,14 @@
 					<div class="tsd-signature tsd-kind-icon">create<wbr>Parents<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">boolean</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L29">persisto.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L48">persisto.ts:48</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>set() creates missing intermediate parent objects for children</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="debuglevel" class="tsd-anchor"></a>
@@ -175,7 +202,7 @@
 					<div class="tsd-signature tsd-kind-icon">debug<wbr>Level<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L35">persisto.ts:35</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L58">persisto.ts:58</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -185,9 +212,14 @@
 					<div class="tsd-signature tsd-kind-icon">defaults<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L25">persisto.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L42">persisto.ts:42</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>default value if no data is found in localStorage</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="error" class="tsd-anchor"></a>
@@ -195,7 +227,7 @@
 					<div class="tsd-signature tsd-kind-icon">error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>hint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L40">persisto.ts:40</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L63">persisto.ts:63</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -205,9 +237,14 @@
 					<div class="tsd-signature tsd-kind-icon">max<wbr>Commit<wbr>Delay<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L30">persisto.ts:30</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L50">persisto.ts:50</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>commit changes max. 3 seconds after first change</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="maxpushdelay" class="tsd-anchor"></a>
@@ -215,9 +252,14 @@
 					<div class="tsd-signature tsd-kind-icon">max<wbr>Push<wbr>Delay<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L32">persisto.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L54">persisto.ts:54</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>push commits max. 30 seconds after first change</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="pull" class="tsd-anchor"></a>
@@ -225,7 +267,7 @@
 					<div class="tsd-signature tsd-kind-icon">pull<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>hint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L41">persisto.ts:41</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L64">persisto.ts:64</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -235,7 +277,7 @@
 					<div class="tsd-signature tsd-kind-icon">push<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>hint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L42">persisto.ts:42</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L65">persisto.ts:65</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -245,9 +287,14 @@
 					<div class="tsd-signature tsd-kind-icon">push<wbr>Delay<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L31">persisto.ts:31</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L52">persisto.ts:52</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>push commits after 5 seconds of inactivity</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="remote" class="tsd-anchor"></a>
@@ -255,9 +302,14 @@
 					<div class="tsd-signature tsd-kind-icon">remote<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L24">persisto.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L40">persisto.ts:40</a></li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>URL for GET/PUT, ajax options, or callback</p>
+						</div>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
 					<a name="storage" class="tsd-anchor"></a>
@@ -265,7 +317,7 @@
 					<div class="tsd-signature tsd-kind-icon">storage<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L33">persisto.ts:33</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L56">persisto.ts:56</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -275,7 +327,7 @@
 					<div class="tsd-signature tsd-kind-icon">update<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>hint<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/mar10/persisto/blob/f8a319f/src/persisto.ts#L43">persisto.ts:43</a></li>
+							<li>Defined in <a href="https://github.com/mar10/persisto/blob/992261b/src/persisto.ts#L66">persisto.ts:66</a></li>
 						</ul>
 					</aside>
 				</section>

@@ -1,11 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Persisto Demo</title>
+	<meta charset="utf-8">
+	<title>Persisto Demo</title>
+	<style>
+
+		form.persisto div.persisto-state {
+			text-align: right;
+		}
+		form.persisto.modified {
+			background-color: aliceblue;
+		}
+		form.persisto.error {
+			background-color: aliceblue;
+		}
+		form.persisto span[class^=persisto-state-] {
+			display: none;
+			border-color:antiquewhite;
+			border-radius: 3px;
+			padding: 2px;
+		}
+		form.persisto.persisto-modified span.persisto-state-modified {
+			display: inline;
+			background-color: aliceblue;
+		}
+		form.persisto.persisto-saving span.persisto-state-saving {
+			display: inline;
+			background-color:darkgoldenrod;
+		}
+		form.persisto.persisto-error span.persisto-state-error {
+			display: inline;
+			background-color:darkgoldenrod;
+		}
+	</style>
 </head>
 <body>
-	<form id="form1" action="">
+	<form id="form1" action="" class="persisto">
+		<p class="persisto-state">
+			<span>State:</span>
+			<span class=persisto-state-ok>Ok.</span>
+			<span class=persisto-state-modified>Modified&hellip;</span>
+			<span class=persisto-state-saving>Saving&hellip;</span>
+			<span class=persisto-state-error>Error!</span>
+		</p>
 		<label>Title:<input name="title" type="text" value="" /></label><br>
 		<label>Details: <textarea name="details" rows="3"></textarea></label><br>
 		<label>Favorite:
@@ -46,5 +83,5 @@
 	</form>
 	<script src="../dist/persisto.umd.js"> </script>
 	<script src="main.js"> </script>
-  </body>
+</body>
 </html>

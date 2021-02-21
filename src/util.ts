@@ -5,14 +5,14 @@
  */
 
 export const MAX_INT = 9007199254740991;
-type promiseCallbackType = (val:any) => void
+type promiseCallbackType = (val: any) => void;
 
 /**
  * Deferred is a ES6 Promise, that exposes the resolve() method
  */
 export class Deferred {
-  private thens:promiseCallbackType[] = [];
-  private catches:promiseCallbackType[] = [];
+  private thens: promiseCallbackType[] = [];
+  private catches: promiseCallbackType[] = [];
 
   private status = "";
   private resolvedValue: any;
@@ -60,6 +60,51 @@ export class Deferred {
   }
 }
 
+// function delegate(rootElem:any, selector:string, event:Event, handler:(ev:Event)=>boolean|undefined,bind?:any):boolean|undefined {
+//   let nearest = event.target!.closest(selector);
+//   if (nearest && rootElem.contains(nearest)) {
+//     return handler.call(bind, event);
+//   }
+//   return
+// }
+
+/**
+ * Bind event handler using event delegation:
+ *
+ * E.g. handle all 'input' events for input and textarea elements of a given
+ * form
+ * ```ts
+ * onEvent("#form_1", "input", "input,textarea", function (e: Event) {
+ *   console.log(e.type, e.target);
+ * });
+ * ```
+ *
+ * @param element HTMLElement or selector
+ * @param eventName
+ * @param selector
+ * @param handler
+ * @param bind
+ */
+export function onEvent(
+  element: HTMLElement | string,
+  eventName: string,
+  selector: string,
+  handler: (e:Event) => boolean | void,
+  bind?: any
+): void {
+  if (typeof element === "string") {
+    element = <HTMLElement>document.querySelector(element);
+  }
+  element.addEventListener(eventName, function (e) {
+    if (e.target && (<HTMLElement>e.target).matches(selector)) {
+      if(bind) {
+        return handler.call(bind, e);
+      }else{
+        return handler(e)
+      }
+    }
+  });
+}
 /**
  * jQuery Shims
  * http://youmightnotneedjquery.com

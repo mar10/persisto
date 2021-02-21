@@ -16,34 +16,71 @@
   - change eslint to non-jquery
   - use :scope for querySelectorAll
 */
-import { each, error, extend, noop, Deferred, MAX_INT } from "./util";
+import { each, error, extend, noop, onEvent, Deferred, MAX_INT } from "./util";
 
 // type PersistoCallbackType = (...args: any[]) => void | boolean;
 
-interface PersistoOptions {
-  remote?: any; // URL for GET/PUT, ajax options, or callback
-  defaults?: any; // default value if no data is found in localStorage
-  commitDelay?: number; // commit changes after 0.5 seconds of inactivity
-  createParents?: boolean; // set() creates missing intermediate parent objects for children
-  maxCommitDelay?: number; // commit changes max. 3 seconds after first change
-  pushDelay?: number; // push commits after 5 seconds of inactivity
-  maxPushDelay?: number; // push commits max. 30 seconds after first change
+/**
+ * Available options for [[PersistentObject]].
+ *
+ * **Note:** this will be passed as plain object:
+ * ```ts
+ * let store = new mar10.PersistentObject("test", {
+ *   store: sessionStorage,
+ *   attachForm: "#form1",
+ *   defaults: {
+ *     title: "foo",
+ *     ...
+ *   }
+ * });
+ * ```
+ */
+export interface PersistoOptions {
+  /** URL for GET/PUT, ajax options, or callback */
+  remote?: any;
+  /** default value if no data is found in localStorage */
+  defaults?: any;
+  /** Track form input changes and maintain status class names. */
+  attachForm?: any;
+  /** Commit changes after 0.5 seconds of inactivity */
+  commitDelay?: number;
+  /** set() creates missing intermediate parent objects for children */
+  createParents?: boolean;
+  /** commit changes max. 3 seconds after first change */
+  maxCommitDelay?: number;
+  /** push commits after 5 seconds of inactivity */
+  pushDelay?: number;
+  /** push commits max. 30 seconds after first change */
+  maxPushDelay?: number;
+  /** localStorage */
   storage?: any;
-  // Default debugLevel is set to 1 by `grunt build`:
-  debugLevel?: number; // 0:quiet, 1:normal, 2:verbose
+  // Default debugLevel 0:quiet, 1:normal, 2:verbose, is set to 1 by `grunt build`:
+  debugLevel?: number;
   // Events
+  /** @event at least one  */
   change?: (hint: string) => void;
+  /** Modified data was written to storage */
   commit?: (hint: string) => void;
   conflict?: (hint: string) => boolean;
   error?: (hint: string) => void;
   pull?: (hint: string) => void;
+  /** Modified data was sent to `remote` */
   push?: (hint: string) => void;
+  /** Modified data was stored.
+   * If `remote was passed, this means `push`has finished,
+   * otherwise `commit` has finished.
+   */
+  saved?: () => void;
   update?: (hint: string) => void;
 }
 
 /**
  * A persistent plain object or array.
  */
+const class_modified = "persisto-modified";
+const class_saving = "persisto-saving";
+const class_error = "persisto-error";
+
 export class PersistentObject {
   version: string = "@VERSION"; // Set to semver by 'grunt release'
   protected _data: any;
@@ -51,6 +88,7 @@ export class PersistentObject {
   protected storage: Storage;
   protected _checkTimer: any = null;
   readonly namespace: string;
+  protected form: any;
   protected offline: undefined | boolean = undefined;
   protected phase: string | null = null;
   protected uncommittedSince = 0;
@@ -76,6 +114,7 @@ export class PersistentObject {
       {
         remote: null, // URL for GET/PUT, ajax options, or callback
         defaults: {}, // default value if no data is found in localStorage
+        attachForm: null, // track input changes and
         commitDelay: 500, // commit changes after 0.5 seconds of inactivity
         createParents: true, // set() creates missing intermediate parent objects for children
         maxCommitDelay: 3000, // commit changes max. 3 seconds after first change
@@ -91,6 +130,7 @@ export class PersistentObject {
         error: noop,
         pull: noop,
         push: noop,
+        save: noop,
         update: noop,
       },
       options
@@ -98,11 +138,27 @@ export class PersistentObject {
     this.storage = this.opts.storage;
     this._data = this.opts.defaults;
     // this.ready = new Promise();
+    if (typeof this.opts.attachForm === "string") {
+      this.form = document.querySelector(this.opts.attachForm);
+    } else if (this.opts.attachForm instanceof HTMLElement) {
+      this.form = this.opts.attachForm;
+    }
 
     // _data contains the default value. Now load from persistent storage if any
     let prevValue = this.storage ? this.storage.getItem(this.namespace) : null;
     let self = this;
 
+    // Monitor form changes
+    if (this.form) {
+      this.form.classList.add("persisto");
+      onEvent(this.form, "input", "input,textarea", function (e: Event) {
+        console.log(e.type, e.target, e);
+        self.readFromForm(self.form);
+      });
+      onEvent(this.form, "change", "select", function (e: Event) {
+        self.readFromForm(self.form);
+      });
+    }
     if (this.opts.remote) {
       // Try to pull, then resolve
       this.pull()
@@ -143,8 +199,8 @@ export class PersistentObject {
     }
   }
 
-  /* Trigger commit/push according to current settings. */
-  _invalidate(hint: string, deferredCall?: boolean) {
+  /** Trigger commit/push according to current settings. */
+  protected _invalidate(hint: string, deferredCall?: boolean) {
     let self = this,
       prevChange = this.lastModified,
       now = Date.now(),
@@ -169,8 +225,11 @@ export class PersistentObject {
         this.unpushedSince = now;
       }
       this.opts.change(hint);
+      if (this.form) {
+        this.form.classList.add(class_modified);
+        self.form.classList.remove(class_error);
+      }
     }
-
     if (this.storage) {
       // If we came here by a deferred timer (or delay is 0), commit
       // immediately
@@ -184,7 +243,7 @@ export class PersistentObject {
           now - prevChange >= this.opts.commitDelay,
           now - this.uncommittedSince >= this.opts.maxCommitDelay
         );
-        this.commit();
+        self.commit.call(self);
       } else {
         // otherwise schedule next check
         nextCommit = Math.min(
@@ -225,8 +284,8 @@ export class PersistentObject {
       }, nextCheck - now);
     }
   }
-  /* Load data from localStorage. */
-  _update(objData: any) {
+  /** Load data from localStorage. */
+  protected _update(objData: any) {
     if (this.uncommittedSince) {
       console.warn("Updating an uncommitted object.");
       if (this.opts.conflict(objData, this._data) === false) {
@@ -296,8 +355,8 @@ export class PersistentObject {
     }
     return cur;
   }
-  /* Modify object property and set the `dirty` flag (`key` supports dot notation). */
-  _setOrRemove(key: string, value: any, remove?: boolean) {
+  /** Modify object property and set the `dirty` flag (`key` supports dot notation). */
+  protected _setOrRemove(key: string, value: any, remove?: boolean) {
     let i,
       parent,
       cur = this._data,
@@ -352,6 +411,7 @@ export class PersistentObject {
   }
   /** Flag object as modified, so that commit / push will be scheduled. */
   setDirty(flag?: boolean) {
+    console.log("setDirty", flag);
     if (flag !== false) {
       this._invalidate("explicit");
     }
@@ -387,8 +447,15 @@ export class PersistentObject {
     this.uncommittedSince = 0;
     this.commitCount += 1;
     // this.lastCommit = Date.now();
+    if (this.form && !this.opts.remote) {
+      this.form.classList.remove(class_modified);
+    }
     if (this.opts.debugLevel >= 2 && console.time) {
       console.timeEnd(this + ".commit");
+    }
+    this.opts.commit.call(this);
+    if (!this.opts.remote) {
+      this.opts.save.call(this);
     }
     return jsonData;
   }
@@ -424,10 +491,11 @@ export class PersistentObject {
         self.storage.setItem(self.namespace, JSON.stringify(data));
         self._update.call(self, data);
         self.lastPull = Date.now();
+        self.opts.pull.call(self);
       })
       .catch(function () {
         console.error(arguments);
-        self.opts.error(arguments);
+        self.opts.error.call(self, arguments);
       })
       .finally(function () {
         self.phase = null;
@@ -450,6 +518,10 @@ export class PersistentObject {
     this.phase = "push";
     if (!this.opts.remote) {
       error(this + ": Missing remote option");
+    }
+    if (this.form) {
+      this.form.classList.remove(class_modified);
+      this.form.classList.add(class_saving);
     }
     return fetch(this.opts.remote, {
       method: "PUT",
@@ -475,9 +547,17 @@ export class PersistentObject {
         }
         self.unpushedSince = 0;
         self.pushCount += 1;
+        self.opts.push.call(self);
+        self.opts.save.call(self);
+        if (self.form) {
+          self.form.classList.remove(class_saving);
+        }
       })
       .catch(function () {
-        self.opts.error(arguments);
+        if (self.form) {
+          self.form.classList.remove(class_error);
+        }
+        self.opts.error.call(self, arguments);
       })
       .finally(function () {
         self.phase = null;
@@ -631,4 +711,4 @@ export class PersistentObject {
 //   conflict: (...args) => {return true}
 // });
 
-export default PersistentObject;
+// export default PersistentObject;

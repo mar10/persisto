@@ -25,6 +25,23 @@ declare module "util" {
         };
     }
     /**
+     * Bind event handler using event delegation:
+     *
+     * Examples:
+     * ```typescript
+     * onEvent("form", "input", "input,textarea", function (e: Event) {
+     *   console.log(e.type, e.target);
+     * });
+     * ```
+     *
+     * @param element
+     * @param eventName,
+     * @param selector
+     * @param handler
+     * @param bind
+     */
+    export function onEvent(element: HTMLElement | string, eventName: string, selector: string, handler: (e: Event) => boolean | void, bind?: any): void;
+    /**
      * jQuery Shims
      * http://youmightnotneedjquery.com
      */
@@ -38,9 +55,11 @@ declare module "util" {
     export function type(obj: any): any;
 }
 declare module "persisto" {
-    interface PersistoOptions {
+    export interface PersistoOptions {
         remote?: any;
         defaults?: any;
+        /** Track form input changes and maintain status class names. */
+        attachForm?: any;
         commitDelay?: number;
         createParents?: boolean;
         maxCommitDelay?: number;
@@ -66,6 +85,7 @@ declare module "persisto" {
         protected storage: Storage;
         protected _checkTimer: any;
         readonly namespace: string;
+        protected form: any;
         protected offline: undefined | boolean;
         protected phase: string | null;
         protected uncommittedSince: number;

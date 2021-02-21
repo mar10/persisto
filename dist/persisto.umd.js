@@ -60,6 +60,45 @@
             };
         }
     }
+    // function delegate(rootElem:any, selector:string, event:Event, handler:(ev:Event)=>boolean|undefined,bind?:any):boolean|undefined {
+    //   let nearest = event.target!.closest(selector);
+    //   if (nearest && rootElem.contains(nearest)) {
+    //     return handler.call(bind, event);
+    //   }
+    //   return
+    // }
+    /**
+     * Bind event handler using event delegation:
+     *
+     * E.g. handle all 'input' events for input and textarea elements of a given
+     * form
+     * ```ts
+     * onEvent("#form_1", "input", "input,textarea", function (e: Event) {
+     *   console.log(e.type, e.target);
+     * });
+     * ```
+     *
+     * @param element HTMLElement or selector
+     * @param eventName
+     * @param selector
+     * @param handler
+     * @param bind
+     */
+    function onEvent(element, eventName, selector, handler, bind) {
+        if (typeof element === "string") {
+            element = document.querySelector(element);
+        }
+        element.addEventListener(eventName, function (e) {
+            if (e.target && e.target.matches(selector)) {
+                if (bind) {
+                    return handler.call(bind, e);
+                }
+                else {
+                    return handler(e);
+                }
+            }
+        });
+    }
     /**
      * jQuery Shims
      * http://youmightnotneedjquery.com
@@ -116,6 +155,9 @@
     /**
      * A persistent plain object or array.
      */
+    const class_modified = "persisto-modified";
+    const class_saving = "persisto-saving";
+    const class_error = "persisto-error";
     class PersistentObject {
         // ready: Promise<any>;
         constructor(namespace, options) {
@@ -140,6 +182,7 @@
             this.opts = extend({
                 remote: null,
                 defaults: {},
+                attachForm: null,
                 commitDelay: 500,
                 createParents: true,
                 maxCommitDelay: 3000,
@@ -155,14 +198,32 @@
                 error: noop,
                 pull: noop,
                 push: noop,
+                save: noop,
                 update: noop,
             }, options);
             this.storage = this.opts.storage;
             this._data = this.opts.defaults;
             // this.ready = new Promise();
+            if (typeof this.opts.attachForm === "string") {
+                this.form = document.querySelector(this.opts.attachForm);
+            }
+            else if (this.opts.attachForm instanceof HTMLElement) {
+                this.form = this.opts.attachForm;
+            }
             // _data contains the default value. Now load from persistent storage if any
             let prevValue = this.storage ? this.storage.getItem(this.namespace) : null;
             let self = this;
+            // Monitor form changes
+            if (this.form) {
+                this.form.classList.add("persisto");
+                onEvent(this.form, "input", "input,textarea", function (e) {
+                    console.log(e.type, e.target, e);
+                    self.readFromForm(self.form);
+                });
+                onEvent(this.form, "change", "select", function (e) {
+                    self.readFromForm(self.form);
+                });
+            }
             if (this.opts.remote) {
                 // Try to pull, then resolve
                 this.pull()
@@ -199,7 +260,7 @@
                 dfd.resolve();
             }
         }
-        /* Trigger commit/push according to current settings. */
+        /** Trigger commit/push according to current settings. */
         _invalidate(hint, deferredCall) {
             let self = this, prevChange = this.lastModified, now = Date.now(), nextCommit = 0, nextPush = 0, nextCheck = 0;
             if (this._checkTimer) {
@@ -219,6 +280,10 @@
                     this.unpushedSince = now;
                 }
                 this.opts.change(hint);
+                if (this.form) {
+                    this.form.classList.add(class_modified);
+                    self.form.classList.remove(class_error);
+                }
             }
             if (this.storage) {
                 // If we came here by a deferred timer (or delay is 0), commit
@@ -228,7 +293,7 @@
                 (prevChange && now - prevChange >= this.opts.commitDelay) ||
                     now - this.uncommittedSince >= this.opts.maxCommitDelay) {
                     this.debug("_invalidate(): force commit", now - prevChange >= this.opts.commitDelay, now - this.uncommittedSince >= this.opts.maxCommitDelay);
-                    this.commit();
+                    self.commit.call(self);
                 }
                 else {
                     // otherwise schedule next check
@@ -257,7 +322,7 @@
                 }, nextCheck - now);
             }
         }
-        /* Load data from localStorage. */
+        /** Load data from localStorage. */
         _update(objData) {
             if (this.uncommittedSince) {
                 console.warn("Updating an uncommitted object.");
@@ -320,7 +385,7 @@
             }
             return cur;
         }
-        /* Modify object property and set the `dirty` flag (`key` supports dot notation). */
+        /** Modify object property and set the `dirty` flag (`key` supports dot notation). */
         _setOrRemove(key, value, remove) {
             let i, parent, cur = this._data, parts = ("" + key) // convert to string
                 .replace(/\[(\w+)\]/g, ".$1") // convert indexes to properties
@@ -371,6 +436,7 @@
         }
         /** Flag object as modified, so that commit / push will be scheduled. */
         setDirty(flag) {
+            console.log("setDirty", flag);
             if (flag !== false) {
                 this._invalidate("explicit");
             }
@@ -406,8 +472,15 @@
             this.uncommittedSince = 0;
             this.commitCount += 1;
             // this.lastCommit = Date.now();
+            if (this.form && !this.opts.remote) {
+                this.form.classList.remove(class_modified);
+            }
             if (this.opts.debugLevel >= 2 && console.time) {
                 console.timeEnd(this + ".commit");
+            }
+            this.opts.commit.call(this);
+            if (!this.opts.remote) {
+                this.opts.save.call(this);
             }
             return jsonData;
         }
@@ -440,10 +513,11 @@
                 self.storage.setItem(self.namespace, JSON.stringify(data));
                 self._update.call(self, data);
                 self.lastPull = Date.now();
+                self.opts.pull.call(self);
             })
                 .catch(function () {
                 console.error(arguments);
-                self.opts.error(arguments);
+                self.opts.error.call(self, arguments);
             })
                 .finally(function () {
                 self.phase = null;
@@ -464,6 +538,10 @@
             this.phase = "push";
             if (!this.opts.remote) {
                 error(this + ": Missing remote option");
+            }
+            if (this.form) {
+                this.form.classList.remove(class_modified);
+                this.form.classList.add(class_saving);
             }
             return fetch(this.opts.remote, {
                 method: "PUT",
@@ -488,9 +566,17 @@
                 }
                 self.unpushedSince = 0;
                 self.pushCount += 1;
+                self.opts.push.call(self);
+                self.opts.save.call(self);
+                if (self.form) {
+                    self.form.classList.remove(class_saving);
+                }
             })
                 .catch(function () {
-                self.opts.error(arguments);
+                if (self.form) {
+                    self.form.classList.remove(class_error);
+                }
+                self.opts.error.call(self, arguments);
             })
                 .finally(function () {
                 self.phase = null;
@@ -624,9 +710,16 @@
             });
         }
     }
+    // let p = new PersistentObject("namespace", {
+    //   remote: null,
+    //   change: function () {
+    //     return 3;
+    //   },
+    //   conflict: (...args) => {return true}
+    // });
+    // export default PersistentObject;
 
     exports.PersistentObject = PersistentObject;
-    exports.default = PersistentObject;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
