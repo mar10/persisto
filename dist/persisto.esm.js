@@ -2,7 +2,7 @@
  * persisto.js - utils
  * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de).
  * Released under the MIT license.
- * v2.0.0-0, Sun, 21 Feb 2021 20:06:48 GMT
+ * v2.0.0-1, Sun, 21 Feb 2021 20:43:26 GMT
  */
 const MAX_INT = 9007199254740991;
 /**
@@ -144,8 +144,8 @@ function noop() { }
  * Copyright (c) 2016-2021, Martin Wendt (https://wwWendt.de).
  * Released under the MIT license.
  *
- * @version v2.0.0-0
- * @date Sun, 21 Feb 2021 20:06:48 GMT
+ * @version v2.0.0-1
+ * @date Sun, 21 Feb 2021 20:43:26 GMT
  */
 const default_debuglevel = 1; // Replaced by rollup script
 const class_modified = "persisto-modified";
@@ -157,7 +157,7 @@ const class_error = "persisto-error";
 class PersistentObject {
     // ready: Promise<any>;
     constructor(namespace, options) {
-        this.version = "v2.0.0-0"; // Set to semver by 'grunt release'
+        this.version = "v2.0.0-1"; // Set to semver by 'grunt release'
         this._checkTimer = null;
         this.offline = undefined;
         this.phase = null;
