@@ -27,15 +27,16 @@ declare module "util" {
     /**
      * Bind event handler using event delegation:
      *
-     * Examples:
-     * ```typescript
-     * onEvent("form", "input", "input,textarea", function (e: Event) {
+     * E.g. handle all 'input' events for input and textarea elements of a given
+     * form
+     * ```ts
+     * onEvent("#form_1", "input", "input,textarea", function (e: Event) {
      *   console.log(e.type, e.target);
      * });
      * ```
      *
-     * @param element
-     * @param eventName,
+     * @param element HTMLElement or selector
+     * @param eventName
      * @param selector
      * @param handler
      * @param bind
@@ -55,29 +56,57 @@ declare module "util" {
     export function type(obj: any): any;
 }
 declare module "persisto" {
+    /**
+     * Available options for [[PersistentObject]].
+     *
+     * **Note:** this will be passed as plain object:
+     * ```ts
+     * let store = new mar10.PersistentObject("test", {
+     *   store: sessionStorage,
+     *   attachForm: "#form1",
+     *   defaults: {
+     *     title: "foo",
+     *     ...
+     *   }
+     * });
+     * ```
+     */
     export interface PersistoOptions {
+        /** URL for GET/PUT, ajax options, or callback */
         remote?: any;
+        /** default value if no data is found in localStorage */
         defaults?: any;
         /** Track form input changes and maintain status class names. */
         attachForm?: any;
+        /** Commit changes after 0.5 seconds of inactivity */
         commitDelay?: number;
+        /** set() creates missing intermediate parent objects for children */
         createParents?: boolean;
+        /** commit changes max. 3 seconds after first change */
         maxCommitDelay?: number;
+        /** push commits after 5 seconds of inactivity */
         pushDelay?: number;
+        /** push commits max. 30 seconds after first change */
         maxPushDelay?: number;
+        /** localStorage */
         storage?: any;
         debugLevel?: number;
+        /** @event at least one  */
         change?: (hint: string) => void;
+        /** Modified data was written to storage */
         commit?: (hint: string) => void;
         conflict?: (hint: string) => boolean;
         error?: (hint: string) => void;
         pull?: (hint: string) => void;
+        /** Modified data was sent to `remote` */
         push?: (hint: string) => void;
+        /** Modified data was stored.
+         * If `remote was passed, this means `push`has finished,
+         * otherwise `commit` has finished.
+         */
+        saved?: () => void;
         update?: (hint: string) => void;
     }
-    /**
-     * A persistent plain object or array.
-     */
     export class PersistentObject {
         version: string;
         protected _data: any;
@@ -96,8 +125,10 @@ declare module "persisto" {
         pushCount: number;
         protected lastModified: number;
         constructor(namespace: string, options: PersistoOptions);
-        _invalidate(hint: string, deferredCall?: boolean): void;
-        _update(objData: any): void;
+        /** Trigger commit/push according to current settings. */
+        protected _invalidate(hint: string, deferredCall?: boolean): void;
+        /** Load data from localStorage. */
+        protected _update(objData: any): void;
         toString(): string;
         debug(...args: any[]): void;
         log(...args: any[]): void;
@@ -107,7 +138,8 @@ declare module "persisto" {
         isReady(): void;
         /** Access object property (`key` supports dot notation). */
         get(key: string): any;
-        _setOrRemove(key: string, value: any, remove?: boolean): void;
+        /** Modify object property and set the `dirty` flag (`key` supports dot notation). */
+        protected _setOrRemove(key: string, value: any, remove?: boolean): void;
         /** Modify object property and set the `dirty` flag (`key` supports dot notation). */
         set(key: string, value: any): void;
         /** Delete object property and set the `dirty` flag (`key` supports dot notation). */
@@ -133,5 +165,4 @@ declare module "persisto" {
          */
         writeToForm(form: any, options?: any): void;
     }
-    export default PersistentObject;
 }

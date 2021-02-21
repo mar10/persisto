@@ -256,7 +256,8 @@ class PersistentObject {
     }
     /** Trigger commit/push according to current settings. */
     _invalidate(hint, deferredCall) {
-        let self = this, prevChange = this.lastModified, now = Date.now(), nextCommit = 0, nextPush = 0, nextCheck = 0;
+        let self = this, now = Date.now(), prevChange = this.lastModified || now, // first change?
+        nextCommit = 0, nextPush = 0, nextCheck = 0;
         if (this._checkTimer) {
             clearTimeout(this._checkTimer);
             this._checkTimer = null;
@@ -282,9 +283,7 @@ class PersistentObject {
         if (this.storage) {
             // If we came here by a deferred timer (or delay is 0), commit
             // immediately
-            if (
-            // Do not force commit if this is the first change (i.e. prevChange is 0)
-            (prevChange && now - prevChange >= this.opts.commitDelay) ||
+            if (now - prevChange >= this.opts.commitDelay ||
                 now - this.uncommittedSince >= this.opts.maxCommitDelay) {
                 this.debug("_invalidate(): force commit", now - prevChange >= this.opts.commitDelay, now - this.uncommittedSince >= this.opts.maxCommitDelay);
                 self.commit.call(self);
@@ -295,9 +294,7 @@ class PersistentObject {
             }
         }
         if (this.opts.remote) {
-            if (
-            // Do not force push if this is the first change (i.e. prevChange is 0)
-            (prevChange && now - prevChange >= this.opts.pushDelay) ||
+            if (now - prevChange >= this.opts.pushDelay ||
                 now - this.unpushedSince >= this.opts.maxPushDelay) {
                 this.debug("_invalidate(): force push", now - prevChange >= this.opts.pushDelay, now - this.unpushedSince >= this.opts.maxPushDelay);
                 this.push();
@@ -475,6 +472,7 @@ class PersistentObject {
         this.opts.commit.call(this);
         if (!this.opts.remote) {
             this.opts.save.call(this);
+            this.lastModified = 0; // so next change will not force-commit
         }
         return jsonData;
     }
@@ -559,6 +557,7 @@ class PersistentObject {
                     response);
             }
             self.unpushedSince = 0;
+            // self.lastModified = 0;  // so next change will not force-commit
             self.pushCount += 1;
             self.opts.push.call(self);
             self.opts.save.call(self);
