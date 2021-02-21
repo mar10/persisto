@@ -1,7 +1,7 @@
 var store = new mar10.PersistentObject("test", {
     store: sessionStorage,
     attachForm: "#form1",
-    remote: "https://google.com",
+    // remote: "https://google.com",
     defaults: {
       title: "foo",
       details: "bar\nbaz",
