@@ -89,7 +89,7 @@
   },
   "scripts": {
     "test": "grunt ci --verbose",
-    "docs": "typedoc && touch docs/typedoc/.nojekyll",
+    "docs": "typedoc && touch docs/.nojekyll",
     "build:types": "tsc -t esnext --moduleResolution node -d --emitDeclarationOnly --outFile dist/persisto.d.ts src/persisto.ts",
     "build:js": "rollup -c rollup.config.js",
     "build:minjs:umd": "terser dist/persisto.umd.js --compress --mangle > dist/persisto.umd.min.js",
