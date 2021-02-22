@@ -11,14 +11,6 @@ module.exports = (grunt) ->
     pkg:
         grunt.file.readJSON("package.json")
 
-    # Project metadata, used by the <banner> directive.
-    # meta:
-    #     banner: "/*! <%= pkg.title || pkg.name %> - @VERSION - @DATE\n" +
-    #             # "<%= grunt.template.today('yyyy-mm-dd HH:mm') %>\n" +
-    #             "<%= pkg.homepage ? '  * ' + pkg.homepage + '\\n' : '' %>" +
-    #             "  * Copyright (c) <%= grunt.template.today('yyyy') %> <%= pkg.author.name %>;" +
-    #             " Licensed <%= _.map(pkg.licenses, 'type').join(', ') %> */\n"
-
     exec:
         build:
             # FTP upload the demo files (requires https://github.com/mar10/pyftpsync)
@@ -59,23 +51,17 @@ module.exports = (grunt) ->
 
   # ----------------------------------------------------------------------------
 
-
   # Load "grunt*" dependencies
-
   for key of grunt.file.readJSON("package.json").devDependencies
       grunt.loadNpmTasks key  if key isnt "grunt" and key.indexOf("grunt") is 0
 
   # Register tasks
-
-#   grunt.registerTask "server", ["connect:forever"]
-#   grunt.registerTask "dev", ["connect:dev", "watch"]
-  # grunt.registerTask "tabfix", ["exec:tabfix"]
   grunt.registerTask "test", [
-    #   "eslint:dev"
       "qunit:develop"
   ]
+  grunt.registerTask "ci", ["test"]  # Called by 'npm test'
+  grunt.registerTask "default", ["test"]
 
-#   grunt.registerTask "sauce", ["connect:sauce", "saucelabs-qunit"]
   if parseInt(process.env.TRAVIS_PULL_REQUEST, 10) > 0
       # saucelab keys do not work on forks
       # http://support.saucelabs.com/entries/25614798
@@ -83,31 +69,3 @@ module.exports = (grunt) ->
   else
       grunt.registerTask "travis", ["test"]  # , "sauce"]
 
-  grunt.registerTask "default", ["test"]
-
-  grunt.registerTask "ci", ["test"]  # Called by 'npm test'
-
-#   grunt.registerTask "build", [
-#       "eslint:fix"
-#       "test"
-#       "clean:build"
-#       "copy:build"
-#       "uglify:build"
-#       # "clean:extMin"
-#       "replace:production"
-#       # "uglify:build"
-#       # "qunit:build"
-#       ]
-
-#   grunt.registerTask "make_dist", [
-#       "build"
-#       "clean:dist"
-#       "copy:dist"
-#       "clean:build"
-#       "replace:release"
-#       ]
-
-  # grunt.registerTask "upload", [
-  #     "build"
-  #     "exec:upload"
-  #     ]

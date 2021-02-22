@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>persisto - v2.0.0-1</title>
-	<meta name="description" content="Documentation for persisto - v2.0.0-1">
+	<title>persisto - v2.0.1-0</title>
+	<meta name="description" content="Documentation for persisto - v2.0.1-0">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
 	<script async src="assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">persisto - v2.0.0-1</a>
+					<a href="index.html" class="title">persisto - v2.0.1-0</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -50,7 +50,7 @@
 	</div>
 	<div class="tsd-page-title">
 		<div class="container">
-			<h1>persisto - v2.0.0-1</h1>
+			<h1>persisto - v2.0.1-0</h1>
 		</div>
 	</div>
 </header>
@@ -71,19 +71,20 @@
 				<blockquote>
 					<p>Persistent JavaScript objects and web forms using Web Storage.</p>
 				</blockquote>
-				<p>Features</p>
-				<ul>
+				<p><strong>Features</strong></p>
+				<ol>
 					<li>Persist JavaScript objects (<code>{...}</code>) to
 						<a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API"><code>localStorage</code> / <code>sessionStorage</code></a>.<br>
-						Use the <code>get()</code>/<code>set()</code> API for direct (even nested) access, hiding the need
-					to convert from/to JSON.</li>
+						Use the <code>get()</code>/<code>set()</code> API for direct (even nested) access, avoiding the
+					need to convert from/to JSON.</li>
 					<li>Cache access to
 						<a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API"><code>localStorage</code> / <code>sessionStorage</code></a>
-					(deferred writing appears to be 10-15 times faster) and remote backends.</li>
+					(deferred writing appears to be 10-15 times faster).</li>
 					<li>Make JavaScript objects editable in HTML forms.<br>
-					Common use case: maintain persistent client settings and let users edit them.</li>
-					<li>Optionally synchronize the data with a remote endpoint</li>
-				</ul>
+						A simple naming convention maps data properties to form elements.<br>
+					Listen for input change events and automatically store data.</li>
+					<li>Optionally synchronize the data with a remote endpoint.</li>
+				</ol>
 				<p><a href="https://mar10.github.io/persisto/">API Documentation</a></p>
 				<p>Overview:</p>
 				<p><img src="https://rawgit.com/mar10/persisto/no-jquery-ts/assets/architecture.png?raw=true" alt="sample"></p>
@@ -106,11 +107,11 @@
 				<pre><code class="language-html"><span style="color: #800000">&lt;script</span><span style="color: #000000FF"> </span><span style="color: #FF0000">src</span><span style="color: #000000FF">=</span><span style="color: #0000FF">&quot;//cdn.jsdelivr.net/npm/persisto@1/dist/persisto.min.js&quot;</span><span style="color: #800000">&gt;&lt;/script&gt;</span>
 </code></pre>
 				<p>then instantiate a <code>PersistentObject</code>:</p>
-				<pre><code class="language-js"><span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
-<span style="color: #000000">              </span><span style="color: #001080">defaults:</span><span style="color: #000000"> {</span>
-<span style="color: #000000">                </span><span style="color: #001080">theme:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;default&quot;</span>
-<span style="color: #000000">                }</span>
-<span style="color: #000000">            });</span>
+				<pre><code class="language-js"><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #001080">mar10</span><span style="color: #000000">.</span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
+<span style="color: #000000">      </span><span style="color: #001080">defaults:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">        </span><span style="color: #001080">theme:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;default&quot;</span>
+<span style="color: #000000">        }</span>
+<span style="color: #000000">    });</span>
 </code></pre>
 				<p><code>store</code> now contains the data that was stored in <code>localStorage.mySettings</code> if
 					present. Otherwise, <code>store</code> is initialized to the default values that we
@@ -137,7 +138,7 @@
 					API calls.
 				Example:</p>
 				<pre><code class="language-js"><span style="color: #008000">// Maintain client&#039;s preferences and define some defaults:</span>
-<span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">settingsStore</span><span style="color: #000000"> = </span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
+<span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">settingsStore</span><span style="color: #000000"> = </span><span style="color: #001080">mar10</span><span style="color: #000000">.</span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
 <span style="color: #000000">        </span><span style="color: #001080">defaults:</span><span style="color: #000000"> {</span>
 <span style="color: #000000">          </span><span style="color: #001080">nickname:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anonymous&quot;</span><span style="color: #000000">,</span>
 <span style="color: #000000">          </span><span style="color: #001080">theme:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;default&quot;</span>
@@ -199,14 +200,14 @@
 				</a>
 				<p>Arrays are only a special form of plain JavaScript objects, so we can store and
 				access them as top level type like this:</p>
-				<pre><code class="language-js"><span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
+				<pre><code class="language-js"><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #001080">mar10</span><span style="color: #000000">.</span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
 <span style="color: #000000">                </span><span style="color: #001080">defaults:</span><span style="color: #000000"> [</span><span style="color: #A31515">&quot;a&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;b&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;c&quot;</span><span style="color: #000000">]</span>
 <span style="color: #000000">            });</span>
 <span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;[0]&quot;</span><span style="color: #000000">);  </span><span style="color: #008000">// &#039;a&#039;</span>
 <span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">set</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;[1]&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;b2&quot;</span><span style="color: #000000">);</span>
 </code></pre>
 				<p>However if we use child properties, it is even easier:</p>
-				<pre><code class="language-js"><span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
+				<pre><code class="language-js"><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #001080">mar10</span><span style="color: #000000">.</span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
 <span style="color: #000000">        </span><span style="color: #001080">defaults:</span><span style="color: #000000"> {</span>
 <span style="color: #000000">          </span><span style="color: #001080">values:</span><span style="color: #000000"> [</span><span style="color: #A31515">&quot;a&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;b&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;c&quot;</span><span style="color: #000000">]</span>
 <span style="color: #000000">        }</span>
@@ -250,7 +251,7 @@
 				</a>
 				<p>Optionally, we may specify an endpoint URL that is used to synchronize the data
 				with a web server using HTTP REST requests (GET and PUT):</p>
-				<pre><code class="language-js"><span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
+				<pre><code class="language-js"><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #001080">mar10</span><span style="color: #000000">.</span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
 <span style="color: #000000">        </span><span style="color: #001080">remote:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;persist/settings&quot;</span>
 <span style="color: #000000">      });</span>
 
@@ -271,197 +272,34 @@
 				<a href="#api-reference" id="api-reference" style="color: inherit; text-decoration: none;">
 					<h1>API Reference</h1>
 				</a>
-				<a href="#options" id="options" style="color: inherit; text-decoration: none;">
-					<h3>Options</h3>
+				<a href="#options-and-events" id="options-and-events" style="color: inherit; text-decoration: none;">
+					<h3>Options and Events</h3>
 				</a>
 				<p>The following options are available:</p>
-				<dl>
-					<dt>commitDelay</dt>
-					<dd>
-						Type: <code>int</code>,
-						default: <code>500</code> milliseconds<br>
-						Commit cached changes to localStorage after 0.5 seconds of inactivity.<br>
-						After each change, we wait 0.5 more seconds for additional changes to come
-						in, before the actual commit is executed.<br>
-						The maximum delay (first change until actual commit) is limited by
-						`maxCommitDelay`.<br>
-						Set to <code>0</code> to force synchronous mode.
-					</dd>
-					<dt>debugLevel</dt>
-					<dd>
-						Type: <code>int</code>,
-						default: <code>1</code><br>
-						Verbosity level: 0:quiet, 1:normal, 2:verbose.
-					</dd>
-					<dt>defaults</dt>
-					<dd>
-						Type: <code>object</code>,
-						default: <code>{}</code><br>
-						Default value if no data is found in localStorage.
-					</dd>
-					<dt>maxCommitDelay</dt>
-					<dd>
-						Type: <code>int</code>,
-						default: <code>3000</code> milliseconds<br>
-						Commit every change max. 3 seconds after it occurred.
-					</dd>
-					<dt>maxPushDelay</dt>
-					<dd>
-						Type: <code>int</code>,
-						default: <code>30000</code> milliseconds<br>
-						Push every commit to remote max. 30 seconds after it occurred.
-					</dd>
-					<dt>pushDelay</dt>
-					<dd>
-						Type: <code>int</code>,
-						default: <code>5000</code> milliseconds<br>
-						Push commits to remote after 5 seconds of inactivity.<br>
-						After each change, we wait 5 more seconds for additional changes to come
-						in, before the actual push is executed.<br>
-						The maximum delay (first change until actual push) is limited by `maxPushDelay`.<br>
-						Set to <code>0</code> to force synchronous mode.
-					</dd>
-					<dt>remote</dt>
-					<dd>
-						Type: <code>string</code>,
-						default: <code>null</code><br>
-						URL for GET/PUT request. Pass `null` to disable remote synchronization.
-					</dd>
-					<dt>storage</dt>
-					<dd>
-						Type: <code>object</code>,
-						default: <code>window.localStorage</code><br>
-						Instance of [Web Storage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API).<br>
-						Possible values are `window.localStorage`, `window.sessionStorage`.<br>
-						Pass `null` to disable persistence.
-					</dd>
-				</dl>
+				<p><a href="https://mar10.github.io/persisto/interfaces/persistooptions.html">https://mar10.github.io/persisto/interfaces/persistooptions.html</a></p>
 				<a href="#methods" id="methods" style="color: inherit; text-decoration: none;">
 					<h3>Methods</h3>
 				</a>
 				<p>Following a list of available methods:</p>
-				<dl>
-					<dt>commit()</dt>
-					<dd>
-						Write modified data to localStorage.<br>
-						(Normally there is no need to call this method, since it is triggered internally
-						after a short collation interval.)
-					</dd>
-					<dt>get(key)</dt>
-					<dd>
-						Return a data property value (`key` supports dot notation).
-					</dd>
-					<dt>isDirty()</dt>
-					<dd>
-						Return *true* if there are uncommited or unpushed modifications.
-					</dd>
-					<dt>isReady()</dt>
-					<dd>
-						Return true if initial pull has completed.<br>
-						See also the `store.ready` promise, that is resolved accordingly.
-					</dd>
-					<dt>pull()</dt>
-					<dd>
-						Download  data from the cloud, then call `.update()`.
-					</dd>
-					<dt>push()</dt>
-					<dd>
-						Commit, then upload data into the cloud.<br>
-						(Normally there is no need to call this method, since it is triggered internally.)
-					</dd>
-					<dt>readFromForm(form, [options])</dt>
-					<dd>
-						Read data properties from form input elements with the same name.<br>
-						Supports elements of input (type: text, radio, checkbox), textarea,
-						and select.<br>
-						*form* may be a form element or selector string. Example: `"#myForm"`.<br>
-						*options* is optional and defaults to <code>{addNew: false, coerce: true, trim: true}</code>.
-					</dd>
-					<dt>remove(key)</dt>
-					<dd>
-						Delete object property and set the `dirty` flag (`key` supports dot notation).
-					</dd>
-					<dt>reset(newData)</dt>
-					<dd>
-						Replace data object with a new instance and set the `dirty` flag.
-						*newData* is optional and defaults to <code>{}</code>.
-					</dd>
-					<dt>set(key, value)</dt>
-					<dd>
-						Modify object property and set the `dirty` flag (`key` supports dot notation).<br>
-						*value* must be [convertible to JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify).
-					</dd>
-					<dt>setDirty()</dt>
-					<dd>
-						Flag object as *modified*, so that commit / push will be scheduled.
-					</dd>
-					<dt>update()</dt>
-					<dd>
-						Load data from localStorage.
-					</dd>
-					<dt>writeToForm(form)</dt>
-					<dd>
-						Write data to form elements with the same name.<br>
-						*form* may be a form selector or jQuery object. Example: `"#myForm"`.
-					</dd>
-				</dl>
-				<a href="#events" id="events" style="color: inherit; text-decoration: none;">
-					<h3>Events</h3>
-				</a>
-				<p>Events may be handled by passing a handler callback option:</p>
-				<pre><code class="language-js"><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
-<span style="color: #000000">          </span><span style="color: #001080">[</span><span style="color: #000000">...</span><span style="color: #001080">]</span>
-<span style="color: #001080">          change:</span><span style="color: #000000"> </span><span style="color: #0000FF">function</span><span style="color: #000000">(</span><span style="color: #001080">hint</span><span style="color: #000000">){</span>
-<span style="color: #000000">            </span><span style="color: #795E26">alert</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;Store &quot;</span><span style="color: #000000"> + </span><span style="color: #0000FF">this</span><span style="color: #000000"> + </span><span style="color: #A31515">&quot; was changed. Reason: &quot;</span><span style="color: #000000"> + </span><span style="color: #001080">hint</span><span style="color: #000000">);</span>
-<span style="color: #000000">          }</span>
-<span style="color: #000000">        });</span>
-</code></pre>
-				<p><strong>Note:</strong>
-				Events are not yet finally implemented and subject to change!</p>
-				<p>This is what we have so far:</p>
-				<pre><code class="language-js"><span style="color: #000000">{</span>
-<span style="color: #000000">    change: </span><span style="color: #001080">$</span><span style="color: #000000">.</span><span style="color: #001080">noop</span><span style="color: #000000">,</span>
-<span style="color: #000000">    commit: </span><span style="color: #001080">$</span><span style="color: #000000">.</span><span style="color: #001080">noop</span><span style="color: #000000">,</span>
-<span style="color: #000000">    conflict: </span><span style="color: #001080">$</span><span style="color: #000000">.</span><span style="color: #001080">noop</span><span style="color: #000000">,</span>
-<span style="color: #000000">    error: </span><span style="color: #001080">$</span><span style="color: #000000">.</span><span style="color: #001080">noop</span><span style="color: #000000">,</span>
-<span style="color: #000000">    pull: </span><span style="color: #001080">$</span><span style="color: #000000">.</span><span style="color: #001080">noop</span><span style="color: #000000">,</span>
-<span style="color: #000000">    push: </span><span style="color: #001080">$</span><span style="color: #000000">.</span><span style="color: #001080">noop</span><span style="color: #000000">,</span>
-<span style="color: #000000">    ready: </span><span style="color: #0070C1">PROMISE</span>
-<span style="color: #000000">    update: </span><span style="color: #001080">$</span><span style="color: #000000">.</span><span style="color: #001080">noop</span>
-<span style="color: #000000">}</span>
-</code></pre>
-				<!--
-Following a list of available events:
-
-<dl>
-<dt>change(hint)</dt>
-<dd>
-    Triggered just before the popup menu is opened.<br>
-    Return <code>false</code> to prevent opening.<br>
-    This is also a good place to modify the menu (i.e. hiding, disabling, or
-    renaming entries, or replace the menu altogether).
-</dd>
-</dd>
-</dl>
--->
+				<p><a href="https://mar10.github.io/persisto/classes/persistentobject.html">https://mar10.github.io/persisto/classes/persistentobject.html</a></p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 			<nav class="tsd-navigation primary">
 				<ul>
 					<li class=" ">
-						<a href="modules.html">Exports</a>
+						<a href="modules.html">Modules</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/persisto.html">persisto</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/persisto_options.html">persisto_<wbr>options</a>
 					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-class">
-						<a href="classes/persistentobject.html" class="tsd-kind-icon">Persistent<wbr>Object</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/persistooptions.html" class="tsd-kind-icon">Persisto<wbr>Options</a>
-					</li>
 				</ul>
 			</nav>
 		</div>
@@ -472,12 +310,10 @@ Following a list of available events:
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
 			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
 			</ul>
 		</div>
 	</div>

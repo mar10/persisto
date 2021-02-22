@@ -24,7 +24,7 @@ var store = new mar10.PersistentObject("test", {
       console.log("persisto.push", arguments)
     },
     save: function() {
-      console.log("persisto.save", arguments)
+      console.log("persisto.save", arguments, this)
       document.querySelector("#stats").innerHTML = "" + this.commitCount + " commits"
     }
   });

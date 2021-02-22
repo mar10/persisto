@@ -9,18 +9,19 @@
 
 > Persistent JavaScript objects and web forms using Web Storage.
 
-Features
+**Features**
 
-  - Persist JavaScript objects (`{...}`) to
-    [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API).<br>
-    Use the `get()`/`set()` API for direct (even nested) access, hiding the need
-    to convert from/to JSON.
-  - Cache access to
-    [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
-    (deferred writing appears to be 10-15 times faster) and remote backends.
-  - Make JavaScript objects editable in HTML forms.<br>
-    Common use case: maintain persistent client settings and let users edit them.
-  - Optionally synchronize the data with a remote endpoint
+  1. Persist JavaScript objects (`{...}`) to
+     [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API).<br>
+     Use the `get()`/`set()` API for direct (even nested) access, avoiding the
+     need to convert from/to JSON.
+  2. Cache access to
+     [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
+     (deferred writing appears to be 10-15 times faster).
+  3. Make JavaScript objects editable in HTML forms.<br>
+     A simple naming convention maps data properties to form elements.<br>
+     Listen for input change events and automatically store data.
+  4. Optionally synchronize the data with a remote endpoint.
 
 
 [API Documentation](https://mar10.github.io/persisto/)
@@ -54,11 +55,11 @@ or include directly from CDN: [![](https://data.jsdelivr.com/v1/package/npm/pers
 then instantiate a `PersistentObject`:
 
 ```js
-var store = PersistentObject("mySettings", {
-              defaults: {
-                theme: "default"
-                }
-            });
+let store = mar10.PersistentObject("mySettings", {
+      defaults: {
+        theme: "default"
+        }
+    });
 ```
 
 `store` now contains the data that was stored in `localStorage.mySettings` if
@@ -93,7 +94,7 @@ Example:
 
 ```js
 // Maintain client's preferences and define some defaults:
-var settingsStore = PersistentObject("mySettings", {
+let settingsStore = mar10.PersistentObject("mySettings", {
         defaults: {
           nickname: "anonymous",
           theme: "default"
@@ -161,7 +162,7 @@ Arrays are only a special form of plain JavaScript objects, so we can store and
 access them as top level type like this:
 
 ```js
-var store = PersistentObject("mySettings", {
+let store = mar10.PersistentObject("mySettings", {
 				defaults: ["a", "b", "c"]
 			});
 store.get("[0]");  // 'a'
@@ -171,7 +172,7 @@ store.set("[1]", "b2");
 However if we use child properties, it is even easier:
 
 ```js
-var store = PersistentObject("mySettings", {
+let store = mar10.PersistentObject("mySettings", {
         defaults: {
           values: ["a", "b", "c"]
         }
@@ -226,7 +227,7 @@ Optionally, we may specify an endpoint URL that is used to synchronize the data
 with a web server using HTTP REST requests (GET and PUT):
 
 ```js
-var store = PersistentObject("mySettings", {
+let store = mar10.PersistentObject("mySettings", {
         remote: "persist/settings"
       });
 
@@ -248,186 +249,14 @@ $.when(
 
 # API Reference
 
-### Options
+### Options and Events
 
 The following options are available:
 
-<dl>
-<dt>commitDelay</dt>
-<dd>
-    Type: <code>int</code>,
-    default: <code>500</code> milliseconds<br>
-    Commit cached changes to localStorage after 0.5 seconds of inactivity.<br>
-    After each change, we wait 0.5 more seconds for additional changes to come
-    in, before the actual commit is executed.<br>
-    The maximum delay (first change until actual commit) is limited by
-    `maxCommitDelay`.<br>
-    Set to <code>0</code> to force synchronous mode.
-</dd>
-<dt>debugLevel</dt>
-<dd>
-    Type: <code>int</code>,
-    default: <code>1</code><br>
-    Verbosity level: 0:quiet, 1:normal, 2:verbose.
-</dd>
-<dt>defaults</dt>
-<dd>
-    Type: <code>object</code>,
-    default: <code>{}</code><br>
-    Default value if no data is found in localStorage.
-</dd>
-<dt>maxCommitDelay</dt>
-<dd>
-    Type: <code>int</code>,
-    default: <code>3000</code> milliseconds<br>
-    Commit every change max. 3 seconds after it occurred.
-</dd>
-<dt>maxPushDelay</dt>
-<dd>
-    Type: <code>int</code>,
-    default: <code>30000</code> milliseconds<br>
-    Push every commit to remote max. 30 seconds after it occurred.
-</dd>
-<dt>pushDelay</dt>
-<dd>
-    Type: <code>int</code>,
-    default: <code>5000</code> milliseconds<br>
-    Push commits to remote after 5 seconds of inactivity.<br>
-    After each change, we wait 5 more seconds for additional changes to come
-    in, before the actual push is executed.<br>
-    The maximum delay (first change until actual push) is limited by `maxPushDelay`.<br>
-    Set to <code>0</code> to force synchronous mode.
-</dd>
-<dt>remote</dt>
-<dd>
-    Type: <code>string</code>,
-    default: <code>null</code><br>
-    URL for GET/PUT request. Pass `null` to disable remote synchronization.
-</dd>
-<dt>storage</dt>
-<dd>
-    Type: <code>object</code>,
-    default: <code>window.localStorage</code><br>
-    Instance of [Web Storage](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API).<br>
-    Possible values are `window.localStorage`, `window.sessionStorage`.<br>
-    Pass `null` to disable persistence.
-</dd>
-</dl>
-
+https://mar10.github.io/persisto/interfaces/persistooptions.html
 
 ### Methods
 
 Following a list of available methods:
 
-<dl>
-<dt>commit()</dt>
-<dd>
-    Write modified data to localStorage.<br>
-    (Normally there is no need to call this method, since it is triggered internally
-    after a short collation interval.)
-</dd>
-<dt>get(key)</dt>
-<dd>
-    Return a data property value (`key` supports dot notation).
-</dd>
-<dt>isDirty()</dt>
-<dd>
-    Return *true* if there are uncommited or unpushed modifications.
-</dd>
-<dt>isReady()</dt>
-<dd>
-    Return true if initial pull has completed.<br>
-    See also the `store.ready` promise, that is resolved accordingly.
-</dd>
-<dt>pull()</dt>
-<dd>
-    Download  data from the cloud, then call `.update()`.
-</dd>
-<dt>push()</dt>
-<dd>
-    Commit, then upload data into the cloud.<br>
-    (Normally there is no need to call this method, since it is triggered internally.)
-</dd>
-<dt>readFromForm(form, [options])</dt>
-<dd>
-    Read data properties from form input elements with the same name.<br>
-    Supports elements of input (type: text, radio, checkbox), textarea,
-    and select.<br>
-    *form* may be a form element or selector string. Example: `"#myForm"`.<br>
-    *options* is optional and defaults to <code>{addNew: false, coerce: true, trim: true}</code>.
-</dd>
-<dt>remove(key)</dt>
-<dd>
-    Delete object property and set the `dirty` flag (`key` supports dot notation).
-</dd>
-<dt>reset(newData)</dt>
-<dd>
-    Replace data object with a new instance and set the `dirty` flag.
-    *newData* is optional and defaults to <code>{}</code>.
-</dd>
-<dt>set(key, value)</dt>
-<dd>
-    Modify object property and set the `dirty` flag (`key` supports dot notation).<br>
-    *value* must be [convertible to JSON](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify).
-</dd>
-<dt>setDirty()</dt>
-<dd>
-    Flag object as *modified*, so that commit / push will be scheduled.
-</dd>
-<dt>update()</dt>
-<dd>
-    Load data from localStorage.
-</dd>
-<dt>writeToForm(form)</dt>
-<dd>
-    Write data to form elements with the same name.<br>
-    *form* may be a form selector or jQuery object. Example: `"#myForm"`.
-</dd>
-</dl>
-
-
-### Events
-
-Events may be handled by passing a handler callback option:
-
-```js
-store = PersistentObject("mySettings", {
-          [...]
-          change: function(hint){
-            alert("Store " + this + " was changed. Reason: " + hint);
-          }
-        });
-```
-
-**Note:**
-Events are not yet finally implemented and subject to change!
-
-This is what we have so far:
-```js
-{
-    change: $.noop,
-    commit: $.noop,
-    conflict: $.noop,
-    error: $.noop,
-    pull: $.noop,
-    push: $.noop,
-    ready: PROMISE
-    update: $.noop
-}
-```
-
-
-<!--
-Following a list of available events:
-
-<dl>
-<dt>change(hint)</dt>
-<dd>
-    Triggered just before the popup menu is opened.<br>
-    Return <code>false</code> to prevent opening.<br>
-    This is also a good place to modify the menu (i.e. hiding, disabling, or
-    renaming entries, or replace the menu altogether).
-</dd>
-</dd>
-</dl>
--->
+https://mar10.github.io/persisto/classes/persistentobject.html

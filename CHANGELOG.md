@@ -1,8 +1,9 @@
 # 2.0.0-0 / Unreleased
+  * Rewritten in TypeScript
   * Drop dependency on jQuery
   * Drop support for IE
-  * Rewritten in TypeScript
   * Use typedoc for API documetation
+  * [ADD] `attachForm` option
 
 # 1.3.1-0 / Unreleased
 

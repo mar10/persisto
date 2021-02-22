@@ -67,7 +67,7 @@
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
 
   "typedocOptions": {
-    "entryPoints": ["src/persisto.ts"],
+    "entryPoints": ["src/persisto.ts", "src/persisto_options.ts"],
     "out": "docs",
     "excludePrivate": true,
     "excludeProtected": true,
