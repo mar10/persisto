@@ -53,6 +53,11 @@ export interface PersistoOptions {
    */
   attachForm?: HTMLFormElement|string;
   /**
+   * Set status-dependant classes here.
+   */
+  statusElement?: HTMLFormElement|string;
+
+  /**
    * Commit changes after *X* milliseconds of inactivity.
    *
    * Commit cached changes to localStorage after 0.5 seconds of inactivity.<br>
@@ -156,6 +161,13 @@ export interface PersistoOptions {
    * @category Callback
    */
   save?: () => void;
+  /**
+   * Status changed.
+   *
+   * Possible values: 'ok', 'error', 'loading', 'status', 'modified'.
+   * @category Callback
+   */
+  status?: (status:string) => void;
   /**
    * Called after data was loaded from local storage.
    * @category Callback

@@ -2,6 +2,7 @@ var store = new mar10.PersistentObject("test", {
     store: sessionStorage,
     attachForm: "#form1",
     // remote: "https://google.com",
+    debugLevel: 2,
     defaults: {
       title: "foo",
       details: "bar\nbaz",
@@ -26,6 +27,9 @@ var store = new mar10.PersistentObject("test", {
     save: function() {
       console.log("persisto.save", arguments, this)
       document.querySelector("#stats").innerHTML = "" + this.commitCount + " commits"
+    },
+    status: function(status) {
+      console.log("persisto.status", arguments, this)
     }
   });
 

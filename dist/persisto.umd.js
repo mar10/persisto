@@ -7,7 +7,7 @@
     /*!
      * persisto.js - utils
      * Copyright (c) 2016-2021, Martin Wendt. Released under the MIT license.
-     * v2.0.1-0, Mon, 22 Feb 2021 20:54:30 GMT (https://github.com/mar10/persisto)
+     * v2.0.1-0, Sat, 27 Feb 2021 07:42:05 GMT (https://github.com/mar10/persisto)
      */
     const MAX_INT = 9007199254740991;
     /**
@@ -60,13 +60,6 @@
             };
         }
     }
-    // function delegate(rootElem:any, selector:string, event:Event, handler:(ev:Event)=>boolean|undefined,bind?:any):boolean|undefined {
-    //   let nearest = event.target!.closest(selector);
-    //   if (nearest && rootElem.contains(nearest)) {
-    //     return handler.call(bind, event);
-    //   }
-    //   return
-    // }
     /**
      * Bind event handler using event delegation:
      *
@@ -98,6 +91,21 @@
                 }
             }
         });
+    }
+    function toggleClass(element, classname, force) {
+        if (typeof element === "string") {
+            element = document.querySelector(element);
+        }
+        switch (force) {
+            case true:
+                element.classList.add(classname);
+                break;
+            case false:
+                element.classList.remove(classname);
+                break;
+            default:
+                element.classList.toggle(classname);
+        }
     }
     /**
      * jQuery Shims
@@ -150,12 +158,24 @@
      * Released under the MIT license.
      *
      * @version v2.0.1-0
-     * @date Mon, 22 Feb 2021 20:54:30 GMT
+     * @date Sat, 27 Feb 2021 07:42:05 GMT
      */
     const default_debuglevel = 1; // Replaced by rollup script
-    const class_modified = "persisto-modified";
-    const class_saving = "persisto-saving";
-    const class_error = "persisto-error";
+    const class_prefix = "persisto-";
+    var Status;
+    (function (Status) {
+        Status["Ok"] = "ok";
+        Status["Modified"] = "modified";
+        Status["Loading"] = "loading";
+        Status["Saving"] = "saving";
+        Status["Error"] = "error";
+    })(Status || (Status = {}));
+    var Phase;
+    (function (Phase) {
+        Phase["Idle"] = "";
+        Phase["Push"] = "push";
+        Phase["Pull"] = "pull";
+    })(Phase || (Phase = {}));
     /**
      * A persistent plain object or array.
      *
@@ -167,7 +187,8 @@
             this.version = "v2.0.1-0"; // Set to semver by 'grunt release'
             this._checkTimer = null;
             this.offline = undefined;
-            this.phase = null;
+            this.phase = Phase.Idle;
+            this.status = Status.Ok;
             this.uncommittedSince = 0;
             this.unpushedSince = 0;
             this.lastUpdate = 0;
@@ -184,6 +205,7 @@
                 remote: null,
                 defaults: {},
                 attachForm: null,
+                statusElement: null,
                 commitDelay: 500,
                 createParents: true,
                 maxCommitDelay: 3000,
@@ -200,6 +222,7 @@
                 pull: noop,
                 push: noop,
                 save: noop,
+                status: noop,
             }, options);
             this.storage = this.opts.storage;
             this._data = this.opts.defaults;
@@ -258,6 +281,21 @@
                 dfd.resolve();
             }
         }
+        _setStatus(status) {
+            this.debug("status " + this.status + " => " + status);
+            this.status = status;
+            function _setClass(elem) {
+                if (elem) {
+                    for (let s in Status) {
+                        s = s.toLocaleLowerCase();
+                        toggleClass(elem, class_prefix + s, status === s);
+                    }
+                }
+            }
+            _setClass(this.form);
+            _setClass(this.statusElement);
+            this.opts.status.call(this, status);
+        }
         /** Trigger commit/push according to current settings. */
         _invalidate(hint, deferredCall) {
             let self = this, now = Date.now(), prevChange = this.lastModified || now, // first change?
@@ -279,10 +317,7 @@
                     this.unpushedSince = now;
                 }
                 this.opts.change.call(this, hint);
-                if (this.form) {
-                    this.form.classList.add(class_modified);
-                    this.form.classList.remove(class_error);
-                }
+                this._setStatus(Status.Modified);
             }
             if (this.storage) {
                 // If we came here by a deferred timer (or delay is 0), commit
@@ -491,8 +526,8 @@
             this.uncommittedSince = 0;
             this.commitCount += 1;
             // this.lastCommit = Date.now();
-            if (this.form && !this.opts.remote) {
-                this.form.classList.remove(class_modified);
+            if (!this.opts.remote) {
+                this._setStatus(Status.Ok);
             }
             if (this.opts.debugLevel >= 2 && console.time) {
                 console.timeEnd(this + ".commit");
@@ -513,7 +548,7 @@
             if (this.opts.debugLevel >= 2 && console.time) {
                 console.time(this + ".pull");
             }
-            this.phase = "pull";
+            this.phase = Phase.Pull;
             return fetch(this.opts.remote, { method: "GET" })
                 .then(function (response) {
                 if (response.ok) {
@@ -540,7 +575,7 @@
                 self.opts.error.call(self, arguments);
             })
                 .finally(function () {
-                self.phase = null;
+                self.phase = Phase.Idle;
                 if (self.opts.debugLevel >= 2 && console.time) {
                     console.timeEnd(self + ".pull");
                 }
@@ -555,7 +590,7 @@
             if (this.uncommittedSince) {
                 if (this.phase) {
                     console.error("Resetting phase: " + this.phase);
-                    this.phase = null;
+                    this.phase = Phase.Idle;
                 }
                 jsonData = this.commit();
             }
@@ -568,14 +603,11 @@
             if (this.opts.debugLevel >= 2 && console.time) {
                 console.time(self + ".push");
             }
-            this.phase = "push";
+            this.phase = Phase.Push;
             if (!this.opts.remote) {
                 error(this + ": Missing remote option");
             }
-            if (this.form) {
-                this.form.classList.remove(class_error);
-                this.form.classList.add(class_saving);
-            }
+            this._setStatus(Status.Saving);
             return fetch(this.opts.remote, {
                 method: "PUT",
                 body: jsonData,
@@ -601,19 +633,15 @@
                 self.opts.save.call(self);
             })
                 .catch(function () {
-                if (self.form) {
-                    self.form.classList.add(class_error);
-                }
+                self._setStatus(Status.Error);
                 self.opts.error.call(self, arguments);
             })
                 .finally(function () {
-                self.phase = null;
+                self.phase = Phase.Idle;
                 if (self.opts.debugLevel >= 2 && console.time) {
                     console.timeEnd(self + ".push");
                 }
-                if (self.form) {
-                    self.form.classList.remove(class_saving);
-                }
+                self._setStatus(Status.Ok);
             });
         }
         /** Read data properties from form input elements with the same name.
@@ -746,14 +774,6 @@
             });
         }
     }
-    // let p = new PersistentObject("namespace", {
-    //   remote: null,
-    //   change: function () {
-    //     return 3;
-    //   },
-    //   conflict: (...args) => {return true}
-    // });
-    // export default PersistentObject;
 
     exports.PersistentObject = PersistentObject;
 

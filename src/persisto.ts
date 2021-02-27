@@ -28,13 +28,35 @@
     });
   - use :scope for querySelectorAll
 */
-import { each, error, extend, noop, onEvent, Deferred, MAX_INT } from "./util";
+import {
+  each,
+  error,
+  extend,
+  noop,
+  onEvent,
+  toggleClass,
+  Deferred,
+  MAX_INT,
+} from "./util";
 import { PersistoOptions } from "./persisto_options";
 
 const default_debuglevel = 2; // Replaced by rollup script
-const class_modified = "persisto-modified";
-const class_saving = "persisto-saving";
-const class_error = "persisto-error";
+
+const class_prefix = "persisto-";
+
+enum Status {
+  Ok = "ok",
+  Modified = "modified",
+  Loading = "loading",
+  Saving = "saving",
+  Error = "error",
+}
+
+enum Phase {
+  Idle = "",
+  Push = "push",
+  Pull = "pull",
+}
 
 /**
  * A persistent plain object or array.
@@ -49,8 +71,10 @@ export class PersistentObject {
   protected _checkTimer: any = null;
   readonly namespace: string;
   protected form: any;
+  protected statusElement: any;
   protected offline: undefined | boolean = undefined;
-  protected phase: string | null = null;
+  protected phase: Phase = Phase.Idle;
+  protected status: Status = Status.Ok;
   protected uncommittedSince = 0;
   protected unpushedSince = 0;
   protected lastUpdate = 0;
@@ -74,6 +98,7 @@ export class PersistentObject {
         remote: null, // URL for GET/PUT, ajax options, or callback
         defaults: {}, // default value if no data is found in localStorage
         attachForm: null, // track input changes and
+        statusElement: null, // set status-dependant classes here
         commitDelay: 500, // commit changes after 0.5 seconds of inactivity
         createParents: true, // set() creates missing intermediate parent objects for children
         maxCommitDelay: 3000, // commit changes max. 3 seconds after first change
@@ -90,6 +115,7 @@ export class PersistentObject {
         pull: noop,
         push: noop,
         save: noop,
+        status: noop,
       },
       options
     );
@@ -155,6 +181,22 @@ export class PersistentObject {
     }
   }
 
+  protected _setStatus(status: Status) {
+    this.debug("status " + this.status + " => " + status);
+    this.status = status;
+    function _setClass(elem: any) {
+      if (elem) {
+        for (let s in Status) {
+          s = s.toLocaleLowerCase();
+          toggleClass(elem, class_prefix + s, status === s);
+        }
+      }
+    }
+    _setClass(this.form);
+    _setClass(this.statusElement);
+    this.opts.status.call(this, status);
+  }
+
   /** Trigger commit/push according to current settings. */
   protected _invalidate(hint: string, deferredCall?: boolean) {
     let self = this,
@@ -181,10 +223,7 @@ export class PersistentObject {
         this.unpushedSince = now;
       }
       this.opts.change.call(this, hint);
-      if (this.form) {
-        this.form.classList.add(class_modified);
-        this.form.classList.remove(class_error);
-      }
+      this._setStatus(Status.Modified);
     }
     if (this.storage) {
       // If we came here by a deferred timer (or delay is 0), commit
@@ -425,8 +464,8 @@ export class PersistentObject {
     this.uncommittedSince = 0;
     this.commitCount += 1;
     // this.lastCommit = Date.now();
-    if (this.form && !this.opts.remote) {
-      this.form.classList.remove(class_modified);
+    if (!this.opts.remote) {
+      this._setStatus(Status.Ok);
     }
     if (this.opts.debugLevel >= 2 && console.time) {
       console.timeEnd(this + ".commit");
@@ -448,7 +487,7 @@ export class PersistentObject {
     if (this.opts.debugLevel >= 2 && console.time) {
       console.time(this + ".pull");
     }
-    this.phase = "pull";
+    this.phase = Phase.Pull;
 
     return fetch(this.opts.remote, { method: "GET" })
       .then(function (response) {
@@ -477,7 +516,7 @@ export class PersistentObject {
         self.opts.error.call(self, arguments);
       })
       .finally(function () {
-        self.phase = null;
+        self.phase = Phase.Idle;
         if (self.opts.debugLevel >= 2 && console.time) {
           console.timeEnd(self + ".pull");
         }
@@ -493,7 +532,7 @@ export class PersistentObject {
     if (this.uncommittedSince) {
       if (this.phase) {
         console.error("Resetting phase: " + this.phase);
-        this.phase = null;
+        this.phase = Phase.Idle;
       }
       jsonData = this.commit();
     } else {
@@ -505,14 +544,11 @@ export class PersistentObject {
     if (this.opts.debugLevel >= 2 && console.time) {
       console.time(self + ".push");
     }
-    this.phase = "push";
+    this.phase = Phase.Push;
     if (!this.opts.remote) {
       error(this + ": Missing remote option");
     }
-    if (this.form) {
-      this.form.classList.remove(class_error);
-      this.form.classList.add(class_saving);
-    }
+    this._setStatus(Status.Saving);
     return fetch(this.opts.remote, {
       method: "PUT",
       body: jsonData,
@@ -540,19 +576,15 @@ export class PersistentObject {
         self.opts.save.call(self);
       })
       .catch(function () {
-        if (self.form) {
-          self.form.classList.add(class_error);
-        }
+        self._setStatus(Status.Error);
         self.opts.error.call(self, arguments);
       })
       .finally(function () {
-        self.phase = null;
+        self.phase = Phase.Idle;
         if (self.opts.debugLevel >= 2 && console.time) {
           console.timeEnd(self + ".push");
         }
-        if (self.form) {
-          self.form.classList.remove(class_saving);
-        }
+        self._setStatus(Status.Ok);
       });
   }
   /** Read data properties from form input elements with the same name.
@@ -696,13 +728,3 @@ export class PersistentObject {
     });
   }
 }
-
-// let p = new PersistentObject("namespace", {
-//   remote: null,
-//   change: function () {
-//     return 3;
-//   },
-//   conflict: (...args) => {return true}
-// });
-
-// export default PersistentObject;

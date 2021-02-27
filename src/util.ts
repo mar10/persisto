@@ -60,14 +60,6 @@ export class Deferred {
   }
 }
 
-// function delegate(rootElem:any, selector:string, event:Event, handler:(ev:Event)=>boolean|undefined,bind?:any):boolean|undefined {
-//   let nearest = event.target!.closest(selector);
-//   if (nearest && rootElem.contains(nearest)) {
-//     return handler.call(bind, event);
-//   }
-//   return
-// }
-
 /**
  * Bind event handler using event delegation:
  *
@@ -89,7 +81,7 @@ export function onEvent(
   element: HTMLElement | string,
   eventName: string,
   selector: string,
-  handler: (e:Event) => boolean | void,
+  handler: (e: Event) => boolean | void,
   bind?: any
 ): void {
   if (typeof element === "string") {
@@ -97,13 +89,33 @@ export function onEvent(
   }
   element.addEventListener(eventName, function (e) {
     if (e.target && (<HTMLElement>e.target).matches(selector)) {
-      if(bind) {
+      if (bind) {
         return handler.call(bind, e);
-      }else{
-        return handler(e)
+      } else {
+        return handler(e);
       }
     }
   });
+}
+
+export function toggleClass(
+  element: HTMLElement | string,
+  classname: string,
+  force?: boolean
+): void {
+  if (typeof element === "string") {
+    element = <HTMLElement>document.querySelector(element);
+  }
+  switch (force) {
+    case true:
+      element.classList.add(classname);
+      break;
+    case false:
+      element.classList.remove(classname);
+      break;
+    default:
+      element.classList.toggle(classname);
+  }
 }
 /**
  * jQuery Shims

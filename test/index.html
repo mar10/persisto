@@ -5,45 +5,60 @@
 	<title>Persisto Demo</title>
 	<style>
 
-		form.persisto div.persisto-state {
-			text-align: right;
-		}
 		form.persisto.modified {
 			background-color: aliceblue;
 		}
 		form.persisto.error {
 			background-color: aliceblue;
 		}
-		form.persisto span[class^=persisto-state-] {
-			display: none;
-			border-color:antiquewhite;
+		/* State-tag container*/
+		.persisto-state {
+			position: relative;
+			/* display: inline-block; */
+			width: 8rem;
+			height: 1rem;
+			padding: 2px 3px;
+			border:1px solid #ccc;
 			border-radius: 3px;
-			padding: 2px;
 		}
-		form.persisto.persisto-modified span.persisto-state-modified {
-			display: inline;
+		.persisto-state > span {
+			position: absolute;
+			top: 0;
+			left: 0;
+			visibility: hidden;
+			opacity: 0;
+			transition: visibility 0s, opacity 0.5s linear;
+			/* display: inline-block; */
+		}
+		.persisto-state > span.persisto-state-modified,
+		.persisto-state > span.persisto-state-loading,
+		.persisto-state > span.persisto-state-error,
+		.persisto-state > span.persisto-state-modified,
+		 {
+			visibility: visible;
+			opacity: 1;
 			background-color: aliceblue;
 		}
-		form.persisto.persisto-saving span.persisto-state-saving {
-			display: inline;
-			background-color:darkgoldenrod;
-		}
-		form.persisto.persisto-error span.persisto-state-error {
-			display: inline;
-			background-color:rgb(184, 17, 11);
-			color: white;
+		.persisto-state > span.persisto-state-modified {
+			visibility: visible;
+			opacity: 1;
+			background-color: aliceblue;
 		}
 	</style>
 </head>
 <body>
+
 	<form id="form1" action="" class="persisto">
-		<p class="persisto-state">
+		<p class="status-bar">
 			<span>State:</span>
-			<span id="stats"></span>
-			<span class=persisto-state-ok>Ok.</span>
-			<span class=persisto-state-modified>Modified&hellip;</span>
-			<span class=persisto-state-saving>Saving&hellip;</span>
-			<span class=persisto-state-error>Error!</span>
+			<span class=persisto-state>
+				<span class=persisto-state-ok>Ok.</span>
+				<span class=persisto-state-modified>Modified&hellip;</span>
+				<span class=persisto-state-saving>Saving&hellip;</span>
+				<span class=persisto-state-loading>Loading&hellip;</span>
+				<span class=persisto-state-error>Error!</span>
+			</span>
+			<span id="stats">0</span>
 		</p>
 		<label>Title:<input name="title" type="text" value="" /></label><br>
 		<label>Details: <textarea name="details" rows="3"></textarea></label><br>
