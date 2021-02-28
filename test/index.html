@@ -4,42 +4,36 @@
 	<meta charset="utf-8">
 	<title>Persisto Demo</title>
 	<style>
-
-		form.persisto.modified {
-			background-color: aliceblue;
+		/* `attachForm` option sets 'persisto-STATUS' classes: */
+/*
+		form.persisto.persisto-modified {
+			background-color:aliceblue	;
 		}
-		form.persisto.error {
-			background-color: aliceblue;
-		}
-		/* State-tag container*/
-		.persisto-state {
+*/
+		/* Status-Tag container */
+		.persisto-status {
 			position: relative;
-			/* display: inline-block; */
-			width: 8rem;
-			height: 1rem;
-			padding: 2px 3px;
-			border:1px solid #ccc;
-			border-radius: 3px;
+			display: inline-block;
+			width: 6em;
+			height: 1em;
 		}
-		.persisto-state > span {
+		.persisto-status > span {
 			position: absolute;
 			top: 0;
 			left: 0;
+			padding: 2px 3px;
+			border:1px solid #ccc;
+			border-radius: 3px;
 			visibility: hidden;
 			opacity: 0;
 			transition: visibility 0s, opacity 0.5s linear;
-			/* display: inline-block; */
 		}
-		.persisto-state > span.persisto-state-modified,
-		.persisto-state > span.persisto-state-loading,
-		.persisto-state > span.persisto-state-error,
-		.persisto-state > span.persisto-state-modified,
+		.persisto-ok > span.persisto-status-ok,
+		.persisto-modified > span.persisto-status-modified,
+		.persisto-loading > span.persisto-status-loading,
+		.persisto-saving > span.persisto-status-saving,
+		.persisto-error > span.persisto-status-error
 		 {
-			visibility: visible;
-			opacity: 1;
-			background-color: aliceblue;
-		}
-		.persisto-state > span.persisto-state-modified {
 			visibility: visible;
 			opacity: 1;
 			background-color: aliceblue;
@@ -50,15 +44,15 @@
 
 	<form id="form1" action="" class="persisto">
 		<p class="status-bar">
-			<span>State:</span>
-			<span class=persisto-state>
-				<span class=persisto-state-ok>Ok.</span>
-				<span class=persisto-state-modified>Modified&hellip;</span>
-				<span class=persisto-state-saving>Saving&hellip;</span>
-				<span class=persisto-state-loading>Loading&hellip;</span>
-				<span class=persisto-state-error>Error!</span>
+			<span>Status:</span>
+			<span class=persisto-status>
+				<span class=persisto-status-ok>Ok.</span>
+				<span class=persisto-status-modified>Modified&hellip;</span>
+				<span class=persisto-status-saving>Saving&hellip;</span>
+				<span class=persisto-status-loading>Loading&hellip;</span>
+				<span class=persisto-status-error style="color:crimson">Error!</span>
 			</span>
-			<span id="stats">0</span>
+			<span id="stats">0 commits</span>
 		</p>
 		<label>Title:<input name="title" type="text" value="" /></label><br>
 		<label>Details: <textarea name="details" rows="3"></textarea></label><br>

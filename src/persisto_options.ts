@@ -47,13 +47,13 @@ export interface PersistoOptions {
    */
   defaults?: any;
   /**
-   * Track form input changes and maintain status class names.
+   * Track form input changes and maintain `persisto-STATUS` class names.
    *
    * Automatically call [[readFromForm]] when users enter form data.
    */
   attachForm?: HTMLFormElement|string;
   /**
-   * Set status-dependant classes here.
+   * Set `persisto-STATUS` classes here.
    */
   statusElement?: HTMLFormElement|string;
 

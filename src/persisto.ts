@@ -12,6 +12,8 @@
 
 /*
   TODO:
+  - Push called twice (parallel) after error
+
   - Promise & .ready
       $.when(
       // Page must be loaded
@@ -28,16 +30,7 @@
     });
   - use :scope for querySelectorAll
 */
-import {
-  each,
-  error,
-  extend,
-  noop,
-  onEvent,
-  toggleClass,
-  Deferred,
-  MAX_INT,
-} from "./util";
+import * as util from "./util";
 import { PersistoOptions } from "./persisto_options";
 
 const default_debuglevel = 2; // Replaced by rollup script
@@ -86,19 +79,19 @@ export class PersistentObject {
   // ready: Promise<any>;
 
   constructor(namespace: string, options: PersistoOptions) {
-    let dfd = new Deferred();
+    let dfd = new util.Deferred();
 
     this.namespace = namespace;
     if (!namespace) {
-      error("Missing required argument: namespace");
+      util.error("Missing required argument: namespace");
     }
 
-    this.opts = extend(
+    this.opts = util.extend(
       {
         remote: null, // URL for GET/PUT, ajax options, or callback
         defaults: {}, // default value if no data is found in localStorage
-        attachForm: null, // track input changes and
-        statusElement: null, // set status-dependant classes here
+        attachForm: null, // track input changes and set `persisto-STATUS`
+        statusElement: null, // set `persisto-STATUS` classes here
         commitDelay: 500, // commit changes after 0.5 seconds of inactivity
         createParents: true, // set() creates missing intermediate parent objects for children
         maxCommitDelay: 3000, // commit changes max. 3 seconds after first change
@@ -107,15 +100,15 @@ export class PersistentObject {
         storage: window.localStorage,
         debugLevel: default_debuglevel, // 0:quiet, 1:normal, 2:verbose
         // Events
-        change: noop,
-        update: noop,
-        commit: noop,
-        conflict: noop,
-        error: noop,
-        pull: noop,
-        push: noop,
-        save: noop,
-        status: noop,
+        change: util.noop,
+        update: util.noop,
+        commit: util.noop,
+        conflict: util.noop,
+        error: util.noop,
+        pull: util.noop,
+        push: util.noop,
+        save: util.noop,
+        status: util.noop,
       },
       options
     );
@@ -127,6 +120,11 @@ export class PersistentObject {
     } else if (this.opts.attachForm instanceof HTMLElement) {
       this.form = this.opts.attachForm;
     }
+    if (typeof this.opts.statusElement === "string") {
+      this.statusElement = document.querySelector(this.opts.statusElement);
+    } else if (this.opts.statusElement instanceof HTMLElement) {
+      this.statusElement = this.opts.statusElement;
+    }
 
     // _data contains the default value. Now load from persistent storage if any
     let prevValue = this.storage ? this.storage.getItem(this.namespace) : null;
@@ -135,11 +133,19 @@ export class PersistentObject {
     // Monitor form changes
     if (this.form) {
       this.form.classList.add("persisto");
-      onEvent(this.form, "input", "input,textarea", function (e: Event) {
+      util.onEvent(this.form, "input", "input,textarea", function (e: Event) {
         self.readFromForm(self.form);
       });
-      onEvent(this.form, "change", "select", function (e: Event) {
+      util.onEvent(this.form, "change", "select", function (e: Event) {
         self.readFromForm(self.form);
+      });
+      this.form.addEventListener("submit", function (e: Event) {
+        self.readFromForm(self.form);
+        e.preventDefault();
+      });
+      this.form.addEventListener("reset", function (e: Event) {
+        self.readFromForm(self.form);
+        e.preventDefault();
       });
     }
     if (this.opts.remote) {
@@ -163,14 +169,18 @@ export class PersistentObject {
               arguments
             );
             // self._data = JSON.parse(prevValue);
-            self._data = extend({}, self.opts.defaults, JSON.parse(prevValue));
+            self._data = util.extend(
+              {},
+              self.opts.defaults,
+              JSON.parse(prevValue)
+            );
           }
           dfd.resolve();
         });
     } else if (prevValue != null) {
       this.update();
       // We still extend from opts.defaults, in case some fields were missing
-      this._data = extend({}, this.opts.defaults, this._data);
+      this._data = util.extend({}, this.opts.defaults, this._data);
       // this.debug("init from storage", this._data);
       dfd.resolve();
       // this.lastUpdate = stamp;
@@ -188,7 +198,7 @@ export class PersistentObject {
       if (elem) {
         for (let s in Status) {
           s = s.toLocaleLowerCase();
-          toggleClass(elem, class_prefix + s, status === s);
+          util.toggleClass(elem, class_prefix + s, status === s);
         }
       }
     }
@@ -266,7 +276,10 @@ export class PersistentObject {
       }
     }
     if (nextCommit || nextPush) {
-      nextCheck = Math.min(nextCommit || MAX_INT, nextPush || MAX_INT);
+      nextCheck = Math.min(
+        nextCommit || util.MAX_INT,
+        nextPush || util.MAX_INT
+      );
       // this.debug("Defer update:", nextCheck - now)
       this.debug(
         "_invalidate(" + hint + ") defer by " + (nextCheck - now) + "ms"
@@ -324,7 +337,7 @@ export class PersistentObject {
    * See also the `store.ready` promise, that is resolved accordingly.
    */
   isReady() {
-    error("Not implemented");
+    util.error("Not implemented");
     // return this.ready.state !== "pending";
   }
   /**
@@ -346,7 +359,7 @@ export class PersistentObject {
     for (i = 0; i < parts.length; i++) {
       cur = cur[parts[i]];
       if (cur === undefined && i < parts.length - 1) {
-        error(
+        util.error(
           this +
             ": Property '" +
             key +
@@ -378,7 +391,7 @@ export class PersistentObject {
           this.debug("Creating intermediate parent '" + parts[i] + "'");
           cur = parent[parts[i]] = {};
         } else {
-          error(
+          util.error(
             this +
               ": Property '" +
               key +
@@ -432,7 +445,9 @@ export class PersistentObject {
    */
   update() {
     if (this.phase) {
-      error(this + ": Trying to update while '" + this.phase + "' is pending.");
+      util.error(
+        this + ": Trying to update while '" + this.phase + "' is pending."
+      );
     }
     if (this.opts.debugLevel >= 2 && console.time) {
       console.time(this + ".update");
@@ -454,7 +469,9 @@ export class PersistentObject {
   commit() {
     let jsonData;
     if (this.phase) {
-      error(this + ": Trying to commit while '" + this.phase + "' is pending.");
+      util.error(
+        this + ": Trying to commit while '" + this.phase + "' is pending."
+      );
     }
     if (this.opts.debugLevel >= 2 && console.time) {
       console.time(this + ".commit");
@@ -482,19 +499,22 @@ export class PersistentObject {
     let self = this;
 
     if (this.phase) {
-      error(this + ": Trying to pull while '" + this.phase + "' is pending.");
+      util.error(
+        this + ": Trying to pull while '" + this.phase + "' is pending."
+      );
     }
     if (this.opts.debugLevel >= 2 && console.time) {
       console.time(this + ".pull");
     }
     this.phase = Phase.Pull;
+    self._setStatus(Status.Loading);
 
     return fetch(this.opts.remote, { method: "GET" })
       .then(function (response) {
         if (response.ok) {
           self.opts.pull.call(self, response);
         } else {
-          error(
+          util.error(
             "GET " +
               self.opts.remote +
               " returned " +
@@ -508,11 +528,13 @@ export class PersistentObject {
       .then(function (data) {
         self.storage.setItem(self.namespace, JSON.stringify(data));
         self._update.call(self, data);
+        self._setStatus(Status.Ok);
         self.lastPull = Date.now();
         self.opts.pull.call(self);
       })
       .catch(function () {
         console.error(arguments);
+        self._setStatus(Status.Error);
         self.opts.error.call(self, arguments);
       })
       .finally(function () {
@@ -539,14 +561,16 @@ export class PersistentObject {
       jsonData = JSON.stringify(this._data);
     }
     if (this.phase) {
-      error(this + ": Trying to push while '" + this.phase + "' is pending.");
+      util.error(
+        this + ": Trying to push while '" + this.phase + "' is pending."
+      );
     }
     if (this.opts.debugLevel >= 2 && console.time) {
       console.time(self + ".push");
     }
     this.phase = Phase.Push;
     if (!this.opts.remote) {
-      error(this + ": Missing remote option");
+      util.error(this + ": Missing remote option");
     }
     this._setStatus(Status.Saving);
     return fetch(this.opts.remote, {
@@ -560,7 +584,7 @@ export class PersistentObject {
         // console.log("PUT", arguments);
         // self.lastPush = Date.now();
         if (!response.ok) {
-          error(
+          util.error(
             "PUT " +
               self.opts.remote +
               " returned " +
@@ -572,6 +596,7 @@ export class PersistentObject {
         self.unpushedSince = 0;
         // self.lastModified = 0;  // so next change will not force-commit
         self.pushCount += 1;
+        self._setStatus(Status.Ok);
         self.opts.push.call(self, response);
         self.opts.save.call(self);
       })
@@ -584,7 +609,6 @@ export class PersistentObject {
         if (self.opts.debugLevel >= 2 && console.time) {
           console.timeEnd(self + ".push");
         }
-        self._setStatus(Status.Ok);
       });
   }
   /** Read data properties from form input elements with the same name.
@@ -592,11 +616,12 @@ export class PersistentObject {
    * Supports elements of input (type: text, radio, checkbox), textarea,
     and select.<br>
     *form* may be a form element or selector string. Example: `"#myForm"`.<br>
+    * (defaults to [[PersistoOptions.attachForm]])<br>
     *options* is optional and defaults to <code>{addNew: false, coerce: true, trim: true}</code>.
-   */
-  readFromForm(form: any, options?: any) {
+    */
+  readFromForm(form?: any, options?: any) {
     let self = this;
-    let opts = extend(
+    let opts = util.extend(
       {
         addNew: false,
         coerce: true, // convert single checkboxes to bool (instead value)
@@ -605,6 +630,7 @@ export class PersistentObject {
       options
     );
 
+    form = form || this.form;
     if (typeof form === "string") {
       form = document.querySelector(form);
     }
@@ -619,7 +645,7 @@ export class PersistentObject {
       }
     }
 
-    each(this._data, function (k: string, _v: any) {
+    util.each(this._data, function (k: string, _v: any) {
       let val,
         type,
         inputItems = form.querySelectorAll("[name='" + k + "']"),
@@ -669,19 +695,21 @@ export class PersistentObject {
   }
   /** Write data to form elements with the same name.
    *
-   * *form* may be a form selector or HTMLElement object. Example: `"#myForm"`.
+   * *form* may be a form selector or HTMLElement object. Example: `"#myForm"`
+   * (defaults to [[PersistoOptions.attachForm]])
    */
-  writeToForm(form: any, options?: any) {
+  writeToForm(form?: any, options?: any) {
     let i,
       elem,
       match,
       self = this;
 
+    form = form || this.form;
     if (typeof form === "string") {
       form = document.querySelector(form);
     }
 
-    each(this._data, function (k: string) {
+    util.each(this._data, function (k: string) {
       let v = self.get(k),
         vIsArray = Array.isArray(v),
         inputItems = form.querySelectorAll("[name='" + k + "']");

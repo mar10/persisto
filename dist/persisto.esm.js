@@ -1,7 +1,7 @@
 /*!
  * persisto.js - utils
  * Copyright (c) 2016-2021, Martin Wendt. Released under the MIT license.
- * v2.0.1-0, Sat, 27 Feb 2021 07:42:05 GMT (https://github.com/mar10/persisto)
+ * v2.0.1-0, Sun, 28 Feb 2021 08:26:51 GMT (https://github.com/mar10/persisto)
  */
 const MAX_INT = 9007199254740991;
 /**
@@ -152,7 +152,7 @@ function noop() { }
  * Released under the MIT license.
  *
  * @version v2.0.1-0
- * @date Sat, 27 Feb 2021 07:42:05 GMT
+ * @date Sun, 28 Feb 2021 08:26:51 GMT
  */
 const default_debuglevel = 1; // Replaced by rollup script
 const class_prefix = "persisto-";
@@ -227,6 +227,12 @@ class PersistentObject {
         else if (this.opts.attachForm instanceof HTMLElement) {
             this.form = this.opts.attachForm;
         }
+        if (typeof this.opts.statusElement === "string") {
+            this.statusElement = document.querySelector(this.opts.statusElement);
+        }
+        else if (this.opts.statusElement instanceof HTMLElement) {
+            this.statusElement = this.opts.statusElement;
+        }
         // _data contains the default value. Now load from persistent storage if any
         let prevValue = this.storage ? this.storage.getItem(this.namespace) : null;
         let self = this;
@@ -238,6 +244,14 @@ class PersistentObject {
             });
             onEvent(this.form, "change", "select", function (e) {
                 self.readFromForm(self.form);
+            });
+            this.form.addEventListener("submit", function (e) {
+                self.readFromForm(self.form);
+                e.preventDefault();
+            });
+            this.form.addEventListener("reset", function (e) {
+                self.readFromForm(self.form);
+                e.preventDefault();
             });
         }
         if (this.opts.remote) {
@@ -543,6 +557,7 @@ class PersistentObject {
             console.time(this + ".pull");
         }
         this.phase = Phase.Pull;
+        self._setStatus(Status.Loading);
         return fetch(this.opts.remote, { method: "GET" })
             .then(function (response) {
             if (response.ok) {
@@ -561,11 +576,13 @@ class PersistentObject {
             .then(function (data) {
             self.storage.setItem(self.namespace, JSON.stringify(data));
             self._update.call(self, data);
+            self._setStatus(Status.Ok);
             self.lastPull = Date.now();
             self.opts.pull.call(self);
         })
             .catch(function () {
             console.error(arguments);
+            self._setStatus(Status.Error);
             self.opts.error.call(self, arguments);
         })
             .finally(function () {
@@ -623,6 +640,7 @@ class PersistentObject {
             self.unpushedSince = 0;
             // self.lastModified = 0;  // so next change will not force-commit
             self.pushCount += 1;
+            self._setStatus(Status.Ok);
             self.opts.push.call(self, response);
             self.opts.save.call(self);
         })
@@ -635,7 +653,6 @@ class PersistentObject {
             if (self.opts.debugLevel >= 2 && console.time) {
                 console.timeEnd(self + ".push");
             }
-            self._setStatus(Status.Ok);
         });
     }
     /** Read data properties from form input elements with the same name.
@@ -643,8 +660,9 @@ class PersistentObject {
      * Supports elements of input (type: text, radio, checkbox), textarea,
       and select.<br>
       *form* may be a form element or selector string. Example: `"#myForm"`.<br>
+      * (defaults to [[PersistoOptions.attachForm]])<br>
       *options* is optional and defaults to <code>{addNew: false, coerce: true, trim: true}</code>.
-     */
+      */
     readFromForm(form, options) {
         let self = this;
         let opts = extend({
@@ -652,6 +670,7 @@ class PersistentObject {
             coerce: true,
             trim: true,
         }, options);
+        form = form || this.form;
         if (typeof form === "string") {
             form = document.querySelector(form);
         }
@@ -716,10 +735,12 @@ class PersistentObject {
     }
     /** Write data to form elements with the same name.
      *
-     * *form* may be a form selector or HTMLElement object. Example: `"#myForm"`.
+     * *form* may be a form selector or HTMLElement object. Example: `"#myForm"`
+     * (defaults to [[PersistoOptions.attachForm]])
      */
     writeToForm(form, options) {
         let i, elem, match, self = this;
+        form = form || this.form;
         if (typeof form === "string") {
             form = document.querySelector(form);
         }

@@ -42,6 +42,7 @@ declare module "util" {
      * @param bind
      */
     export function onEvent(element: HTMLElement | string, eventName: string, selector: string, handler: (e: Event) => boolean | void, bind?: any): void;
+    export function toggleClass(element: HTMLElement | string, classname: string, force?: boolean): void;
     /**
      * jQuery Shims
      * http://youmightnotneedjquery.com
@@ -104,11 +105,15 @@ declare module "persisto_options" {
          */
         defaults?: any;
         /**
-         * Track form input changes and maintain status class names.
+         * Track form input changes and maintain `persisto-STATUS` class names.
          *
          * Automatically call [[readFromForm]] when users enter form data.
          */
         attachForm?: HTMLFormElement | string;
+        /**
+         * Set `persisto-STATUS` classes here.
+         */
+        statusElement?: HTMLFormElement | string;
         /**
          * Commit changes after *X* milliseconds of inactivity.
          *
@@ -214,6 +219,13 @@ declare module "persisto_options" {
          */
         save?: () => void;
         /**
+         * Status changed.
+         *
+         * Possible values: 'ok', 'error', 'loading', 'status', 'modified'.
+         * @category Callback
+         */
+        status?: (status: string) => void;
+        /**
          * Called after data was loaded from local storage.
          * @category Callback
          */
@@ -222,6 +234,18 @@ declare module "persisto_options" {
 }
 declare module "persisto" {
     import { PersistoOptions } from "persisto_options";
+    enum Status {
+        Ok = "ok",
+        Modified = "modified",
+        Loading = "loading",
+        Saving = "saving",
+        Error = "error"
+    }
+    enum Phase {
+        Idle = "",
+        Push = "push",
+        Pull = "pull"
+    }
     /**
      * A persistent plain object or array.
      *
@@ -235,8 +259,10 @@ declare module "persisto" {
         protected _checkTimer: any;
         readonly namespace: string;
         protected form: any;
+        protected statusElement: any;
         protected offline: undefined | boolean;
-        protected phase: string | null;
+        protected phase: Phase;
+        protected status: Status;
         protected uncommittedSince: number;
         protected unpushedSince: number;
         protected lastUpdate: number;
@@ -245,6 +271,7 @@ declare module "persisto" {
         pushCount: number;
         protected lastModified: number;
         constructor(namespace: string, options: PersistoOptions);
+        protected _setStatus(status: Status): void;
         /** Trigger commit/push according to current settings. */
         protected _invalidate(hint: string, deferredCall?: boolean): void;
         /**
@@ -310,13 +337,15 @@ declare module "persisto" {
          * Supports elements of input (type: text, radio, checkbox), textarea,
           and select.<br>
           *form* may be a form element or selector string. Example: `"#myForm"`.<br>
+          * (defaults to [[PersistoOptions.attachForm]])<br>
           *options* is optional and defaults to <code>{addNew: false, coerce: true, trim: true}</code>.
-         */
-        readFromForm(form: any, options?: any): void;
+          */
+        readFromForm(form?: any, options?: any): void;
         /** Write data to form elements with the same name.
          *
-         * *form* may be a form selector or HTMLElement object. Example: `"#myForm"`.
+         * *form* may be a form selector or HTMLElement object. Example: `"#myForm"`
+         * (defaults to [[PersistoOptions.attachForm]])
          */
-        writeToForm(form: any, options?: any): void;
+        writeToForm(form?: any, options?: any): void;
     }
 }
