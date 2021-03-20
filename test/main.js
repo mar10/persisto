@@ -20,7 +20,7 @@ var store = new mar10.PersistentObject("test", {
     console.log("persisto.commit", arguments);
   },
   error: function () {
-    console.log("persisto.error", arguments);
+    console.log("persisto.error", arguments, this);
   },
   push: function () {
     console.log("persisto.push", arguments);
@@ -35,21 +35,13 @@ var store = new mar10.PersistentObject("test", {
   },
 });
 
-store.ready
-  .then((value) => {
-    alert("ready " + value);
-  })
-  .catch((reason) => {
-    alert("catch" + reason);
-  })
-  .finally(()=>{
-    alert("finally")
-  });
-
-document.addEventListener("DOMContentLoaded", function (event) {
-  document.querySelector("#form1").addEventListener("submit", function (e) {
-    store.readFromForm("#form1");
-    e.preventDefault();
-  });
-  store.writeToForm("#form1");
+store.ready.then((value) => {
+  console.log("store isa initialized.")
+  // document.querySelector("#form1").addEventListener("submit", function (e) {
+  //   store.readFromForm("#form1");
+  //   e.preventDefault();
+  // });
+  // store.writeToForm("#form1");
 });
+
+// document.addEventListener("DOMContentLoaded", function (event) {});

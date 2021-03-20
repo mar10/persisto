@@ -33,12 +33,14 @@
 		.persisto-loading > span.persisto-status-loading,
 		.persisto-saving > span.persisto-status-saving,
 		.persisto-error > span.persisto-status-error
-		 {
+		{
 			visibility: visible;
 			opacity: 1;
 			background-color: aliceblue;
 		}
 	</style>
+	<script defer src="../dist/persisto.umd.js"> </script>
+	<script defer src="main.js"> </script>
 </head>
 <body>
 
@@ -92,7 +94,5 @@
 		<button type="submit">Submit</button>
 		<button type="reset">Reset</button>
 	</form>
-	<script src="../dist/persisto.umd.js"> </script>
-	<script src="main.js"> </script>
 </body>
 </html>

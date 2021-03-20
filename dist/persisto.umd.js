@@ -7,7 +7,7 @@
     /*!
      * persisto.js - utils
      * Copyright (c) 2016-2021, Martin Wendt. Released under the MIT license.
-     * v2.0.1-0, Sat, 20 Mar 2021 11:44:08 GMT (https://github.com/mar10/persisto)
+     * v2.0.1-0, Sat, 20 Mar 2021 16:14:12 GMT (https://github.com/mar10/persisto)
      */
     const MAX_INT = 9007199254740991;
     /**
@@ -83,9 +83,6 @@
         }
         return obj;
     }
-    function error(msg) {
-        throw new Error(msg);
-    }
     function extend(...args) {
         for (let i = 1; i < args.length; i++) {
             let arg = args[i];
@@ -102,7 +99,7 @@
     /*!
      * persisto.js - utils
      * Copyright (c) 2016-2021, Martin Wendt. Released under the MIT license.
-     * v2.0.1-0, Sat, 20 Mar 2021 11:44:08 GMT (https://github.com/mar10/persisto)
+     * v2.0.1-0, Sat, 20 Mar 2021 16:14:12 GMT (https://github.com/mar10/persisto)
      */
     /**
      * Deferred is a ES6 Promise, that exposes the resolve() and reject()` method.
@@ -201,7 +198,7 @@
      * Released under the MIT license.
      *
      * @version v2.0.1-0
-     * @date Sat, 20 Mar 2021 11:44:08 GMT
+     * @date Sat, 20 Mar 2021 16:14:12 GMT
      */
     const default_debuglevel = 1; // Replaced by rollup script
     const class_prefix = "persisto-";
@@ -242,7 +239,7 @@
             this.ready = dfd.promise();
             this.namespace = namespace;
             if (!namespace) {
-                error("Missing required argument: namespace");
+                throw new Error("Missing required argument: namespace");
             }
             this.opts = extend({
                 remote: null,
@@ -284,7 +281,6 @@
             }
             // _data contains the default value. Now load from persistent storage if any
             let prevValue = this.storage ? this.storage.getItem(this.namespace) : null;
-            // let self = this;
             // Monitor form changes
             if (this.form) {
                 this.form.classList.add("persisto");
@@ -355,7 +351,7 @@
         }
         /** Trigger commit/push according to current settings. */
         _invalidate(hint, deferredCall) {
-            let self = this, now = Date.now(), prevChange = this.lastModified || now, // first change?
+            let now = Date.now(), prevChange = this.lastModified || now, // first change?
             nextCommit = 0, nextPush = 0, nextCheck = 0;
             if (this._checkTimer) {
                 clearTimeout(this._checkTimer);
@@ -403,9 +399,9 @@
                 nextCheck = Math.min(nextCommit || MAX_INT, nextPush || MAX_INT);
                 // this.debug("Defer update:", nextCheck - now)
                 this.debug("_invalidate(" + hint + ") defer by " + (nextCheck - now) + "ms");
-                this._checkTimer = setTimeout(function () {
-                    self._checkTimer = null; // no need to call clearTimeout in the handler...
-                    self._invalidate.call(self, "deferred " + hint, true);
+                this._checkTimer = setTimeout(() => {
+                    this._checkTimer = null; // no need to call clearTimeout in the handler...
+                    this._invalidate.call(this, "deferred " + hint, true);
                 }, nextCheck - now);
             }
         }
@@ -454,7 +450,7 @@
          * See also the `store.ready` promise, that is resolved accordingly.
          */
         isReady() {
-            error("Not implemented");
+            throw new Error("Not implemented");
             // return this.ready.state !== "pending";
         }
         /**
@@ -465,14 +461,10 @@
                 .replace(/\[(\w+)\]/g, ".$1") // convert indexes to properties
                 .replace(/^\./, "") // strip a leading dot
                 .split(".");
-            // NOTE: this is slower (tested on Safari):
-            // return key.split(".").reduce(function(prev, curr) {
-            // 	return prev[curr];
-            // }, this._data);
             for (i = 0; i < parts.length; i++) {
                 cur = cur[parts[i]];
                 if (cur === undefined && i < parts.length - 1) {
-                    error(this +
+                    throw new Error(this +
                         ": Property '" +
                         key +
                         "' could not be accessed because parent '" +
@@ -498,7 +490,7 @@
                         cur = parent[parts[i]] = {};
                     }
                     else {
-                        error(this +
+                        throw new Error(this +
                             ": Property '" +
                             key +
                             "' could not be set because parent '" +
@@ -551,7 +543,7 @@
          */
         update() {
             if (this.phase) {
-                error(this + ": Trying to update while '" + this.phase + "' is pending.");
+                throw new Error(this + ": Trying to update while '" + this.phase + "' is pending.");
             }
             if (this.opts.debugLevel >= 2 && console.time) {
                 console.time(this + ".update");
@@ -573,7 +565,7 @@
         commit() {
             let jsonData;
             if (this.phase) {
-                error(this + ": Trying to commit while '" + this.phase + "' is pending.");
+                throw new Error(this + ": Trying to commit while '" + this.phase + "' is pending.");
             }
             if (this.opts.debugLevel >= 2 && console.time) {
                 console.time(this + ".commit");
@@ -598,23 +590,19 @@
         }
         /** Download  data from the cloud, then call `.update()`. */
         pull() {
-            let self = this;
             if (this.phase) {
-                error(this + ": Trying to pull while '" + this.phase + "' is pending.");
+                throw new Error(this + ": Trying to pull while '" + this.phase + "' is pending.");
             }
             if (this.opts.debugLevel >= 2 && console.time) {
                 console.time(this + ".pull");
             }
             this.phase = Phase.Pull;
-            self._setStatus(Status.Loading);
+            this._setStatus(Status.Loading);
             return fetch(this.opts.remote, { method: "GET" })
-                .then(function (response) {
-                if (response.ok) {
-                    self.opts.pull.call(self, response);
-                }
-                else {
-                    error("GET " +
-                        self.opts.remote +
+                .then((response) => {
+                if (!response.ok) {
+                    throw new Error("GET " +
+                        this.opts.remote +
                         " returned " +
                         response.status +
                         ", " +
@@ -622,23 +610,23 @@
                 }
                 return response.json();
             })
-                .then(function (data) {
-                self.storage.setItem(self.namespace, JSON.stringify(data));
-                self._update.call(self, data);
-                self._setStatus(Status.Ok);
-                self.lastPull = Date.now();
-                self.opts.pull.call(self);
+                .then((data) => {
+                this.storage.setItem(this.namespace, JSON.stringify(data));
+                this._update(data);
+                this._setStatus(Status.Ok);
+                this.lastPull = Date.now();
+                this.opts.pull.call(this);
             })
-                .catch(function (reason) {
+                .catch((reason) => {
                 console.error(arguments);
-                self._setStatus(Status.Error);
-                self.opts.error.call(self, arguments);
-                throw new Error(reason);
+                this._setStatus(Status.Error);
+                this.opts.error.call(this, reason);
+                throw reason; // re-throw, so caller can catch it
             })
-                .finally(function () {
-                self.phase = Phase.Idle;
-                if (self.opts.debugLevel >= 2 && console.time) {
-                    console.timeEnd(self + ".pull");
+                .finally(() => {
+                this.phase = Phase.Idle;
+                if (this.opts.debugLevel >= 2 && console.time) {
+                    console.timeEnd(this + ".pull");
                 }
             });
         }
@@ -647,10 +635,9 @@
           (Normally there is no need to call this method, since it is triggered internally.) */
         push() {
             let jsonData;
-            let self = this;
             if (this.uncommittedSince) {
                 if (this.phase) {
-                    console.error("Resetting phase: " + this.phase);
+                    console.error("push(): Resetting phase " + this.phase + " => idle");
                     this.phase = Phase.Idle;
                 }
                 jsonData = this.commit();
@@ -659,14 +646,14 @@
                 jsonData = JSON.stringify(this._data);
             }
             if (this.phase) {
-                error(this + ": Trying to push while '" + this.phase + "' is pending.");
+                throw new Error(this + ": Trying to push while '" + this.phase + "' is pending.");
             }
             if (this.opts.debugLevel >= 2 && console.time) {
-                console.time(self + ".push");
+                console.time(this + ".push");
             }
             this.phase = Phase.Push;
             if (!this.opts.remote) {
-                error(this + ": Missing remote option");
+                throw new Error(this + ": Missing remote option");
             }
             this._setStatus(Status.Saving);
             return fetch(this.opts.remote, {
@@ -676,32 +663,33 @@
                     "Content-Type": "application/json",
                 },
             })
-                .then(function (response) {
+                .then((response) => {
                 // console.log("PUT", arguments);
-                // self.lastPush = Date.now();
+                // this.lastPush = Date.now();
                 if (!response.ok) {
-                    error("PUT " +
-                        self.opts.remote +
+                    throw new Error("PUT " +
+                        this.opts.remote +
                         " returned " +
                         response.status +
                         ", " +
                         response);
                 }
-                self.unpushedSince = 0;
-                // self.lastModified = 0;  // so next change will not force-commit
-                self.pushCount += 1;
-                self._setStatus(Status.Ok);
-                self.opts.push.call(self, response);
-                self.opts.save.call(self);
+                this.unpushedSince = 0;
+                // this.lastModified = 0;  // so next change will not force-commit
+                this.pushCount += 1;
+                this._setStatus(Status.Ok);
+                this.opts.push.call(this, response);
+                this.opts.save.call(this);
             })
-                .catch(function () {
-                self._setStatus(Status.Error);
-                self.opts.error.call(self, arguments);
+                .catch((reason) => {
+                this._setStatus(Status.Error);
+                this.opts.error.call(this, reason);
+                throw reason; // Re-throw, so caller can catch it
             })
-                .finally(function () {
-                self.phase = Phase.Idle;
-                if (self.opts.debugLevel >= 2 && console.time) {
-                    console.timeEnd(self + ".push");
+                .finally(() => {
+                this.phase = Phase.Idle;
+                if (this.opts.debugLevel >= 2 && console.time) {
+                    console.timeEnd(this + ".push");
                 }
             });
         }
@@ -714,7 +702,6 @@
           *options* is optional and defaults to <code>{addNew: false, coerce: true, trim: true}</code>.
           */
         readFromForm(form, options) {
-            let self = this;
             let opts = extend({
                 addNew: false,
                 coerce: true,
@@ -728,16 +715,16 @@
                 let formItems = form.querySelectorAll("[name]");
                 for (let i = 0; i < formItems.length; i++) {
                     let name = formItems[i].getAttribute("name");
-                    if (self._data[name] === undefined) {
-                        self.debug("readFromForm: add field '" + name + "'");
-                        self._data[name] = null;
+                    if (this._data[name] === undefined) {
+                        this.debug("readFromForm: add field '" + name + "'");
+                        this._data[name] = null;
                     }
                 }
             }
-            each(this._data, function (k, _v) {
+            each(this._data, (k, _v) => {
                 let val, type, inputItems = form.querySelectorAll("[name='" + k + "']"), item = inputItems[0];
                 if (!inputItems.length) {
-                    self.debug("readFromForm: field not found: '" + k + "'");
+                    this.debug("readFromForm: field not found: '" + k + "'");
                     return; // continue iteration
                 }
                 type = item.getAttribute("type");
@@ -753,7 +740,7 @@
                 else if (type === "checkbox" && inputItems.length > 1) {
                     // Multi-checkbox group is handled as array of values
                     val = [];
-                    inputItems.forEach(function (elem) {
+                    inputItems.forEach((elem) => {
                         if (elem.checked) {
                             val.push(elem.value);
                         }
@@ -763,7 +750,7 @@
                     if (item.multiple) {
                         // Multiselect listbox
                         val = [];
-                        Array.from(item.selectedOptions).forEach(function (elem) {
+                        Array.from(item.selectedOptions).forEach((elem) => {
                             val.push(elem.value);
                         });
                     }
@@ -779,7 +766,7 @@
                     }
                 }
                 // console.log("readFromForm: val(" + k + "): '" + val + "'");
-                self.set(k, val);
+                this.set(k, val);
             });
             // console.log("readFromForm: '" + this + "'", this._data);
         }
@@ -789,19 +776,19 @@
          * (defaults to [[PersistoOptions.attachForm]])
          */
         writeToForm(form, options) {
-            let i, elem, match, self = this;
+            let i, elem, match;
             form = form || this.form;
             if (typeof form === "string") {
                 form = document.querySelector(form);
             }
-            each(this._data, function (k) {
-                let v = self.get(k), vIsArray = Array.isArray(v), inputItems = form.querySelectorAll("[name='" + k + "']");
+            each(this._data, (k) => {
+                let v = this.get(k), vIsArray = Array.isArray(v), inputItems = form.querySelectorAll("[name='" + k + "']");
                 if (!inputItems.length) {
                     return; // continue iteration
                 }
                 let item = inputItems[0], type = item.getAttribute("type");
                 if (type === "radio") {
-                    inputItems.forEach(function (elem) {
+                    inputItems.forEach((elem) => {
                         elem.checked = elem.value === v;
                     });
                 }
