@@ -7,7 +7,7 @@
     /*!
      * persisto.js - utils
      * Copyright (c) 2016-2021, Martin Wendt. Released under the MIT license.
-     * v2.0.1-0, Sat, 20 Mar 2021 16:14:12 GMT (https://github.com/mar10/persisto)
+     * v2.0.1-0, Sat, 20 Mar 2021 17:00:44 GMT (https://github.com/mar10/persisto)
      */
     const MAX_INT = 9007199254740991;
     /**
@@ -99,7 +99,7 @@
     /*!
      * persisto.js - utils
      * Copyright (c) 2016-2021, Martin Wendt. Released under the MIT license.
-     * v2.0.1-0, Sat, 20 Mar 2021 16:14:12 GMT (https://github.com/mar10/persisto)
+     * v2.0.1-0, Sat, 20 Mar 2021 17:00:44 GMT (https://github.com/mar10/persisto)
      */
     /**
      * Deferred is a ES6 Promise, that exposes the resolve() and reject()` method.
@@ -198,7 +198,7 @@
      * Released under the MIT license.
      *
      * @version v2.0.1-0
-     * @date Sat, 20 Mar 2021 16:14:12 GMT
+     * @date Sat, 20 Mar 2021 17:00:44 GMT
      */
     const default_debuglevel = 1; // Replaced by rollup script
     const class_prefix = "persisto-";

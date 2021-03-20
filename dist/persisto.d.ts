@@ -6,25 +6,6 @@ declare module "util" {
      */
     export const MAX_INT = 9007199254740991;
     /**
-     * Deferred is a ES6 Promise, that exposes the resolve() method
-     */
-    export class Deferred {
-        private thens;
-        private catches;
-        private status;
-        private resolvedValue;
-        private rejectedError;
-        constructor();
-        resolve(value?: any): void;
-        reject(error?: any): void;
-        then(cb: any): void;
-        catch(cb: any): void;
-        promise(): {
-            then: (cb: any) => void;
-            catch: (cb: any) => void;
-        };
-    }
-    /**
      * Bind event handler using event delegation:
      *
      * E.g. handle all 'input' events for input and textarea elements of a given
@@ -55,6 +36,38 @@ declare module "util" {
     export function noop(): any;
     export function ready(fn: any): void;
     export function type(obj: any): any;
+}
+declare module "deferred" {
+    /*!
+     * persisto.js - utils
+     * Copyright (c) 2016-2021, Martin Wendt. Released under the MIT license.
+     * @VERSION, @DATE (https://github.com/mar10/persisto)
+     */
+    type promiseCallbackType = (val: any) => void;
+    type finallyCallbackType = () => void;
+    /**
+     * Deferred is a ES6 Promise, that exposes the resolve() and reject()` method.
+     *
+     * Loosely mimics [`jQuery.Deferred`](https://api.jquery.com/category/deferred-object/).
+     */
+    export class Deferred {
+        private _promise;
+        protected _resolve: any;
+        protected _reject: any;
+        constructor();
+        /** Resolve the [[Promise]]. */
+        resolve(value?: any): void;
+        /** Reject the [[Promise]]. */
+        reject(reason?: any): void;
+        /** Return the native [[Promise]] instance.*/
+        promise(): Promise<any>;
+        /** Call [[Promise.then]] on the embedded promise instance.*/
+        then(cb: promiseCallbackType): Promise<void>;
+        /** Call [[Promise.catch]] on the embedded promise instance.*/
+        catch(cb: promiseCallbackType): Promise<any>;
+        /** Call [[Promise.finally]] on the embedded promise instance.*/
+        finally(cb: finallyCallbackType): Promise<any>;
+    }
 }
 declare module "persisto_options" {
     /*!
@@ -270,6 +283,7 @@ declare module "persisto" {
         commitCount: number;
         pushCount: number;
         protected lastModified: number;
+        ready: Promise<any>;
         constructor(namespace: string, options: PersistoOptions);
         protected _setStatus(status: Status): void;
         /** Trigger commit/push according to current settings. */

@@ -1,5 +1,5 @@
 # 2.0.0-0 / Unreleased
-  * Rewritten in TypeScript
+  * Rewritten in TypeScript (but also distribute as JavaScript module)
   * Drop dependency on jQuery
   * Drop support for IE
   * Use typedoc for API documetation
