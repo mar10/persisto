@@ -13,7 +13,8 @@ globals:
   define: false
   require: false
   module: false
-  jQuery: false
+  # jQuery: false
+  Promise: false
 
 # Custom rules (see https://eslint.org/docs/rules/ )
 # 0:off, 1:warn, 2:error
