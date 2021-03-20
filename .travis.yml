@@ -4,6 +4,7 @@ node_js:
   - "10"
 before_script:
   - npm install -g grunt-cli
+  - yarn build
 script: grunt travis --verbose
 # env:
 #   global:

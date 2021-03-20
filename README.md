@@ -28,7 +28,7 @@
 
 Overview:
 
-![sample](https://rawgit.com/mar10/persisto/no-jquery-ts/assets/architecture.png?raw=true)
+![sample](https://rawgit.com/mar10/persisto/master/assets/architecture.png?raw=true)
 
 
 Requirements:
@@ -36,31 +36,25 @@ Requirements:
   - <strike>jQuery</strike> not required since v2.0
   - Recent major browser (Internet Explorer is **not** supported!)
 
-Requirements for version 1.x:
+Requirements for [version 1.x](https://github.com/mar10/persisto/tree/maintain_1.x):
 
   - jQuery
   - IE 8+ or any recent major browser
-
-**NOTE:**
-You may try the
-[experimental 2.0 pre-release](https://github.com/mar10/persisto/blob/no-jquery/src/persisto.js)
-that drops the jQuery dependency (and Internet Explorer). Please provide feedback!
-
 
 ## Usage
 
 [Download the latest persisto.js](https://github.com/mar10/persisto/releases)
 or include directly from CDN: [![](https://data.jsdelivr.com/v1/package/npm/persisto/badge)](https://www.jsdelivr.com/package/npm/persisto) or
-[UNPKG](https://unpkg.com/persisto@latest/dist/persisto.min.js):
+[UNPKG](https://unpkg.com/persisto@latest/dist/persisto.umd.min.js):
 
 ```html
-<script src="//cdn.jsdelivr.net/npm/persisto@1/dist/persisto.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/persisto@latest/dist/persisto.umd.min.js"></script>
 ```
 
 then instantiate a `PersistentObject`:
 
 ```js
-let store = mar10.PersistentObject("mySettings", {
+let store = new mar10.PersistentObject("mySettings", {
       defaults: {
         theme: "default"
         }
@@ -87,7 +81,7 @@ the data is serialized to JSON and written to `localStorage.mySettings`.
 
 **More:**
 
-  * Try the [online example](http://plnkr.co/edit/qcDmvN?p=preview).
+  * Try the [online example](https://plnkr.co/plunk/PI8Z2lqn0WfcHvL8).
   * Run the [unit tests](https://rawgit.com/mar10/persisto/master/test/unit/test-core.html).
 
 
@@ -99,7 +93,7 @@ Example:
 
 ```js
 // Maintain client's preferences and define some defaults:
-let settingsStore = mar10.PersistentObject("mySettings", {
+let settingsStore = new mar10.PersistentObject("mySettings", {
         defaults: {
           nickname: "anonymous",
           theme: "default"
@@ -167,7 +161,7 @@ Arrays are only a special form of plain JavaScript objects, so we can store and
 access them as top level type like this:
 
 ```js
-let store = mar10.PersistentObject("mySettings", {
+let store = new mar10.PersistentObject("mySettings", {
 				defaults: ["a", "b", "c"]
 			});
 store.get("[0]");  // 'a'
@@ -177,7 +171,7 @@ store.set("[1]", "b2");
 However if we use child properties, it is even easier:
 
 ```js
-let store = mar10.PersistentObject("mySettings", {
+let store = new mar10.PersistentObject("mySettings", {
         defaults: {
           values: ["a", "b", "c"]
         }
@@ -232,7 +226,7 @@ Optionally, we may specify an endpoint URL that is used to synchronize the data
 with a web server using HTTP REST requests (GET and PUT):
 
 ```js
-let store = mar10.PersistentObject("mySettings", {
+let store = new mar10.PersistentObject("mySettings", {
         remote: "persist/settings"
       });
 
@@ -258,10 +252,10 @@ $.when(
 
 The following options are available:
 
-https://mar10.github.io/persisto/interfaces/persistooptions.html
+http://mar10.github.io/persisto/interfaces/persisto_options.persistooptions.html
 
 ### Methods
 
 Following a list of available methods:
 
-https://mar10.github.io/persisto/classes/persistentobject.html
+http://mar10.github.io/persisto/classes/persisto.persistentobject.html
