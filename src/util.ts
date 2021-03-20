@@ -5,60 +5,6 @@
  */
 
 export const MAX_INT = 9007199254740991;
-type promiseCallbackType = (val: any) => void;
-
-/**
- * Deferred is a ES6 Promise, that exposes the resolve() method
- */
-export class Deferred {
-  private thens: promiseCallbackType[] = [];
-  private catches: promiseCallbackType[] = [];
-
-  private status = "";
-  private resolvedValue: any;
-  private rejectedError: any;
-
-  constructor() {}
-
-  resolve(value?: any) {
-    if (this.status) {
-      throw new Error("already settled");
-    }
-    this.status = "resolved";
-    this.resolvedValue = value;
-    this.thens.forEach((t) => t(value));
-    this.thens = []; // Avoid memleaks.
-  }
-  reject(error?: any) {
-    if (this.status) {
-      throw new Error("already settled");
-    }
-    this.status = "rejected";
-    this.rejectedError = error;
-    this.catches.forEach((c) => c(error));
-    this.catches = []; // Avoid memleaks.
-  }
-  then(cb: any) {
-    if (status === "resolved") {
-      cb(this.resolvedValue);
-    } else {
-      this.thens.unshift(cb);
-    }
-  }
-  catch(cb: any) {
-    if (this.status === "rejected") {
-      cb(this.rejectedError);
-    } else {
-      this.catches.unshift(cb);
-    }
-  }
-  promise() {
-    return {
-      then: this.then,
-      catch: this.catch,
-    };
-  }
-}
 
 /**
  * Bind event handler using event delegation:

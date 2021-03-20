@@ -7,59 +7,9 @@
     /*!
      * persisto.js - utils
      * Copyright (c) 2016-2021, Martin Wendt. Released under the MIT license.
-     * v2.0.1-0, Sun, 28 Feb 2021 08:26:51 GMT (https://github.com/mar10/persisto)
+     * v2.0.1-0, Sat, 20 Mar 2021 11:44:08 GMT (https://github.com/mar10/persisto)
      */
     const MAX_INT = 9007199254740991;
-    /**
-     * Deferred is a ES6 Promise, that exposes the resolve() method
-     */
-    class Deferred {
-        constructor() {
-            this.thens = [];
-            this.catches = [];
-            this.status = "";
-        }
-        resolve(value) {
-            if (this.status) {
-                throw new Error("already settled");
-            }
-            this.status = "resolved";
-            this.resolvedValue = value;
-            this.thens.forEach((t) => t(value));
-            this.thens = []; // Avoid memleaks.
-        }
-        reject(error) {
-            if (this.status) {
-                throw new Error("already settled");
-            }
-            this.status = "rejected";
-            this.rejectedError = error;
-            this.catches.forEach((c) => c(error));
-            this.catches = []; // Avoid memleaks.
-        }
-        then(cb) {
-            if (status === "resolved") {
-                cb(this.resolvedValue);
-            }
-            else {
-                this.thens.unshift(cb);
-            }
-        }
-        catch(cb) {
-            if (this.status === "rejected") {
-                cb(this.rejectedError);
-            }
-            else {
-                this.catches.unshift(cb);
-            }
-        }
-        promise() {
-            return {
-                then: this.then,
-                catch: this.catch,
-            };
-        }
-    }
     /**
      * Bind event handler using event delegation:
      *
@@ -150,6 +100,99 @@
     function noop() { }
 
     /*!
+     * persisto.js - utils
+     * Copyright (c) 2016-2021, Martin Wendt. Released under the MIT license.
+     * v2.0.1-0, Sat, 20 Mar 2021 11:44:08 GMT (https://github.com/mar10/persisto)
+     */
+    /**
+     * Deferred is a ES6 Promise, that exposes the resolve() and reject()` method.
+     *
+     * Loosely mimics [`jQuery.Deferred`](https://api.jquery.com/category/deferred-object/).
+     */
+    class Deferred {
+        constructor() {
+            this._promise = new Promise((resolve, reject) => {
+                this._resolve = resolve;
+                this._reject = reject;
+            });
+        }
+        /** Resolve the [[Promise]]. */
+        resolve(value) {
+            this._resolve(value);
+        }
+        /** Reject the [[Promise]]. */
+        reject(reason) {
+            this._reject(reason);
+        }
+        /** Return the native [[Promise]] instance.*/
+        promise() {
+            return this._promise;
+        }
+        /** Call [[Promise.then]] on the embedded promise instance.*/
+        then(cb) {
+            return this._promise.then(cb);
+        }
+        /** Call [[Promise.catch]] on the embedded promise instance.*/
+        catch(cb) {
+            return this._promise.catch(cb);
+        }
+        /** Call [[Promise.finally]] on the embedded promise instance.*/
+        finally(cb) {
+            return this._promise.finally(cb);
+        }
+    }
+    // type promiseCallbackType = (val: any) => void;
+    // /**
+    //  * Deferred is a ES6 Promise, that exposes the resolve() method
+    //  */
+    // export class Deferred {
+    //   private thens: promiseCallbackType[] = [];
+    //   private catches: promiseCallbackType[] = [];
+    //   private status = "";
+    //   private resolvedValue: any;
+    //   private rejectedError: any;
+    //   constructor() {}
+    //   resolve(value?: any) {
+    //     if (this.status) {
+    //       throw new Error("already settled");
+    //     }
+    //     this.status = "resolved";
+    //     this.resolvedValue = value;
+    //     this.thens.forEach((t) => t(value));
+    //     this.thens = []; // Avoid memleaks.
+    //   }
+    //   reject(error?: any) {
+    //     if (this.status) {
+    //       throw new Error("already settled");
+    //     }
+    //     this.status = "rejected";
+    //     this.rejectedError = error;
+    //     this.catches.forEach((c) => c(error));
+    //     this.catches = []; // Avoid memleaks.
+    //   }
+    //   then(cb: any) {
+    //     if (status === "resolved") {
+    //       cb(this.resolvedValue);
+    //     } else {
+    //       this.thens.unshift(cb);
+    //     }
+    //   }
+    //   catch(cb: any) {
+    //     if (this.status === "rejected") {
+    //       cb(this.rejectedError);
+    //     } else {
+    //       this.catches.unshift(cb);
+    //     }
+    //   }
+    //   promise() {
+    //     return {
+    //       then: this.then,
+    //       catch: this.catch,
+    //     };
+    //   }
+    // }
+
+    /*!
      * persisto.js
      *
      * Persistent JavaScript objects and web forms using Web Storage.
@@ -158,7 +201,7 @@
      * Released under the MIT license.
      *
      * @version v2.0.1-0
-     * @date Sun, 28 Feb 2021 08:26:51 GMT
+     * @date Sat, 20 Mar 2021 11:44:08 GMT
      */
     const default_debuglevel = 1; // Replaced by rollup script
     const class_prefix = "persisto-";
@@ -182,7 +225,6 @@
      * See also [[PersistoOptions]].
      */
     class PersistentObject {
-        // ready: Promise<any>;
         constructor(namespace, options) {
             this.version = "v2.0.1-0"; // Set to semver by 'grunt release'
             this._checkTimer = null;
@@ -197,6 +239,7 @@
             this.pushCount = 0;
             this.lastModified = 0;
             let dfd = new Deferred();
+            this.ready = dfd.promise();
             this.namespace = namespace;
             if (!namespace) {
                 error("Missing required argument: namespace");
@@ -241,44 +284,44 @@
             }
             // _data contains the default value. Now load from persistent storage if any
             let prevValue = this.storage ? this.storage.getItem(this.namespace) : null;
-            let self = this;
+            // let self = this;
             // Monitor form changes
             if (this.form) {
                 this.form.classList.add("persisto");
-                onEvent(this.form, "input", "input,textarea", function (e) {
-                    self.readFromForm(self.form);
+                onEvent(this.form, "input", "input,textarea", (e) => {
+                    this.readFromForm(this.form);
                 });
-                onEvent(this.form, "change", "select", function (e) {
-                    self.readFromForm(self.form);
+                onEvent(this.form, "change", "select", (e) => {
+                    this.readFromForm(this.form);
                 });
-                this.form.addEventListener("submit", function (e) {
-                    self.readFromForm(self.form);
+                this.form.addEventListener("submit", (e) => {
+                    this.readFromForm(this.form);
                     e.preventDefault();
                 });
-                this.form.addEventListener("reset", function (e) {
-                    self.readFromForm(self.form);
+                this.form.addEventListener("reset", (e) => {
+                    this.readFromForm(this.form);
                     e.preventDefault();
                 });
             }
             if (this.opts.remote) {
                 // Try to pull, then resolve
                 this.pull()
-                    .then(function () {
-                    self.debug("init from remote", self._data);
-                    self.offline = false;
-                    dfd.resolve();
+                    .then(() => {
+                    this.debug("init from remote", this._data);
+                    this.offline = false;
+                    dfd.resolve(this);
                 })
-                    .catch(function () {
-                    self.offline = true;
+                    .catch((reason) => {
+                    this.offline = true;
                     if (prevValue == null) {
-                        console.warn(self + ": could not init from remote; falling back default.", arguments);
+                        console.warn(this + ": could not init from remote; falling back default.", arguments);
                     }
                     else {
-                        console.warn(self + ": could not init from remote; falling back to storage.", arguments);
-                        // self._data = JSON.parse(prevValue);
-                        self._data = extend({}, self.opts.defaults, JSON.parse(prevValue));
+                        console.warn(this + ": could not init from remote; falling back to storage.", arguments);
+                        // this._data = JSON.parse(prevValue);
+                        this._data = extend({}, this.opts.defaults, JSON.parse(prevValue));
                     }
-                    dfd.resolve();
+                    dfd.reject(reason);
                 });
             }
             else if (prevValue != null) {
@@ -286,13 +329,13 @@
                 // We still extend from opts.defaults, in case some fields were missing
                 this._data = extend({}, this.opts.defaults, this._data);
                 // this.debug("init from storage", this._data);
-                dfd.resolve();
+                dfd.resolve(this);
                 // this.lastUpdate = stamp;
                 // this.setDirty();
             }
             else {
                 // this.debug("init to default", this._data);
-                dfd.resolve();
+                dfd.resolve(this);
             }
         }
         _setStatus(status) {
@@ -586,10 +629,11 @@
                 self.lastPull = Date.now();
                 self.opts.pull.call(self);
             })
-                .catch(function () {
+                .catch(function (reason) {
                 console.error(arguments);
                 self._setStatus(Status.Error);
                 self.opts.error.call(self, arguments);
+                throw new Error(reason);
             })
                 .finally(function () {
                 self.phase = Phase.Idle;

@@ -10,27 +10,8 @@
  * @date @DATE
  */
 
-/*
-  TODO:
-  - Push called twice (parallel) after error
-
-  - Promise & .ready
-      $.when(
-      // Page must be loaded
-      $.ready,
-      // PersistentObject must be pulled
-      store.ready
-
-    ).done(function(){
-      // Page was loaded and and store has pulled the data from the remote endpoint...
-      initPage();
-
-    }).fail(function(){
-      console.error("Error loading persistent objects", arguments);
-    });
-  - use :scope for querySelectorAll
-*/
 import * as util from "./util";
+import { Deferred } from "./deferred";
 import { PersistoOptions } from "./persisto_options";
 
 const default_debuglevel = 2; // Replaced by rollup script
@@ -76,10 +57,12 @@ export class PersistentObject {
   pushCount: number = 0;
   protected lastModified: number = 0;
 
-  // ready: Promise<any>;
+  ready: Promise<any>;
 
   constructor(namespace: string, options: PersistoOptions) {
-    let dfd = new util.Deferred();
+    let dfd = new Deferred();
+
+    this.ready = dfd.promise();
 
     this.namespace = namespace;
     if (!namespace) {
@@ -128,66 +111,66 @@ export class PersistentObject {
 
     // _data contains the default value. Now load from persistent storage if any
     let prevValue = this.storage ? this.storage.getItem(this.namespace) : null;
-    let self = this;
+    // let self = this;
 
     // Monitor form changes
     if (this.form) {
       this.form.classList.add("persisto");
-      util.onEvent(this.form, "input", "input,textarea", function (e: Event) {
-        self.readFromForm(self.form);
+      util.onEvent(this.form, "input", "input,textarea", (e: Event) => {
+        this.readFromForm(this.form);
       });
-      util.onEvent(this.form, "change", "select", function (e: Event) {
-        self.readFromForm(self.form);
+      util.onEvent(this.form, "change", "select", (e: Event) => {
+        this.readFromForm(this.form);
       });
-      this.form.addEventListener("submit", function (e: Event) {
-        self.readFromForm(self.form);
+      this.form.addEventListener("submit", (e: Event) => {
+        this.readFromForm(this.form);
         e.preventDefault();
       });
-      this.form.addEventListener("reset", function (e: Event) {
-        self.readFromForm(self.form);
+      this.form.addEventListener("reset", (e: Event) => {
+        this.readFromForm(this.form);
         e.preventDefault();
       });
     }
     if (this.opts.remote) {
       // Try to pull, then resolve
       this.pull()
-        .then(function () {
-          self.debug("init from remote", self._data);
-          self.offline = false;
-          dfd.resolve();
+        .then(() => {
+          this.debug("init from remote", this._data);
+          this.offline = false;
+          dfd.resolve(this);
         })
-        .catch(function () {
-          self.offline = true;
+        .catch((reason) => {
+          this.offline = true;
           if (prevValue == null) {
             console.warn(
-              self + ": could not init from remote; falling back default.",
+              this + ": could not init from remote; falling back default.",
               arguments
             );
           } else {
             console.warn(
-              self + ": could not init from remote; falling back to storage.",
+              this + ": could not init from remote; falling back to storage.",
               arguments
             );
-            // self._data = JSON.parse(prevValue);
-            self._data = util.extend(
+            // this._data = JSON.parse(prevValue);
+            this._data = util.extend(
               {},
-              self.opts.defaults,
+              this.opts.defaults,
               JSON.parse(prevValue)
             );
           }
-          dfd.resolve();
+          dfd.reject(reason);
         });
     } else if (prevValue != null) {
       this.update();
       // We still extend from opts.defaults, in case some fields were missing
       this._data = util.extend({}, this.opts.defaults, this._data);
       // this.debug("init from storage", this._data);
-      dfd.resolve();
+      dfd.resolve(this);
       // this.lastUpdate = stamp;
       // this.setDirty();
     } else {
       // this.debug("init to default", this._data);
-      dfd.resolve();
+      dfd.resolve(this);
     }
   }
 
@@ -532,10 +515,11 @@ export class PersistentObject {
         self.lastPull = Date.now();
         self.opts.pull.call(self);
       })
-      .catch(function () {
+      .catch(function (reason) {
         console.error(arguments);
         self._setStatus(Status.Error);
         self.opts.error.call(self, arguments);
+        throw new Error(reason);
       })
       .finally(function () {
         self.phase = Phase.Idle;
