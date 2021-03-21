@@ -86,30 +86,30 @@ the data is serialized to JSON and written to `localStorage.mySettings`.
 ## Synchronize Data with HTML Forms
 
 Form input elements can be synchronized with a `PersistentObject` by using two
-API calls.
+API calls (`readFromForm()` and `writeToForm()`).
+This can be automated by simplified by using the `attachForm` option.
 Example:
 
 ```js
-// Maintain client's preferences and define some defaults:
-let settingsStore = new mar10.PersistentObject("mySettings", {
-  defaults: {
-    nickname: "anonymous",
-    theme: "default",
-  },
-});
-
-store.ready.then((value) => {
-  console.log("PersistentStore is initialized.");
-  // Allow users to edit and save settings:
-  document.querySelector("#form1").addEventListener("submit", function (e) {
-    store.readFromForm("#form1");
-    e.preventDefault();
+document.addEventListener("DOMContentLoaded", function (event) {
+  // Maintain client's preferences and define some defaults:
+  var settingsStore = new mar10.PersistentObject("mySettings", {
+    attachForm: "#form1", // Allow users to edit and save settings
+    // remote: "https://example.com/my/data-store",
+    defaults: {
+      nickname: "anonymous",
+      theme: "default",
+    },
   });
-  // Initialize form elements with current data
-  store.writeToForm("#form1");
-});
 
-//document.addEventListener("DOMContentLoaded", function (event) {});
+  settingsStore.ready
+    .then((value) => {
+      console.log(settingsStore + ":  is initialized.");
+    })
+    .catch((reason) => {
+      console.log(settingsStore + ": init failed.");
+    });
+});
 ```
 
 Supported elements are `<input>` (type text, checkbox, or radio), `<textarea>`,
