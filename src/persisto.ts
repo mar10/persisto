@@ -108,6 +108,7 @@ export class PersistentObject {
     } else if (this.opts.statusElement instanceof HTMLElement) {
       this.statusElement = this.opts.statusElement;
     }
+    this._setStatus(Status.Ok); // Set status classes
 
     // _data contains the default value. Now load from persistent storage if any
     let prevValue = this.storage ? this.storage.getItem(this.namespace) : null;
@@ -115,6 +116,7 @@ export class PersistentObject {
     // Monitor form changes
     if (this.form) {
       this.form.classList.add("persisto");
+
       util.onEvent(this.form, "input", "input,textarea", (e: Event) => {
         this.readFromForm(this.form);
       });
@@ -126,8 +128,13 @@ export class PersistentObject {
         e.preventDefault();
       });
       this.form.addEventListener("reset", (e: Event) => {
-        this.readFromForm(this.form);
-        e.preventDefault();
+        setTimeout(() => {
+          this.readFromForm(this.form);
+        }, 10);
+      });
+
+      this.ready.then((value) => {
+        this.writeToForm();
       });
     }
     if (this.opts.remote) {
@@ -203,7 +210,7 @@ export class PersistentObject {
     }
 
     if (deferredCall) {
-      this.debug("_invalidate() recursive");
+      this.debug("_invalidate() delayed");
     } else {
       // this.debug("_invalidate(" + hint + ")");
       this.lastModified = now;
@@ -218,7 +225,7 @@ export class PersistentObject {
     }
     if (this.storage) {
       // If we came here by a deferred timer (or delay is 0), commit
-      // immediately
+      // immediately:
       if (
         now - prevChange >= this.opts.commitDelay ||
         now - this.uncommittedSince >= this.opts.maxCommitDelay

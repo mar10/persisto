@@ -7,7 +7,7 @@
 export const MAX_INT = 9007199254740991;
 
 /**
- * Bind event handler using event delegation:
+ * Bind event handler using event delegation.
  *
  * E.g. handle all 'input' events for input and textarea elements of a given
  * form
@@ -18,29 +18,35 @@ export const MAX_INT = 9007199254740991;
  * ```
  *
  * @param element HTMLElement or selector
- * @param eventName
- * @param selector
+ * @param eventNames
+ * @param selector (pass null if no event delegation is needed)
  * @param handler
  * @param bind
  */
 export function onEvent(
-  element: HTMLElement | string,
-  eventName: string,
-  selector: string,
-  handler: (e: Event) => boolean | void,
-  bind?: any
+  rootElem: HTMLElement | string,
+  eventNames: string,
+  selector: string | null,
+  handler: (e: Event) => boolean | void
 ): void {
-  if (typeof element === "string") {
-    element = <HTMLElement>document.querySelector(element);
+  if (typeof rootElem === "string") {
+    rootElem = <HTMLElement>document.querySelector(rootElem);
   }
-  element.addEventListener(eventName, function (e) {
-    if (e.target && (<HTMLElement>e.target).matches(selector)) {
-      if (bind) {
-        return handler.call(bind, e);
-      } else {
-        return handler(e);
+  eventNames.split(" ").forEach((evn) => {
+    (<HTMLElement>rootElem).addEventListener(evn, function (e) {
+      if (!selector) {
+        return handler(e);  // no event delegation
+      } else if (e.target) {
+        let elem = <HTMLElement>e.target;
+        if (elem.matches(selector)) {
+          return handler(e);
+        }
+        elem = <HTMLElement>elem.closest(selector);
+        if (elem) {
+          return handler(e);
+        }
       }
-    }
+    });
   });
 }
 

@@ -49,13 +49,17 @@ export interface PersistoOptions {
   /**
    * Track form input changes and maintain `persisto-STATUS` class names.
    *
-   * Automatically call [[readFromForm]] when users enter form data.
+   * - Add class `persisto` to form.
+   * - Add and update `persisto-STATUS` class to form.
+   * - Call [[writeToForm]] on init, after data was loaded from storage (or backend).
+   * - Register event handlers to call [[readFromForm]] when users modify form data.
+   * - Handle submit and reset events to call [[readFromForm]] and prevent default.
    */
-  attachForm?: HTMLFormElement|string;
+  attachForm?: HTMLFormElement | string;
   /**
    * Set `persisto-STATUS` classes here.
    */
-  statusElement?: HTMLFormElement|string;
+  statusElement?: HTMLFormElement | string;
 
   /**
    * Commit changes after *X* milliseconds of inactivity.
@@ -83,7 +87,7 @@ export interface PersistoOptions {
    * never commit if the user enters keystrokes frequently.
    *
    * Default: `3000` milliseconds
-  */
+   */
   maxCommitDelay?: number;
   /**
    * Push commits after *X* milliseconds of inactivity.
@@ -113,7 +117,7 @@ export interface PersistoOptions {
    * Pass `null` to disable persistence.
    *
    * Default: `window.localStorage`
-  */
+   */
   storage?: any;
   /**
    * Verbosity level: 0:quiet, 1:normal, 2:verbose.
@@ -167,7 +171,7 @@ export interface PersistoOptions {
    * Possible values: 'ok', 'error', 'loading', 'status', 'modified'.
    * @category Callback
    */
-  status?: (status:string) => void;
+  status?: (status: string) => void;
   /**
    * Called after data was loaded from local storage.
    * @category Callback

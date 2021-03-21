@@ -1,4 +1,5 @@
 # persisto
+
 [![GitHub version](https://img.shields.io/github/release/mar10/persisto.svg)](https://github.com/mar10/persisto/releases/latest)
 [![Build Status](https://travis-ci.org/mar10/persisto.svg?branch=master)](https://travis-ci.org/mar10/persisto)
 [![npm](https://img.shields.io/npm/dm/persisto.svg)](https://www.npmjs.com/package/persisto)
@@ -11,18 +12,17 @@
 
 **Features**
 
-  1. Persist JavaScript objects (`{...}`) to
-     [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API).<br>
-     Use the `get()`/`set()` API for direct (even nested) access, avoiding the
-     need to convert from/to JSON.
-  2. Cache access to
-     [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
-     (deferred writing appears to be 10-15 times faster).
-  3. Make JavaScript objects editable in HTML forms.<br>
-     A simple naming convention maps data properties to form elements.<br>
-     Listen for input change events and automatically store data.
-  4. Optionally synchronize the data with a remote endpoint.
-
+1. Persist JavaScript objects (`{...}`) to
+   [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API).<br>
+   Use the `get()`/`set()` API for direct (even nested) access, avoiding the
+   need to convert from/to JSON.
+2. Cache access to
+   [`localStorage` / `sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
+   (deferred writing appears to be 10-15 times faster).
+3. Make JavaScript objects editable in HTML forms.<br>
+   A simple naming convention maps data properties to form elements.<br>
+   Listen for input change events and automatically store data.
+4. Optionally synchronize the data with a remote endpoint.
 
 [API Documentation](https://mar10.github.io/persisto/)
 
@@ -30,16 +30,15 @@ Overview:
 
 ![sample](https://rawgit.com/mar10/persisto/master/assets/architecture.png?raw=true)
 
-
 Requirements:
 
-  - <strike>jQuery</strike> not required since v2.0
-  - Recent major browser (Internet Explorer is **not** supported!)
+- <strike>jQuery</strike> not required since v2.0
+- Recent major browser (Internet Explorer is **not** supported!)
 
 Requirements for [version 1.x](https://github.com/mar10/persisto/tree/maintain_1.x):
 
-  - jQuery
-  - IE 8+ or any recent major browser
+- jQuery
+- IE 8+ or any recent major browser
 
 ## Usage
 
@@ -55,10 +54,10 @@ then instantiate a `PersistentObject`:
 
 ```js
 let store = new mar10.PersistentObject("mySettings", {
-      defaults: {
-        theme: "default"
-        }
-    });
+  defaults: {
+    theme: "default",
+  },
+});
 ```
 
 `store` now contains the data that was stored in `localStorage.mySettings` if
@@ -68,22 +67,21 @@ passed with the `.defaults` option.
 We can access data using `set`, `get`, `remove`, `reset`:
 
 ```js
-store.get("theme");  // -> 'default'
-store.set("owner", {name: "joe", age: 42});
+store.get("theme"); // -> 'default'
+store.set("owner", { name: "joe", age: 42 });
 store.set("owner.role", "manager");
-store.get("owner.age");  // -> 42
+store.get("owner.age"); // -> 42
 store.remove("owner.age");
 // -> store now holds {theme: "default", owner: {name: "joe", role: "manager"}}
 ```
 
-Every *modifying* operation triggers a deferred commit, so that shortly afterwards
+Every _modifying_ operation triggers a deferred commit, so that shortly afterwards
 the data is serialized to JSON and written to `localStorage.mySettings`.
 
 **More:**
 
-  * Try the [online example](https://plnkr.co/plunk/PI8Z2lqn0WfcHvL8).
-  * Run the [unit tests](https://rawgit.com/mar10/persisto/master/test/unit/test-core.html).
-
+- Try the [online example](https://plnkr.co/plunk/PI8Z2lqn0WfcHvL8).
+- Run the [unit tests](https://rawgit.com/mar10/persisto/master/test/unit/test-core.html).
 
 ## Synchronize Data with HTML Forms
 
@@ -94,21 +92,24 @@ Example:
 ```js
 // Maintain client's preferences and define some defaults:
 let settingsStore = new mar10.PersistentObject("mySettings", {
-        defaults: {
-          nickname: "anonymous",
-          theme: "default"
-          }
-      });
-
-// Initialize form elements with current data
-settingsStore.writeToForm("#settingsForm");
-
-// Allow users to edit and save settings:
-$("#settingsForm").submit(function(event){
-  // ... maybe some validations here ...
-  settingsStore.readFromForm(this);
-  event.preventDefault();
+  defaults: {
+    nickname: "anonymous",
+    theme: "default",
+  },
 });
+
+store.ready.then((value) => {
+  console.log("PersistentStore is initialized.");
+  // Allow users to edit and save settings:
+  document.querySelector("#form1").addEventListener("submit", function (e) {
+    store.readFromForm("#form1");
+    e.preventDefault();
+  });
+  // Initialize form elements with current data
+  store.writeToForm("#form1");
+});
+
+//document.addEventListener("DOMContentLoaded", function (event) {});
 ```
 
 Supported elements are `<input>` (type text, checkbox, or radio), `<textarea>`,
@@ -117,11 +118,15 @@ By convention, the html form **must use element names that match the data proper
 
 ```html
 <form id="settingsForm" action="">
-  <label>Nickname:<input name="nickname" type="text" value="" /></label><br>
-  <label>Theme:
+  <label>Nickname:<input name="nickname" type="text" value="" /></label><br />
+  <label
+    >Theme:
     <fieldset>
-      <label> <input name="theme" type="radio" value="default" /> Standard </label><br>
-      <label> <input name="theme" type="radio" value="light" /> Light </label><br>
+      <label>
+        <input name="theme" type="radio" value="default" /> Standard </label
+      ><br />
+      <label> <input name="theme" type="radio" value="light" /> Light </label
+      ><br />
       <label> <input name="theme" type="radio" value="dark" /> Dark </label>
     </fieldset>
   </label>
@@ -130,20 +135,19 @@ By convention, the html form **must use element names that match the data proper
 ```
 
 Note also that only fields are synchronized, that already existed in the storage
-data. Use the `addNew` option if *all* form fields should be evaluated and create
+data. Use the `addNew` option if _all_ form fields should be evaluated and create
 new properties in the store object:
 
 ```js
 settingsStore.readFromForm(this, {
-  addNew: true
+  addNew: true,
 });
 ```
-
 
 ## Pros and Cons
 
 - Any `PersistentObject` instance is stored as one monolythic JSON string.<br>
-  *Persisto* deferres and collates these updates, but modifying a single
+  _Persisto_ deferres and collates these updates, but modifying a single
   property of a large data object still comes with some overhead.<br>
   Splitting data into several `PersistentObject`s may remedy the problem.<br>
   But if your data model is more like a table with hundredth's of rows, a
@@ -151,7 +155,6 @@ settingsStore.readFromForm(this, {
 
 - Asynchronous operations bear the risk of potential conflicts.
   There is currently no builtin support for resolving those.
-
 
 # HOWTOs
 
@@ -162,9 +165,9 @@ access them as top level type like this:
 
 ```js
 let store = new mar10.PersistentObject("mySettings", {
-				defaults: ["a", "b", "c"]
-			});
-store.get("[0]");  // 'a'
+  defaults: ["a", "b", "c"],
+});
+store.get("[0]"); // 'a'
 store.set("[1]", "b2");
 ```
 
@@ -183,7 +186,6 @@ S.each(store.get("values"), function(idx, obj) { ... });
 store.set("values[1]", "b2");
 ```
 
-
 ### Performance and Direct Access
 
 In general, performance costs of `set()` and `get()` calls should be
@@ -195,9 +197,8 @@ In this case modifications must be signalled by a call to `setDirty()`.
 store._data.owner = { name: "joe", age: 42 };
 store._data.owner.role = "manager";
 delete store._data.owner.age;
-store.setDirty();  // schedule a commit
+store.setDirty(); // schedule a commit
 ```
-
 
 ### Asynchronous Operation
 
@@ -219,32 +220,27 @@ location.reload();
 
 An alternative would be to disable delay completely by setting `commitDelay: 0`.
 
-
 ### Synchronize with Remote Endpoints
 
 Optionally, we may specify an endpoint URL that is used to synchronize the data
 with a web server using HTTP REST requests (GET and PUT):
 
 ```js
-let store = new mar10.PersistentObject("mySettings", {
-        remote: "persist/settings"
-      });
+// Wait fpr page beeing loaded...
+document.addEventListener("DOMContentLoaded", function (event) {
+  let store = new mar10.PersistentObject("mySettings", {
+    remote: "persist/settings",
+  });
 
-$.when(
-  // Page must be loaded
-  $.ready,
-  // PersistentObject must be pulled
   store.ready
-
-).done(function(){
-  // Page was loaded and and store has pulled the data from the remote endpoint...
-  initPage();
-
-}).fail(function(){
-  console.error("Error loading persistent objects", arguments);
+    .then(function (value) {
+      console.log("PersistentStore is initialized and has pulled data.");
+    })
+    .catch(function (reason) {
+      console.error("Error loading persistent objects", arguments);
+    });
 });
 ```
-
 
 # API Reference
 
