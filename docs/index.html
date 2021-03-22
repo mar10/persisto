@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<meta charset="utf-8">
 	<title>Persisto Demo</title>
@@ -7,8 +8,14 @@
 		body {
 			font-family: Verdana, Geneva, Tahoma, sans-serif;
 		}
+
+		div.status {
+			font-size: 70%;
+			text-align: right;
+		}
+
 		/* `attachForm` option sets 'persisto-STATUS' classes: */
-/*
+		/*
 		form.persisto.persisto-modified {
 			background-color:aliceblue	;
 		}
@@ -20,63 +27,95 @@
 			width: 6em;
 			height: 1em;
 		}
-		.persisto-status > span {
+
+		.persisto-status>span {
 			position: absolute;
 			top: 0;
 			left: 0;
 			padding: 2px 3px;
-			border:1px solid #ccc;
+			border: 1px solid #ccc;
 			border-radius: 3px;
 			visibility: hidden;
 			opacity: 0;
 			transition: visibility 0s, opacity 0.5s linear;
 		}
-		.persisto-ok > span.persisto-status-ok,
-		.persisto-modified > span.persisto-status-modified,
-		.persisto-loading > span.persisto-status-loading,
-		.persisto-saving > span.persisto-status-saving,
-		.persisto-error > span.persisto-status-error
-		{
+
+		.persisto-ok>span.persisto-status-ok,
+		.persisto-modified>span.persisto-status-modified,
+		.persisto-loading>span.persisto-status-loading,
+		.persisto-saving>span.persisto-status-saving,
+		.persisto-error>span.persisto-status-error {
 			visibility: visible;
 			opacity: 1;
 			background-color: aliceblue;
 		}
+
 	</style>
-	<script defer src="../dist/persisto.umd.js"> </script>
-	<script defer src="main.js"> </script>
+
+	<script defer src="//cdn.jsdelivr.net/npm/persisto@latest/dist/persisto.umd.min.js"></script>
+	<script defer src="main.js"></script>
 </head>
+
 <body>
-	<h1>persisto.js Demo</h1>
+	<h1>Persisto Demo</h1>
 	<form id="form1" action="" class="persisto">
 		<p class="status-bar">
 			<span>Status:</span>
-			<span class=persisto-status>
-				<span class=persisto-status-ok>Ok.</span>
-				<span class=persisto-status-modified>Modified&hellip;</span>
-				<span class=persisto-status-saving>Saving&hellip;</span>
-				<span class=persisto-status-loading>Loading&hellip;</span>
-				<span class=persisto-status-error style="color:crimson">Error!</span>
+			<span class="persisto-status">
+				<span class="persisto-status-ok">Ok.</span>
+				<span class="persisto-status-modified">Modified&hellip;</span>
+				<span class="persisto-status-saving">Saving&hellip;</span>
+				<span class="persisto-status-loading">Loading&hellip;</span>
+				<span class="persisto-status-error" style="color: crimson">Error!</span>
 			</span>
 			<span id="stats">0 commits</span>
 		</p>
-		<label>Title:<input name="title" type="text" value="" /></label><br>
-		<label>Details: <textarea name="details" rows="3"></textarea></label><br>
+		<label>Title:
+			<input name="title" type="text" value="">
+		</label>
+		<br>
+		<label for="taDetails">Details:</label>
+		<br>
+		<textarea id="taDetails" name="details" rows="3"></textarea>
+		<br>
 		<label>Favorite:
-			<input name="isFavorite" type="checkbox" />
-		</label><br>
+			<input name="isFavorite" type="checkbox">
+		</label>
 
 		<fieldset>
 			<legend>Status</legend>
-			<label> <input name="status" type="radio" value="active" /> active </label><br>
-			<label> <input name="status" type="radio" value="done" checked="checked" /> done </label><br>
-			<label> <input name="status" type="radio" value="waiting" /> waiting </label>
+			<label>
+				<input name="status" type="radio" value="active">
+				Active
+			</label>
+			<br>
+			<label>
+				<input name="status" type="radio" value="done" checked>
+				Done
+			</label>
+			<br>
+			<label>
+				<input name="status" type="radio" value="waiting">
+				Waiting
+			</label>
 		</fieldset>
 
 		<fieldset>
 			<legend>Attributes</legend>
-			<label> <input name="attributes" type="checkbox" value="opt1" checked="" /> opt1 </label><br>
-			<label> <input name="attributes" type="checkbox" value="opt2" checked="" /> opt2 </label><br>
-			<label> <input name="attributes" type="checkbox" value="opt3"> opt3 </input></label>
+			<label>
+				<input name="attributes" type="checkbox" value="opt1" checked>
+				Option 1
+			</label>
+			<br>
+			<label>
+				<input name="attributes" type="checkbox" value="opt2" checked>
+				Option 2
+			</label>
+			<br>
+			<label>
+				<input name="attributes" type="checkbox" value="opt3">
+				Option 3
+			</label>
 		</fieldset>
 
 		<label>Color:
@@ -85,21 +124,25 @@
 				<option value="green" selected>Green</option>
 				<option value="blue">Blue</option>
 			</select>
-		</label><br>
+		</label>
+		<br>
 		<label>Tags:
 			<select name="tags" multiple="multiple">
 				<option value="cool">Cool</option>
 				<option value="hot" selected>Hot</option>
 				<option value="lame">Lame</option>
 			</select>
-		</label><br>
-
-
+		</label>
+		<br>
 		<button type="submit">Submit</button>
 		<button type="reset">Reset</button>
 	</form>
+	<hr>
 	<div class="status">
-		<a href="https://github.com/mar10/persisto">persisto.js</a> &copy; 2021 Martin Wendt.
+		<a href="https://github.com/mar10/persisto">persisto on GitHub</a>
+		&mdash; <a href="https://github.com/mar10/persisto">API documentatio</a>
+		&copy; 2016-2021 Martin Wendt.
 	</div>
 </body>
+
 </html>
