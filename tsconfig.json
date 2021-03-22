@@ -68,7 +68,7 @@
 
   "typedocOptions": {
     "entryPoints": ["src/persisto.ts", "src/persisto_options.ts"],
-    "out": "docs",
+    "out": "docs/api",
     "excludePrivate": true,
     "excludeProtected": true,
     "includeVersion": true

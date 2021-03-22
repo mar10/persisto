@@ -24,7 +24,8 @@
    Listen for input change events and automatically store data.
 4. Optionally synchronize the data with a remote endpoint.
 
-[API Documentation](https://mar10.github.io/persisto/)
+[Demo](https://mar10.github.io/persisto) &mdash;
+[API Documentation](https://mar10.github.io/persisto/api)
 
 Overview:
 
@@ -87,7 +88,7 @@ the data is serialized to JSON and written to `localStorage.mySettings`.
 
 Form input elements can be synchronized with a `PersistentObject` by using two
 API calls (`readFromForm()` and `writeToForm()`).
-This can be automated by simplified by using the `attachForm` option.
+This can be automated by passing the `attachForm` option.
 Example:
 
 ```js
@@ -248,10 +249,10 @@ document.addEventListener("DOMContentLoaded", function (event) {
 
 The following options are available:
 
-http://mar10.github.io/persisto/interfaces/persisto_options.persistooptions.html
+https://mar10.github.io/persisto/api/interfaces/persisto_options.persistooptions.html
 
 ### Methods
 
 Following a list of available methods:
 
-http://mar10.github.io/persisto/classes/persisto.persistentobject.html
+https://mar10.github.io/persisto/api/classes/persisto.persistentobject.html

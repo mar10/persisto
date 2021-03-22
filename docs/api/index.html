@@ -1,0 +1,331 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>persisto - v2.0.3-0</title>
+	<meta name="description" content="Documentation for persisto - v2.0.3-0">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+	<script async src="assets/js/search.js" id="search-script"></script>
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">persisto - v2.0.3-0</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-externals" checked />
+							<label class="tsd-widget" for="tsd-filter-externals">Externals</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<h1>persisto - v2.0.3-0</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<a href="#persisto" id="persisto" style="color: inherit; text-decoration: none;">
+					<h1>persisto</h1>
+				</a>
+				<p><a href="https://github.com/mar10/persisto/releases/latest"><img src="https://img.shields.io/github/release/mar10/persisto.svg" alt="GitHub version"></a>
+					<a href="https://travis-ci.org/mar10/persisto"><img src="https://travis-ci.org/mar10/persisto.svg?branch=master" alt="Build Status"></a>
+					<a href="https://www.npmjs.com/package/persisto"><img src="https://img.shields.io/npm/dm/persisto.svg" alt="npm"></a>
+					<a href="https://www.jsdelivr.com/package/npm/persisto"><img src="https://data.jsdelivr.com/v1/package/npm/persisto/badge" alt="jsDelivr"></a>
+					<a href="http://www.typescriptlang.org/"><img src="https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg" alt="TypeScript"></a>
+					<a href="https://github.com/mar10/grunt-yabs"><img src="https://img.shields.io/badge/released%20with-grunt--yabs-yellowgreen" alt="Released with: grunt-yabs"></a>
+				<a href="https://stackoverflow.com/questions/tagged/persisto"><img src="https://img.shields.io/badge/StackOverflow-persisto-blue.svg" alt="StackOverflow: persisto"></a></p>
+				<blockquote>
+					<p>Persistent JavaScript objects and web forms using Web Storage.</p>
+				</blockquote>
+				<p><strong>Features</strong></p>
+				<ol>
+					<li>Persist JavaScript objects (<code>{...}</code>) to
+						<a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API"><code>localStorage</code> / <code>sessionStorage</code></a>.<br>
+						Use the <code>get()</code>/<code>set()</code> API for direct (even nested) access, avoiding the
+					need to convert from/to JSON.</li>
+					<li>Cache access to
+						<a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API"><code>localStorage</code> / <code>sessionStorage</code></a>
+					(deferred writing appears to be 10-15 times faster).</li>
+					<li>Make JavaScript objects editable in HTML forms.<br>
+						A simple naming convention maps data properties to form elements.<br>
+					Listen for input change events and automatically store data.</li>
+					<li>Optionally synchronize the data with a remote endpoint.</li>
+				</ol>
+				<p><a href="https://mar10.github.io/persisto/">API Documentation</a></p>
+				<p>Overview:</p>
+				<p><img src="https://rawgit.com/mar10/persisto/master/assets/architecture.png?raw=true" alt="sample"></p>
+				<p>Requirements:</p>
+				<ul>
+					<li><strike>jQuery</strike> not required since v2.0</li>
+					<li>Recent major browser (Internet Explorer is <strong>not</strong> supported!)</li>
+				</ul>
+				<p>Requirements for <a href="https://github.com/mar10/persisto/tree/maintain_1.x">version 1.x</a>:</p>
+				<ul>
+					<li>jQuery</li>
+					<li>IE 8+ or any recent major browser</li>
+				</ul>
+				<a href="#usage" id="usage" style="color: inherit; text-decoration: none;">
+					<h2>Usage</h2>
+				</a>
+				<p><a href="https://github.com/mar10/persisto/releases">Download the latest persisto.js</a>
+					or include directly from CDN: <a href="https://www.jsdelivr.com/package/npm/persisto"><img src="https://data.jsdelivr.com/v1/package/npm/persisto/badge" alt=""></a> or
+				<a href="https://unpkg.com/persisto@latest/dist/persisto.umd.min.js">UNPKG</a>:</p>
+				<pre><code class="language-html"><span style="color: #800000">&lt;script</span><span style="color: #000000FF"> </span><span style="color: #FF0000">src</span><span style="color: #000000FF">=</span><span style="color: #0000FF">&quot;//cdn.jsdelivr.net/npm/persisto@latest/dist/persisto.umd.min.js&quot;</span><span style="color: #800000">&gt;&lt;/script&gt;</span>
+</code></pre>
+				<p>then instantiate a <code>PersistentObject</code>:</p>
+				<pre><code class="language-js"><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #001080">mar10</span><span style="color: #000000">.</span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
+<span style="color: #000000">  </span><span style="color: #001080">defaults:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">    </span><span style="color: #001080">theme:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;default&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  },</span>
+<span style="color: #000000">});</span>
+</code></pre>
+				<p><code>store</code> now contains the data that was stored in <code>localStorage.mySettings</code> if
+					present. Otherwise, <code>store</code> is initialized to the default values that we
+				passed with the <code>.defaults</code> option.</p>
+				<p>We can access data using <code>set</code>, <code>get</code>, <code>remove</code>, <code>reset</code>:</p>
+				<pre><code class="language-js"><span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;theme&quot;</span><span style="color: #000000">); </span><span style="color: #008000">// -&gt; &#039;default&#039;</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">set</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;owner&quot;</span><span style="color: #000000">, { </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;joe&quot;</span><span style="color: #000000">, </span><span style="color: #001080">age:</span><span style="color: #000000"> </span><span style="color: #098658">42</span><span style="color: #000000"> });</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">set</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;owner.role&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;manager&quot;</span><span style="color: #000000">);</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;owner.age&quot;</span><span style="color: #000000">); </span><span style="color: #008000">// -&gt; 42</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">remove</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;owner.age&quot;</span><span style="color: #000000">);</span>
+<span style="color: #008000">// -&gt; store now holds {theme: &quot;default&quot;, owner: {name: &quot;joe&quot;, role: &quot;manager&quot;}}</span>
+</code></pre>
+				<p>Every <em>modifying</em> operation triggers a deferred commit, so that shortly afterwards
+				the data is serialized to JSON and written to <code>localStorage.mySettings</code>.</p>
+				<p><strong>More:</strong></p>
+				<ul>
+					<li>Try the <a href="https://plnkr.co/plunk/PI8Z2lqn0WfcHvL8">online example</a>.</li>
+					<li>Run the <a href="https://rawgit.com/mar10/persisto/master/test/unit/test-core.html">unit tests</a>.</li>
+				</ul>
+				<a href="#synchronize-data-with-html-forms" id="synchronize-data-with-html-forms" style="color: inherit; text-decoration: none;">
+					<h2>Synchronize Data with HTML Forms</h2>
+				</a>
+				<p>Form input elements can be synchronized with a <code>PersistentObject</code> by using two
+					API calls (<code>readFromForm()</code> and <code>writeToForm()</code>).
+					This can be automated by passing the <code>attachForm</code> option.
+				Example:</p>
+				<pre><code class="language-js"><span style="color: #001080">document</span><span style="color: #000000">.</span><span style="color: #795E26">addEventListener</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;DOMContentLoaded&quot;</span><span style="color: #000000">, </span><span style="color: #0000FF">function</span><span style="color: #000000"> (</span><span style="color: #001080">event</span><span style="color: #000000">) {</span>
+<span style="color: #000000">  </span><span style="color: #008000">// Maintain client&#039;s preferences and define some defaults:</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">var</span><span style="color: #000000"> </span><span style="color: #001080">settingsStore</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #001080">mar10</span><span style="color: #000000">.</span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
+<span style="color: #000000">    </span><span style="color: #001080">attachForm:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;#form1&quot;</span><span style="color: #000000">, </span><span style="color: #008000">// Allow users to edit and save settings</span>
+<span style="color: #000000">    </span><span style="color: #008000">// remote: &quot;https://example.com/my/data-store&quot;,</span>
+<span style="color: #000000">    </span><span style="color: #001080">defaults:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">      </span><span style="color: #001080">nickname:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;anonymous&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">      </span><span style="color: #001080">theme:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;default&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">    },</span>
+<span style="color: #000000">  });</span>
+
+<span style="color: #000000">  </span><span style="color: #001080">settingsStore</span><span style="color: #000000">.</span><span style="color: #001080">ready</span>
+<span style="color: #000000">    .</span><span style="color: #795E26">then</span><span style="color: #000000">((</span><span style="color: #001080">value</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">      </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">settingsStore</span><span style="color: #000000"> + </span><span style="color: #A31515">&quot;:  is initialized.&quot;</span><span style="color: #000000">);</span>
+<span style="color: #000000">    })</span>
+<span style="color: #000000">    .</span><span style="color: #795E26">catch</span><span style="color: #000000">((</span><span style="color: #001080">reason</span><span style="color: #000000">) </span><span style="color: #0000FF">=&gt;</span><span style="color: #000000"> {</span>
+<span style="color: #000000">      </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #001080">settingsStore</span><span style="color: #000000"> + </span><span style="color: #A31515">&quot;: init failed.&quot;</span><span style="color: #000000">);</span>
+<span style="color: #000000">    });</span>
+<span style="color: #000000">});</span>
+</code></pre>
+				<p>Supported elements are <code>&lt;input&gt;</code> (type text, checkbox, or radio), <code>&lt;textarea&gt;</code>,
+					and <code>&lt;select&gt;</code> (single and multivalue).
+				By convention, the html form <strong>must use element names that match the data properties</strong>.<br></p>
+				<pre><code class="language-html"><span style="color: #800000">&lt;form</span><span style="color: #000000"> </span><span style="color: #FF0000">id</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;settingsForm&quot;</span><span style="color: #000000"> </span><span style="color: #FF0000">action</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;&quot;</span><span style="color: #800000">&gt;</span>
+<span style="color: #000000">  </span><span style="color: #800000">&lt;label&gt;</span><span style="color: #000000">Nickname:</span><span style="color: #800000">&lt;input</span><span style="color: #000000"> </span><span style="color: #FF0000">name</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;nickname&quot;</span><span style="color: #000000"> </span><span style="color: #FF0000">type</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;text&quot;</span><span style="color: #000000"> </span><span style="color: #FF0000">value</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;&quot;</span><span style="color: #000000"> </span><span style="color: #800000">/&gt;&lt;/label&gt;&lt;br</span><span style="color: #000000"> </span><span style="color: #800000">/&gt;</span>
+<span style="color: #000000">  </span><span style="color: #800000">&lt;label</span>
+<span style="color: #000000">    </span><span style="color: #800000">&gt;</span><span style="color: #000000">Theme:</span>
+<span style="color: #000000">    </span><span style="color: #800000">&lt;fieldset&gt;</span>
+<span style="color: #000000">      </span><span style="color: #800000">&lt;label&gt;</span>
+<span style="color: #000000">        </span><span style="color: #800000">&lt;input</span><span style="color: #000000"> </span><span style="color: #FF0000">name</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;theme&quot;</span><span style="color: #000000"> </span><span style="color: #FF0000">type</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;radio&quot;</span><span style="color: #000000"> </span><span style="color: #FF0000">value</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;default&quot;</span><span style="color: #000000"> </span><span style="color: #800000">/&gt;</span><span style="color: #000000"> Standard </span><span style="color: #800000">&lt;/label</span>
+<span style="color: #000000">      </span><span style="color: #800000">&gt;&lt;br</span><span style="color: #000000"> </span><span style="color: #800000">/&gt;</span>
+<span style="color: #000000">      </span><span style="color: #800000">&lt;label&gt;</span><span style="color: #000000"> </span><span style="color: #800000">&lt;input</span><span style="color: #000000"> </span><span style="color: #FF0000">name</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;theme&quot;</span><span style="color: #000000"> </span><span style="color: #FF0000">type</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;radio&quot;</span><span style="color: #000000"> </span><span style="color: #FF0000">value</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;light&quot;</span><span style="color: #000000"> </span><span style="color: #800000">/&gt;</span><span style="color: #000000"> Light </span><span style="color: #800000">&lt;/label</span>
+<span style="color: #000000">      </span><span style="color: #800000">&gt;&lt;br</span><span style="color: #000000"> </span><span style="color: #800000">/&gt;</span>
+<span style="color: #000000">      </span><span style="color: #800000">&lt;label&gt;</span><span style="color: #000000"> </span><span style="color: #800000">&lt;input</span><span style="color: #000000"> </span><span style="color: #FF0000">name</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;theme&quot;</span><span style="color: #000000"> </span><span style="color: #FF0000">type</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;radio&quot;</span><span style="color: #000000"> </span><span style="color: #FF0000">value</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;dark&quot;</span><span style="color: #000000"> </span><span style="color: #800000">/&gt;</span><span style="color: #000000"> Dark </span><span style="color: #800000">&lt;/label&gt;</span>
+<span style="color: #000000">    </span><span style="color: #800000">&lt;/fieldset&gt;</span>
+<span style="color: #000000">  </span><span style="color: #800000">&lt;/label&gt;</span>
+<span style="color: #000000">  </span><span style="color: #800000">&lt;button</span><span style="color: #000000"> </span><span style="color: #FF0000">type</span><span style="color: #000000">=</span><span style="color: #0000FF">&quot;Submit&quot;</span><span style="color: #800000">&gt;</span><span style="color: #000000">Submit</span><span style="color: #800000">&lt;/button&gt;</span>
+<span style="color: #800000">&lt;/form&gt;</span>
+</code></pre>
+				<p>Note also that only fields are synchronized, that already existed in the storage
+					data. Use the <code>addNew</code> option if <em>all</em> form fields should be evaluated and create
+				new properties in the store object:</p>
+				<pre><code class="language-js"><span style="color: #001080">settingsStore</span><span style="color: #000000">.</span><span style="color: #795E26">readFromForm</span><span style="color: #000000">(</span><span style="color: #0000FF">this</span><span style="color: #000000">, {</span>
+<span style="color: #000000">  </span><span style="color: #001080">addNew:</span><span style="color: #000000"> </span><span style="color: #0000FF">true</span><span style="color: #000000">,</span>
+<span style="color: #000000">});</span>
+</code></pre>
+				<a href="#pros-and-cons" id="pros-and-cons" style="color: inherit; text-decoration: none;">
+					<h2>Pros and Cons</h2>
+				</a>
+				<ul>
+					<li><p>Any <code>PersistentObject</code> instance is stored as one monolythic JSON string.<br>
+							<em>Persisto</em> deferres and collates these updates, but modifying a single
+							property of a large data object still comes with some overhead.<br>
+							Splitting data into several <code>PersistentObject</code>s may remedy the problem.<br>
+							But if your data model is more like a table with hundredth&#39;s of rows, a
+						responsive database backend may be a better choice.</p>
+					</li>
+					<li><p>Asynchronous operations bear the risk of potential conflicts.
+						There is currently no builtin support for resolving those.</p>
+					</li>
+				</ul>
+				<a href="#howtos" id="howtos" style="color: inherit; text-decoration: none;">
+					<h1>HOWTOs</h1>
+				</a>
+				<a href="#storing-arrays" id="storing-arrays" style="color: inherit; text-decoration: none;">
+					<h3>Storing Arrays</h3>
+				</a>
+				<p>Arrays are only a special form of plain JavaScript objects, so we can store and
+				access them as top level type like this:</p>
+				<pre><code class="language-js"><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #001080">mar10</span><span style="color: #000000">.</span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
+<span style="color: #000000">  </span><span style="color: #001080">defaults:</span><span style="color: #000000"> [</span><span style="color: #A31515">&quot;a&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;b&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;c&quot;</span><span style="color: #000000">],</span>
+<span style="color: #000000">});</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;[0]&quot;</span><span style="color: #000000">); </span><span style="color: #008000">// &#039;a&#039;</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">set</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;[1]&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;b2&quot;</span><span style="color: #000000">);</span>
+</code></pre>
+				<p>However if we use child properties, it is even easier:</p>
+				<pre><code class="language-js"><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #001080">mar10</span><span style="color: #000000">.</span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
+<span style="color: #000000">        </span><span style="color: #001080">defaults:</span><span style="color: #000000"> {</span>
+<span style="color: #000000">          </span><span style="color: #001080">values:</span><span style="color: #000000"> [</span><span style="color: #A31515">&quot;a&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;b&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;c&quot;</span><span style="color: #000000">]</span>
+<span style="color: #000000">        }</span>
+<span style="color: #000000">      });</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;values&quot;</span><span style="color: #000000">)[</span><span style="color: #098658">0</span><span style="color: #000000">];  </span><span style="color: #008000">// &#039;a&#039;</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;values[0]&quot;</span><span style="color: #000000">);  </span><span style="color: #008000">// &#039;a&#039;</span>
+<span style="color: #0070C1">S</span><span style="color: #000000">.</span><span style="color: #795E26">each</span><span style="color: #000000">(</span><span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">get</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;values&quot;</span><span style="color: #000000">), </span><span style="color: #0000FF">function</span><span style="color: #000000">(</span><span style="color: #001080">idx</span><span style="color: #000000">, </span><span style="color: #001080">obj</span><span style="color: #000000">) { ... });</span>
+
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">set</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;values[1]&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;b2&quot;</span><span style="color: #000000">);</span>
+</code></pre>
+				<a href="#performance-and-direct-access" id="performance-and-direct-access" style="color: inherit; text-decoration: none;">
+					<h3>Performance and Direct Access</h3>
+				</a>
+				<p>In general, performance costs of <code>set()</code> and <code>get()</code> calls should be
+					neglectable, compared to the resulting synchronization times, but in some cases
+					direct access of the internal data object may be preferred.<br>
+				In this case modifications must be signalled by a call to <code>setDirty()</code>.</p>
+				<pre><code class="language-js"><span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #001080">_data</span><span style="color: #000000">.</span><span style="color: #001080">owner</span><span style="color: #000000"> = { </span><span style="color: #001080">name:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;joe&quot;</span><span style="color: #000000">, </span><span style="color: #001080">age:</span><span style="color: #000000"> </span><span style="color: #098658">42</span><span style="color: #000000"> };</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #001080">_data</span><span style="color: #000000">.</span><span style="color: #001080">owner</span><span style="color: #000000">.</span><span style="color: #001080">role</span><span style="color: #000000"> = </span><span style="color: #A31515">&quot;manager&quot;</span><span style="color: #000000">;</span>
+<span style="color: #0000FF">delete</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #001080">_data</span><span style="color: #000000">.</span><span style="color: #001080">owner</span><span style="color: #000000">.</span><span style="color: #001080">age</span><span style="color: #000000">;</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">setDirty</span><span style="color: #000000">(); </span><span style="color: #008000">// schedule a commit</span>
+</code></pre>
+				<a href="#asynchronous-operation" id="asynchronous-operation" style="color: inherit; text-decoration: none;">
+					<h3>Asynchronous Operation</h3>
+				</a>
+				<p>By default, changed values will be commited to webStorage after a small delay
+					(see <code>.commitDelay</code> option). This allows to collate sequences of multiple changes
+				into one single write command.</p>
+				<p>However there are situations, where this is not desirable:</p>
+				<pre><code class="language-js"><span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">set</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;foo&quot;</span><span style="color: #000000">, </span><span style="color: #A31515">&quot;bar&quot;</span><span style="color: #000000">);</span>
+
+<span style="color: #008000">// Page reload would prevent the delayed commit from happen, so we force</span>
+<span style="color: #008000">// synchronization:</span>
+<span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #795E26">commit</span><span style="color: #000000">();</span>
+
+<span style="color: #001080">location</span><span style="color: #000000">.</span><span style="color: #795E26">reload</span><span style="color: #000000">();</span>
+</code></pre>
+				<p>An alternative would be to disable delay completely by setting <code>commitDelay: 0</code>.</p>
+				<a href="#synchronize-with-remote-endpoints" id="synchronize-with-remote-endpoints" style="color: inherit; text-decoration: none;">
+					<h3>Synchronize with Remote Endpoints</h3>
+				</a>
+				<p>Optionally, we may specify an endpoint URL that is used to synchronize the data
+				with a web server using HTTP REST requests (GET and PUT):</p>
+				<pre><code class="language-js"><span style="color: #008000">// Wait fpr page beeing loaded...</span>
+<span style="color: #001080">document</span><span style="color: #000000">.</span><span style="color: #795E26">addEventListener</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;DOMContentLoaded&quot;</span><span style="color: #000000">, </span><span style="color: #0000FF">function</span><span style="color: #000000"> (</span><span style="color: #001080">event</span><span style="color: #000000">) {</span>
+<span style="color: #000000">  </span><span style="color: #0000FF">let</span><span style="color: #000000"> </span><span style="color: #001080">store</span><span style="color: #000000"> = </span><span style="color: #0000FF">new</span><span style="color: #000000"> </span><span style="color: #001080">mar10</span><span style="color: #000000">.</span><span style="color: #795E26">PersistentObject</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;mySettings&quot;</span><span style="color: #000000">, {</span>
+<span style="color: #000000">    </span><span style="color: #001080">remote:</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;persist/settings&quot;</span><span style="color: #000000">,</span>
+<span style="color: #000000">  });</span>
+
+<span style="color: #000000">  </span><span style="color: #001080">store</span><span style="color: #000000">.</span><span style="color: #001080">ready</span>
+<span style="color: #000000">    .</span><span style="color: #795E26">then</span><span style="color: #000000">(</span><span style="color: #0000FF">function</span><span style="color: #000000"> (</span><span style="color: #001080">value</span><span style="color: #000000">) {</span>
+<span style="color: #000000">      </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">log</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;PersistentStore is initialized and has pulled data.&quot;</span><span style="color: #000000">);</span>
+<span style="color: #000000">    })</span>
+<span style="color: #000000">    .</span><span style="color: #795E26">catch</span><span style="color: #000000">(</span><span style="color: #0000FF">function</span><span style="color: #000000"> (</span><span style="color: #001080">reason</span><span style="color: #000000">) {</span>
+<span style="color: #000000">      </span><span style="color: #001080">console</span><span style="color: #000000">.</span><span style="color: #795E26">error</span><span style="color: #000000">(</span><span style="color: #A31515">&quot;Error loading persistent objects&quot;</span><span style="color: #000000">, </span><span style="color: #0000FF">arguments</span><span style="color: #000000">);</span>
+<span style="color: #000000">    });</span>
+<span style="color: #000000">});</span>
+</code></pre>
+				<a href="#api-reference" id="api-reference" style="color: inherit; text-decoration: none;">
+					<h1>API Reference</h1>
+				</a>
+				<a href="#options-and-events" id="options-and-events" style="color: inherit; text-decoration: none;">
+					<h3>Options and Events</h3>
+				</a>
+				<p>The following options are available:</p>
+				<p><a href="http://mar10.github.io/persisto/interfaces/persisto_options.persistooptions.html">http://mar10.github.io/persisto/interfaces/persisto_options.persistooptions.html</a></p>
+				<a href="#methods" id="methods" style="color: inherit; text-decoration: none;">
+					<h3>Methods</h3>
+				</a>
+				<p>Following a list of available methods:</p>
+				<p><a href="http://mar10.github.io/persisto/classes/persisto.persistentobject.html">http://mar10.github.io/persisto/classes/persisto.persistentobject.html</a></p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class=" ">
+						<a href="modules.html">Modules</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/persisto.html">persisto</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/persisto_options.html">persisto_<wbr>options</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
