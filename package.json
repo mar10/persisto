@@ -103,7 +103,7 @@
     "watch:umd": "nodemon --watch src --ext 'ts' -x \"npm run build:minjs:umd\"",
     "watch": "nodemon",
     "serve": "http-server test",
-    "dev": "concurrently 'http-server -p 8080 -o test/' 'nodemon'"
+    "dev": "concurrently 'http-server -p 8080 --cors -o test/' 'nodemon'"
   },
   "npmName": "persisto",
   "npmFileMap": [

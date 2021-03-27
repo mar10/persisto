@@ -1,0 +1,52 @@
+# WsgiDAV configuration file
+#
+# 1. Rename this file to `wsgidav.yaml`
+# 2. Adjust settings as appropriate
+# 3. Run `wsgidav` from the same directory or pass file name with `--config` option.
+#
+# See http://wsgidav.readthedocs.io/en/latest/user_guide_configure.html
+
+host: 127.0.0.1
+port: 8081
+
+# Add custom response headers (list of header-name / header-value tuples):
+response_headers:
+    # Allow out `yarn dev` testserver to do CORS
+    - ["Access-Control-Allow-Origin", "*"]
+
+# Set verbosity level
+verbose: 3
+
+error_printer:
+    catch_all: true
+
+# File system providers
+provider_mapping:
+    "/": "."
+
+    # Access control per share, used by the domaincontroller.
+# These routes must match the provider mapping.
+# Provider routes without a matching entry here, are open for anonymous access!
+
+
+simple_dc:
+    user_mapping:
+        "*": true
+        # "/prj":
+        #     "user1":
+        #         password: "abc123"
+
+# Remove this block to prevent directory browsing
+dir_browser:
+    # enable: false
+    icon: true
+    show_user: true
+    show_logout: true
+    response_trailer: true
+    davmount: true
+    ms_mount: true
+    ms_sharepoint_support: true
+    ignore:
+        - .DS_Store  # macOS
+        - ._*  # macOS
+

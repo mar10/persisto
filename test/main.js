@@ -3,7 +3,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
     store: sessionStorage,
     attachForm: "#form1",
     statusElement: "span.persisto-status",
-    // remote: "https://google.com",
+    // Local test with `wsgidav --config test/wsgidav.yaml`
+    // Then launch `http://127.0.0.1:8081/test/index.html`
+    remote: "http://127.0.0.1:8081/test/fixtures/store.json",
     debugLevel: 2,
     defaults: {
       title: "foo",
