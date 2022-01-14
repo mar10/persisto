@@ -1,7 +1,7 @@
 # persisto
 
 [![GitHub version](https://img.shields.io/github/release/mar10/persisto.svg)](https://github.com/mar10/persisto/releases/latest)
-[![Build Status](https://travis-ci.org/mar10/persisto.svg?branch=master)](https://travis-ci.org/mar10/persisto)
+[![Build Status](https://travis-ci.org/mar10/persisto.svg?branch=master)](https://travis-ci.org/github/mar10/persisto)
 [![npm](https://img.shields.io/npm/dm/persisto.svg)](https://www.npmjs.com/package/persisto)
 [![jsDelivr](https://data.jsdelivr.com/v1/package/npm/persisto/badge)](https://www.jsdelivr.com/package/npm/persisto)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
